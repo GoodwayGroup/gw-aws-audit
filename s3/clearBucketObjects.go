@@ -7,11 +7,38 @@ import (
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/tcnksm/go-input"
+	"os"
 	"sync"
 	"sync/atomic"
 )
 
 func ClearBucketObjects(bucketName string) {
+	ui := &input.UI{
+		Writer: os.Stdout,
+		Reader: os.Stdin,
+	}
+
+	fmt.Println("-- WARNING -- PAY ATTENTION -- FOR REALS --")
+	fmt.Printf("This will delete ALL objects in %s\n", bucketName)
+	fmt.Println("-- THIS ACTION IS NOT REVERSIBLE --")
+	query := fmt.Sprintf("Are you SUPER sure? [%s]", bucketName)
+	name, inputErr := ui.Ask(query, &input.Options{
+		Required: true,
+		// Validate input
+		ValidateFunc: func(s string) error {
+			if s != bucketName {
+				return fmt.Errorf("Input must be %s to coninue. Exiting.", bucketName)
+			}
+
+			return nil
+		},
+	})
+	if inputErr != nil {
+		panic(inputErr)
+	}
+	fmt.Printf("Proceeding with batch delete for bucket: %s\n", bucketName)
+
 	var pageNum int64
 	var listed int64
 	var deleted int64
