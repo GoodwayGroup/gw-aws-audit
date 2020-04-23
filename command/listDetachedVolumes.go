@@ -5,6 +5,7 @@ import (
 
 	"github.com/yitsushi/go-commander"
 )
+
 type ListDetachedVolumesCommand struct {
 }
 

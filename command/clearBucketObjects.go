@@ -4,6 +4,7 @@ import (
 	"github.com/GoodwayGroup/gw-aws-audit/s3"
 	"github.com/yitsushi/go-commander"
 )
+
 type ClearBucketObjectsCommand struct {
 }
 
@@ -22,10 +23,10 @@ func NewClearBucketObjectsCommand(appName string) *commander.CommandWrapper {
 		Handler: &ClearBucketObjectsCommand{},
 		Help: &commander.CommandDescriptor{
 			Name:             "s3-clear-bucket",
-			ShortDescription: "Add s3-cost-name tag to all buckets",
-			Arguments: "<bucket>",
+			ShortDescription: "Clear ALL objects from a Bucket",
+			Arguments:        "<bucket>",
 			Examples: []string{
-				"gw-crs-assets-log",
+				"athena-results-ASDF1337",
 			},
 		},
 	}

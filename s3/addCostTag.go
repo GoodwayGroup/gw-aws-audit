@@ -52,7 +52,7 @@ func AddCostTag() {
 	}
 
 	wg.Wait()
-	fmt.Printf("Bucket tagging complete. Buckets: %d Processed: %d Updated: %d Skipped %d", numBuckets, metrics.Processed, metrics.Modified, metrics.Skipped)
+	fmt.Printf("Bucket tagging complete. Buckets: %d Processed: %d Updated: %d Skipped %d\n", numBuckets, metrics.Processed, metrics.Modified, metrics.Skipped)
 }
 
 func processBucket(s3svc *s3.S3, bucketName *string) (details map[string]int) {

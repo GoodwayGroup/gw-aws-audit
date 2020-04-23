@@ -37,7 +37,7 @@ func ListDetachedVolumes() {
 			if aws.StringValue(volume.VolumeType) == "gp2" {
 				costs = int(aws.Int64Value(volumes.Volumes[0].Size))
 			} else {
-				costs = int(10 * float32(aws.Int64Value(volumes.Volumes[0].Size)) / 2) + int(float32(aws.Int64Value(volumes.Volumes[0].Iops)) * 0.65)
+				costs = int(10*float32(aws.Int64Value(volumes.Volumes[0].Size))/2) + int(float32(aws.Int64Value(volumes.Volumes[0].Iops))*0.65)
 			}
 			metrics.Add("VolumeCosts", costs)
 
@@ -61,7 +61,7 @@ func ListDetachedVolumes() {
 			if numSnaps > 0 {
 				metrics.Add("SumSnapshotSize", int(aws.Int64Value(volumes.Volumes[0].Size)))
 			}
-			fmt.Printf("volume: %s size: %d snaps: %d costs: %.2f\n", aws.StringValue(volume.VolumeId), aws.Int64Value(volumes.Volumes[0].Size), numSnaps, float32(costs) / 10)
+			fmt.Printf("volume: %s size: %d snaps: %d costs: %.2f\n", aws.StringValue(volume.VolumeId), aws.Int64Value(volumes.Volumes[0].Size), numSnaps, float32(costs)/10)
 		}
 	}
 
@@ -72,7 +72,7 @@ func ListDetachedVolumes() {
 
 	fmt.Printf("\nVolumes found: %d\n", metrics.Value("Volumes"))
 	fmt.Printf("Total volume size (GB): %d\n", metrics.Value("SumVolumeSize"))
-	fmt.Printf("Total volume costs: %.2f\n\n", float32(metrics.Value("VolumeCosts")) / 10)
+	fmt.Printf("Total volume costs: %.2f\n\n", float32(metrics.Value("VolumeCosts"))/10)
 	fmt.Printf("Snapshots found: %d\n", metrics.Value("Snapshots"))
 	fmt.Printf("Minimum snapshot size (GB): %d\n", metrics.Value("SumSnapshotSize"))
 }

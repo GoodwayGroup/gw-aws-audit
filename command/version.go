@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/yitsushi/go-commander"
 	"github.com/GoodwayGroup/gw-aws-audit/info"
+	"github.com/yitsushi/go-commander"
 )
 
 // Version structure is the representation of the Version command

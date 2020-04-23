@@ -1,6 +1,5 @@
 package main
 
-// Import the package
 import (
 	"github.com/GoodwayGroup/gw-aws-audit/command"
 	"github.com/yitsushi/go-commander"
@@ -13,7 +12,6 @@ func registerCommands(registry *commander.CommandRegistry) {
 	registry.Register(command.NewListDetachedVolumesCommand)
 	registry.Register(command.NewAddCostTagCommand)
 	registry.Register(command.NewClearBucketObjectsCommand)
-	registry.Register(command.NewBatchDeleteObjectsCommand)
 }
 
 // Main Section

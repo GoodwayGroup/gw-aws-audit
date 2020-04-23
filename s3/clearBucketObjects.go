@@ -34,14 +34,14 @@ func ClearBucketObjects(bucketName string) {
 
 					var objects []*s3.ObjectIdentifier
 					for _, obj := range page.Contents {
-						objects = append(objects, &s3.ObjectIdentifier{ Key: obj.Key })
+						objects = append(objects, &s3.ObjectIdentifier{Key: obj.Key})
 					}
 
 					delInput := s3.DeleteObjectsInput{
 						Bucket: &bucketName,
 						Delete: &s3.Delete{
 							Objects: objects,
-							Quiet: aws.Bool(true),
+							Quiet:   aws.Bool(true),
 						},
 					}
 
@@ -81,4 +81,3 @@ func handleListObjectResponse(err error) (hasTags bool) {
 		return true
 	}
 }
-

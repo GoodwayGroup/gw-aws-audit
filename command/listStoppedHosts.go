@@ -1,9 +1,10 @@
 package command
 
 import (
-	"github.com/yitsushi/go-commander"
 	"github.com/GoodwayGroup/gw-aws-audit/ec2"
+	"github.com/yitsushi/go-commander"
 )
+
 type ListStoppedHostsCommand struct {
 }
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/yitsushi/go-commander"
 )
+
 type AddCostTagCommand struct {
 }
 
@@ -19,7 +20,7 @@ func NewAddCostTagCommand(appName string) *commander.CommandWrapper {
 		Handler: &AddCostTagCommand{},
 		Help: &commander.CommandDescriptor{
 			Name:             "s3-add-cost-tag",
-			ShortDescription: "Add s3-cost-name tag to all buckets",
+			ShortDescription: "Add 's3-cost-name' tag to all buckets",
 		},
 	}
 }
