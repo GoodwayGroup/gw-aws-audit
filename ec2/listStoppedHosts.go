@@ -1,4 +1,4 @@
-package main
+package ec2
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
-func main() {
+func ListStoppedHosts() {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(endpoints.UsEast1RegionID),
 	}))

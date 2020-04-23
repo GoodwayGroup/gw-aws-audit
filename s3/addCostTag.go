@@ -1,4 +1,4 @@
-package main
+package s3
 
 import (
 	"fmt"
@@ -14,8 +14,7 @@ import (
 	"sync/atomic"
 )
 
-func main() {
-	var ops uint64
+func AddCostTag() {
 	var wg sync.WaitGroup
 	metrics := lib.Metrics{}
 
@@ -37,7 +36,6 @@ func main() {
 		wg.Add(1)
 		go func(bucketName *string) {
 			details := processBucket(s3svc, bucketName)
-			atomic.AddUint64(&ops, 1)
 			for key, _ := range details {
 				switch key {
 				case "Processed":
@@ -144,4 +142,3 @@ func handleGetTagsResponse(err error) (hasTags bool) {
 		return true
 	}
 }
-
