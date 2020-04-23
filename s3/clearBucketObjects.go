@@ -23,7 +23,7 @@ func ClearBucketObjects(bucketName string) {
 	fmt.Printf("This will delete ALL objects in %s\n", bucketName)
 	fmt.Println("-- THIS ACTION IS NOT REVERSIBLE --")
 	query := fmt.Sprintf("Are you SUPER sure? [%s]", bucketName)
-	name, inputErr := ui.Ask(query, &input.Options{
+	_, inputErr := ui.Ask(query, &input.Options{
 		Required: true,
 		// Validate input
 		ValidateFunc: func(s string) error {
