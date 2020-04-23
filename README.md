@@ -3,7 +3,7 @@
 
 ## Basic Usage
 
-Use in place of `ansible-vault`. All commands are reimplemented. The tool will default to asking for your Vault password.
+Useful for clearing large S3 buckets, identifying egress EBS volumes and tracking S3 spend.
 
 ```
 $ gw-aws-audit 
@@ -26,7 +26,7 @@ Examples:
 ## Installation
 
 ```
-$ curl https://i.jpillora.com/GoodwayGroup/gwvault! | bash
+$ curl https://i.jpillora.com/GoodwayGroup/gw-aws-audit! | bash
 ```
 
 ## Built With
