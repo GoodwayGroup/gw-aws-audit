@@ -7,10 +7,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/cenkalti/backoff/v4"
+	"github.com/remeh/sizedwaitgroup"
 	"github.com/tcnksm/go-input"
 	"os"
-	"sync"
 	"sync/atomic"
+	"time"
 )
 
 func ClearBucketObjects(bucketName string) {
@@ -42,7 +44,9 @@ func ClearBucketObjects(bucketName string) {
 	var pageNum int64
 	var listed int64
 	var deleted int64
-	var wg sync.WaitGroup
+	var retries int64
+	swg := sizedwaitgroup.New(20)
+	startTime := time.Now()
 
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(endpoints.UsEast1RegionID),
@@ -54,57 +58,61 @@ func ClearBucketObjects(bucketName string) {
 		MaxKeys: aws.Int64(1000),
 	},
 		func(page *s3.ListObjectsV2Output, lastPage bool) bool {
+			atomic.AddInt64(&listed, int64(len(page.Contents)))
 			if len(page.Contents) > 0 {
-				wg.Add(1)
 				go func() {
-					atomic.AddInt64(&listed, int64(len(page.Contents)))
+					backoff.Retry(func() error {
+						defer swg.Done()
 
-					var objects []*s3.ObjectIdentifier
-					for _, obj := range page.Contents {
-						objects = append(objects, &s3.ObjectIdentifier{Key: obj.Key})
-					}
+						var objects []*s3.ObjectIdentifier
+						for _, obj := range page.Contents {
+							objects = append(objects, &s3.ObjectIdentifier{Key: obj.Key})
+						}
 
-					delInput := s3.DeleteObjectsInput{
-						Bucket: &bucketName,
-						Delete: &s3.Delete{
-							Objects: objects,
-							Quiet:   aws.Bool(true),
-						},
-					}
+						delInput := s3.DeleteObjectsInput{
+							Bucket: &bucketName,
+							Delete: &s3.Delete{
+								Objects: objects,
+								Quiet:   aws.Bool(true),
+							},
+						}
 
-					_, err := s3svc.DeleteObjects(&delInput)
-					handleListObjectResponse(err)
-					atomic.AddInt64(&deleted, int64(len(page.Contents)))
-					wg.Done()
+						_, err := s3svc.DeleteObjects(&delInput)
+						hasError := handleResponse(err, &retries)
+						if hasError {
+							return err
+						}
+						atomic.AddInt64(&deleted, int64(len(page.Contents)))
+						return nil
+					}, backoff.NewExponentialBackOff())
 				}()
+
+				swg.Add()
 				atomic.AddInt64(&pageNum, 1)
-				fmt.Printf("Page: %d Objects: %d Listed: %d Deleted: %d\n", pageNum, len(page.Contents), listed, deleted)
+				dps := float64(deleted) / time.Since(startTime).Seconds()
+				fmt.Printf("\rPages: %d Listed: %d Deleted: %d Retries: %d DPS: %.2f", pageNum, listed, deleted, retries, dps)
 			}
 			return !lastPage
 		})
 
-	wg.Wait()
+	swg.Wait()
 
-	handleListObjectResponse(err)
+	handleResponse(err, &retries)
 	fmt.Println("Process complete.")
-	fmt.Printf("Pages: %d Objects: %d Deleted: %d\n", pageNum, listed, deleted)
+	fmt.Printf("Pages: %d Listed: %d Deleted: %d Retries: %d DPS: %.2f", pageNum, listed, deleted, retries, float64(deleted)/time.Since(startTime).Seconds())
 }
 
-func handleListObjectResponse(err error) (hasTags bool) {
+func handleResponse(err error, retries *int64) (hasError bool) {
 	if err != nil {
-		if awsErr, ok := err.(awserr.Error); ok {
-			if awsErr.Code() == "NoSuchTagSet" {
-				return false
-			} else {
-				// Get error details
-				// fmt.Printf("Error for bucket %s", aws.StringValue(bucketName))
-				// fmt.Println("Error:", awsErr.Code(), awsErr.Message())
-				return false
-			}
+		if _, ok := err.(awserr.Error); ok {
+			// Get error details
+			// fmt.Printf("\nError Code: %s Message: %s\nRetrying...\n", awsErr.Code(), awsErr.Message())
+			atomic.AddInt64(retries, 1)
+			return true
 		} else {
 			panic(err)
 		}
 	} else {
-		return true
+		return false
 	}
 }

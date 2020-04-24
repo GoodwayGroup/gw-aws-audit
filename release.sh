@@ -3,8 +3,8 @@
 VERSION=${1}
 
 if [ "x${VERSION}x" = "xx" ]; then
-    echo "Must supply version number as first argument"
-    exit 1
+  echo "Must supply version number as first argument"
+  exit 1
 fi
 
 echo "Updating CHANGELOG.md"
