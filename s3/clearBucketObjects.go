@@ -45,7 +45,7 @@ func ClearBucketObjects(bucketName string) {
 	var listed int64
 	var deleted int64
 	var retries int64
-	swg := sizedwaitgroup.New(3)
+	swg := sizedwaitgroup.New(15)
 	startTime := time.Now()
 
 	sess := session.Must(session.NewSession(&aws.Config{
@@ -61,9 +61,8 @@ func ClearBucketObjects(bucketName string) {
 			atomic.AddInt64(&listed, int64(len(page.Contents)))
 			if len(page.Contents) > 0 {
 				go func() {
+					defer swg.Done()
 					backoff.Retry(func() error {
-						defer swg.Done()
-
 						var objects []*s3.ObjectIdentifier
 						for _, obj := range page.Contents {
 							objects = append(objects, &s3.ObjectIdentifier{Key: obj.Key})
