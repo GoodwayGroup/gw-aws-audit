@@ -45,7 +45,7 @@ func ClearBucketObjects(bucketName string) {
 	var listed int64
 	var deleted int64
 	var retries int64
-	swg := sizedwaitgroup.New(10)
+	swg := sizedwaitgroup.New(3)
 	startTime := time.Now()
 
 	sess := session.Must(session.NewSession(&aws.Config{
@@ -80,6 +80,8 @@ func ClearBucketObjects(bucketName string) {
 						_, err := s3svc.DeleteObjects(&delInput)
 						hasError := handleResponse(err, &retries)
 						if hasError {
+							dps := float64(deleted) / time.Since(startTime).Seconds()
+							fmt.Printf("\rPages: %d Listed: %d Deleted: %d Retries: %d DPS: %.2f", pageNum, listed, deleted, retries, dps)
 							return err
 						}
 						atomic.AddInt64(&deleted, int64(len(page.Contents)))
@@ -99,7 +101,8 @@ func ClearBucketObjects(bucketName string) {
 
 	handleResponse(err, &retries)
 	fmt.Println("Process complete.")
-	fmt.Printf("Pages: %d Listed: %d Deleted: %d Retries: %d DPS: %.2f", pageNum, listed, deleted, retries, float64(deleted)/time.Since(startTime).Seconds())
+	dps := float64(deleted)/time.Since(startTime).Seconds()
+	fmt.Printf("Pages: %d Listed: %d Deleted: %d Retries: %d DPS: %.2f", pageNum, listed, deleted, retries, dps)
 }
 
 func handleResponse(err error, retries *int64) (hasError bool) {
