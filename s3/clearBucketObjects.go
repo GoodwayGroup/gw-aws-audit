@@ -45,7 +45,7 @@ func ClearBucketObjects(bucketName string) {
 	var listed int64
 	var deleted int64
 	var retries int64
-	swg := sizedwaitgroup.New(20)
+	swg := sizedwaitgroup.New(10)
 	startTime := time.Now()
 
 	sess := session.Must(session.NewSession(&aws.Config{
