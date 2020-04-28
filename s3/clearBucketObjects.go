@@ -100,7 +100,7 @@ func ClearBucketObjects(bucketName string) {
 
 	handleResponse(err, &retries)
 	fmt.Println("Process complete.")
-	dps := float64(deleted)/time.Since(startTime).Seconds()
+	dps := float64(deleted) / time.Since(startTime).Seconds()
 	fmt.Printf("Pages: %d Listed: %d Deleted: %d Retries: %d DPS: %.2f", pageNum, listed, deleted, retries, dps)
 }
 

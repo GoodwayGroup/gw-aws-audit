@@ -12,6 +12,7 @@ func registerCommands(registry *commander.CommandRegistry) {
 	registry.Register(command.NewListDetachedVolumesCommand)
 	registry.Register(command.NewAddCostTagCommand)
 	registry.Register(command.NewClearBucketObjectsCommand)
+	registry.Register(command.NewGetBucketMetricsCommand)
 }
 
 // Main Section
