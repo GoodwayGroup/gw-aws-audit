@@ -2,11 +2,12 @@ package ec2
 
 import (
 	"fmt"
-	"github.com/GoodwayGroup/gw-aws-audit/lib"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/jedib0t/go-pretty/table"
+	"os"
 )
 
 func ListDetachedVolumes() {
@@ -15,14 +16,27 @@ func ListDetachedVolumes() {
 	}))
 	client := ec2.New(sess)
 
-	metrics := lib.SafeCounter{}
-
 	results, err := client.DescribeVolumes(&ec2.DescribeVolumesInput{})
 
-	fmt.Println("Detached Volumes")
+	if err != nil {
+		fmt.Println("Failed to list instances", err)
+		return
+	}
+
+	var volCnt int64
+	var volumeSize int64
+	var volumeCosts int64
+	var snapCnt int64
+	var snapSize int64
+
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.SetStyle(table.StyleColoredDark)
+	t.AppendHeader(table.Row{"", "Volume", "Size (GB)", "Snapshots", "min Size (GB)", "Costs"})
+
 	for _, volume := range results.Volumes {
 		if len(volume.Attachments) <= 0 {
-			metrics.Inc("Volumes")
+			volCnt++
 			volParams := &ec2.DescribeVolumesInput{
 				VolumeIds: []*string{volume.VolumeId},
 			}
@@ -31,15 +45,15 @@ func ListDetachedVolumes() {
 				fmt.Println("Failed to list volumes", err2)
 				return
 			}
-			metrics.Add("SumVolumeSize", int(aws.Int64Value(volumes.Volumes[0].Size)))
+			volumeSize += aws.Int64Value(volumes.Volumes[0].Size)
 
-			var costs int
+			var costs int64
 			if aws.StringValue(volume.VolumeType) == "gp2" {
-				costs = int(aws.Int64Value(volumes.Volumes[0].Size))
+				costs = aws.Int64Value(volumes.Volumes[0].Size)
 			} else {
-				costs = int(10*float32(aws.Int64Value(volumes.Volumes[0].Size))/2) + int(float32(aws.Int64Value(volumes.Volumes[0].Iops))*0.65)
+				costs = int64(10*float32(aws.Int64Value(volumes.Volumes[0].Size))/2) + int64(float32(aws.Int64Value(volumes.Volumes[0].Iops))*0.65)
 			}
-			metrics.Add("VolumeCosts", costs)
+			volumeCosts += costs
 
 			snapParams := &ec2.DescribeSnapshotsInput{
 				Filters: []*ec2.Filter{
@@ -57,22 +71,32 @@ func ListDetachedVolumes() {
 				return
 			}
 			numSnaps := len(snapshots.Snapshots)
-			metrics.Add("Snapshots", numSnaps)
+			snapCnt += int64(numSnaps)
+
+			var lsnap int64
 			if numSnaps > 0 {
-				metrics.Add("SumSnapshotSize", int(aws.Int64Value(volumes.Volumes[0].Size)))
+				snapSize += aws.Int64Value(volumes.Volumes[0].Size)
+				lsnap = aws.Int64Value(volumes.Volumes[0].Size)
 			}
-			fmt.Printf("volume: %s size: %d snaps: %d costs: %.2f\n", aws.StringValue(volume.VolumeId), aws.Int64Value(volumes.Volumes[0].Size), numSnaps, float32(costs)/10)
+
+			t.AppendRow([]interface{}{
+				"",
+				aws.StringValue(volume.VolumeId),
+				aws.Int64Value(volumes.Volumes[0].Size),
+				numSnaps,
+				lsnap,
+				fmt.Sprintf("$%.2f", float32(costs)/10),
+			})
 		}
 	}
 
-	if err != nil {
-		fmt.Println("Failed to list instances", err)
-		return
-	}
-
-	fmt.Printf("\nVolumes found: %d\n", metrics.Value("Volumes"))
-	fmt.Printf("Total volume size (GB): %d\n", metrics.Value("SumVolumeSize"))
-	fmt.Printf("Total volume costs: %.2f\n\n", float32(metrics.Value("VolumeCosts"))/10)
-	fmt.Printf("Snapshots found: %d\n", metrics.Value("Snapshots"))
-	fmt.Printf("Minimum snapshot size (GB): %d\n", metrics.Value("SumSnapshotSize"))
+	t.AppendFooter(table.Row{
+		"TOTALS",
+		fmt.Sprintf("%d Volumes", volCnt),
+		fmt.Sprintf("%d GB", volumeSize),
+		snapCnt,
+		fmt.Sprintf("%d GB", snapSize),
+		fmt.Sprintf("$%.2f", float32(volumeCosts)/10),
+	})
+	t.Render()
 }

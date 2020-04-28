@@ -6,10 +6,9 @@ require (
 	github.com/aws/aws-sdk-go v1.30.11
 	github.com/cenkalti/backoff/v4 v4.0.2
 	github.com/cheggaaa/pb/v3 v3.0.4
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/hashicorp/go-version v1.2.0 // indirect
+	github.com/go-openapi/strfmt v0.19.5 // indirect
+	github.com/jedib0t/go-pretty v4.3.0+incompatible
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/mitchellh/gox v1.0.1 // indirect
 	github.com/remeh/sizedwaitgroup v1.0.0
 	github.com/tcnksm/go-input v0.0.0-20180404061846-548a7d7a8ee8
 	github.com/thoas/go-funk v0.6.0
