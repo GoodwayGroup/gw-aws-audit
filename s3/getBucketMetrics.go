@@ -39,7 +39,7 @@ func GetBucketMetrics() {
 	// create and start new bar
 	numBuckets := len(result.Buckets)
 
-	fmt.Println("Bucket,Objects,Size (Bytes),Size (Gigabytes),Bytes per Oject,MB per Object,Has Cost Tag")
+	fmt.Println("Bucket,Objects,Size (Bytes),Size (Gigabytes),Bytes per Object,MB per Object,Has Cost Tag")
 	for _, bucket := range result.Buckets {
 		wg.Add(1)
 		go func(bucketName *string) {
@@ -86,7 +86,7 @@ func processBucketMetrics(s3svc *s3.S3, cwsvc *cloudwatch.CloudWatch, bucketName
 		Statistics: []*string{aws.String("Average")},
 	})
 
-	lib.HandleResponse(err)
+	lib.HandleResponse(err, true)
 
 	var sizeInBytes float64
 	if len(sizeResult.Datapoints) > 0 {
@@ -113,7 +113,7 @@ func processBucketMetrics(s3svc *s3.S3, cwsvc *cloudwatch.CloudWatch, bucketName
 		Statistics: []*string{aws.String("Average")},
 	})
 
-	lib.HandleResponse(err)
+	lib.HandleResponse(err, true)
 
 	var objectCount float64
 	if len(sizeResult.Datapoints) > 0 {
