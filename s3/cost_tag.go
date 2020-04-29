@@ -8,14 +8,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/cheggaaa/pb/v3"
 	"github.com/thoas/go-funk"
 	"sync"
 	"sync/atomic"
 )
 
 func AddCostTag() {
-	var wg sync.WaitGroup
 	metrics := lib.Metrics{}
 
 	sess := session.Must(session.NewSession(&aws.Config{
@@ -30,13 +28,15 @@ func AddCostTag() {
 
 	// create and start new bar
 	numBuckets := len(result.Buckets)
-	bar := pb.StartNew(numBuckets)
 
+	var wg sync.WaitGroup
 	for _, bucket := range result.Buckets {
 		wg.Add(1)
 		go func(bucketName *string) {
+			defer wg.Done()
+
 			details := processBucket(s3svc, bucketName)
-			for key, _ := range details {
+			for key := range details {
 				switch key {
 				case "Processed":
 					atomic.AddInt64(&metrics.Processed, 1)
@@ -46,13 +46,12 @@ func AddCostTag() {
 					atomic.AddInt64(&metrics.Skipped, 1)
 				}
 			}
-			bar.Increment()
-			wg.Done()
+			fmt.Printf("\rBuckets: %d Processed: %d Updated: %d Skipped %d", numBuckets, metrics.Processed, metrics.Modified, metrics.Skipped)
 		}(bucket.Name)
 	}
 
 	wg.Wait()
-	fmt.Printf("Bucket tagging complete. Buckets: %d Processed: %d Updated: %d Skipped %d\n", numBuckets, metrics.Processed, metrics.Modified, metrics.Skipped)
+	fmt.Printf("\nBucket tagging complete\n")
 }
 
 func processBucket(s3svc *s3.S3, bucketName *string) (details map[string]int) {
@@ -81,8 +80,10 @@ func processBucket(s3svc *s3.S3, bucketName *string) (details map[string]int) {
 				},
 			}
 
-			updateTags(s3svc, newTags)
-			return map[string]int{"Processed": 1, "Modified": 1}
+			if updateTags(s3svc, newTags) {
+				return map[string]int{"Processed": 1, "Modified": 1}
+			}
+			return map[string]int{"Processed": 1, "Skipped": 1}
 		} else {
 			return map[string]int{"Processed": 1, "Skipped": 1}
 		}
@@ -99,8 +100,10 @@ func processBucket(s3svc *s3.S3, bucketName *string) (details map[string]int) {
 			},
 		}
 
-		updateTags(s3svc, newTags)
-		return map[string]int{"Processed": 1, "Modified": 1}
+		if updateTags(s3svc, newTags) {
+			return map[string]int{"Processed": 1, "Modified": 1}
+		}
+		return map[string]int{"Processed": 1, "Skipped": 1}
 	}
 }
 

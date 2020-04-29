@@ -17,10 +17,8 @@ import (
 )
 
 func GetBucketMetrics() {
-	var wg sync.WaitGroup
 	// create logger to STDERR
 	l := log.New(os.Stderr, "", 0)
-	metrics := lib.Metrics{}
 
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(endpoints.UsEast1RegionID),
@@ -36,15 +34,17 @@ func GetBucketMetrics() {
 		return
 	}
 
-	// create and start new bar
-	numBuckets := len(result.Buckets)
+	var wg sync.WaitGroup
+	metrics := lib.Metrics{}
 
 	fmt.Println("Bucket,Objects,Size (Bytes),Size (Gigabytes),Bytes per Object,MB per Object,Has Cost Tag")
 	for _, bucket := range result.Buckets {
 		wg.Add(1)
 		go func(bucketName *string) {
+			defer wg.Done()
+
 			details := processBucketMetrics(s3svc, cwsvc, bucketName)
-			for key, _ := range details {
+			for key := range details {
 				switch key {
 				case "Processed":
 					atomic.AddInt64(&metrics.Processed, 1)
@@ -54,12 +54,11 @@ func GetBucketMetrics() {
 					atomic.AddInt64(&metrics.Skipped, 1)
 				}
 			}
-			wg.Done()
 		}(bucket.Name)
 	}
 
 	wg.Wait()
-	l.Printf("Bucket metric pull complete. Buckets: %d Processed: %d\n", numBuckets, metrics.Processed)
+	l.Printf("Bucket metric pull complete. Buckets: %d Processed: %d\n", len(result.Buckets), metrics.Processed)
 }
 
 func processBucketMetrics(s3svc *s3.S3, cwsvc *cloudwatch.CloudWatch, bucketName *string) (details map[string]int) {
@@ -127,13 +126,13 @@ func processBucketMetrics(s3svc *s3.S3, cwsvc *cloudwatch.CloudWatch, bucketName
 		bytesPerObject = 0
 		megabytesPerObject = 0
 	}
-	ynTag := "no"
+	hasTag := "no"
 	if hasCostTag {
-		ynTag = "yes"
+		hasTag = "yes"
 	}
 
 	// Print to STDOUT
-	fmt.Printf("%s,%.0f,%.0f,%.2f,%.2f,%.2f,%s\n", aws.StringValue(bucketName), sizeInBytes, objectCount, gigabytes, bytesPerObject, megabytesPerObject, ynTag)
+	fmt.Printf("%s,%.0f,%.0f,%.2f,%.2f,%.2f,%s\n", aws.StringValue(bucketName), sizeInBytes, objectCount, gigabytes, bytesPerObject, megabytesPerObject, hasTag)
 
 	return map[string]int{"Processed": 1}
 }
