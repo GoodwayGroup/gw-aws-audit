@@ -45,6 +45,7 @@ func ClearBucketObjects(bucketName string) {
 	var listed int64
 	var deleted int64
 	var retries int64
+	var failed int64
 	swg := sizedwaitgroup.New(7)
 	startTime := time.Now()
 
@@ -62,7 +63,7 @@ func ClearBucketObjects(bucketName string) {
 			if len(page.Contents) > 0 {
 				go func() {
 					defer swg.Done()
-					backoff.Retry(func() error {
+					err := backoff.Retry(func() error {
 						var objects []*s3.ObjectIdentifier
 						for _, obj := range page.Contents {
 							objects = append(objects, &s3.ObjectIdentifier{Key: obj.Key})
@@ -80,18 +81,22 @@ func ClearBucketObjects(bucketName string) {
 						hasError := handleResponse(err, &retries)
 						if hasError {
 							dps := float64(deleted) / time.Since(startTime).Seconds()
-							fmt.Printf("\rPages: %d Listed: %d Deleted: %d Retries: %d DPS: %.2f", pageNum, listed, deleted, retries, dps)
+							fmt.Printf("\rPages: %d Listed: %d Deleted: %d Retries: %d Failed: %d DPS: %.2f", pageNum, listed, deleted, retries, failed, dps)
 							return err
 						}
 						atomic.AddInt64(&deleted, int64(len(page.Contents)))
 						return nil
 					}, backoff.NewExponentialBackOff())
+					if err != nil {
+						atomic.AddInt64(&failed, int64(len(page.Contents)))
+						return
+					}
 				}()
 
 				swg.Add()
 				atomic.AddInt64(&pageNum, 1)
 				dps := float64(deleted) / time.Since(startTime).Seconds()
-				fmt.Printf("\rPages: %d Listed: %d Deleted: %d Retries: %d DPS: %.2f", pageNum, listed, deleted, retries, dps)
+				fmt.Printf("\rPages: %d Listed: %d Deleted: %d Retries: %d Failed: %d DPS: %.2f", pageNum, listed, deleted, retries, failed, dps)
 			}
 			return !lastPage
 		})
@@ -101,7 +106,7 @@ func ClearBucketObjects(bucketName string) {
 	handleResponse(err, &retries)
 	fmt.Println("Process complete.")
 	dps := float64(deleted) / time.Since(startTime).Seconds()
-	fmt.Printf("Pages: %d Listed: %d Deleted: %d Retries: %d DPS: %.2f", pageNum, listed, deleted, retries, dps)
+	fmt.Printf("Pages: %d Listed: %d Deleted: %d Retries: %d Failed: %d DPS: %.2f", pageNum, listed, deleted, retries, failed, dps)
 }
 
 func handleResponse(err error, retries *int64) (hasError bool) {
