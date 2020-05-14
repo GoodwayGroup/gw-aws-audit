@@ -35,14 +35,6 @@ COPYRIGHT:
    (c) 2020 Goodway Group
 ```
 
-```
-$ gw-aws-audit help s3 clear-bucket
-Usage: gw-aws-audit s3 clear-bucket <bucket>
-
-Examples:
-  gw-aws-audit s3 clear-bucket athena-results-ASDF1337
-```
-
 ## Installation
 
 ```
