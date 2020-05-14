@@ -1,28 +1,46 @@
 # GW AWS Audit Tool
-> NOTE: This is not perfect. It is a specialized tool to help with actions to take during an audit of AWS usage.
+> NOTE: This is a specialized tool to help with actions to take during an audit of AWS usage.
 
 ## Basic Usage
 
-Useful for clearing large S3 buckets, identifying egress EBS volumes and tracking S3 spend.
+Useful for clearing **large S3 buckets (many millions of objects)**, identifying egress EBS volumes and tracking S3 spend.
 
 ```
-$ gw-aws-audit 
-s3-add-cost-tag              Add 's3-cost-name' tag to all buckets
-s3-clear-bucket <bucket>     Clear ALL objects from a Bucket
-s3-bucket-metrics            Print out bucket metrics to STDOUT
-monitoring-enabled           List EC2 & RDS hosts with Enhanced Monitoring enabled
-version                      Print current version of this application
-ec2-list-stopped-hosts       List stopped EC2 hosts and associated EBS volumes
-ec2-list-detached-volumes    List detached EBS volumes and snapshot counts
-help [command]               Display this help or a command specific help
+$ gw-aws-audit help
+NAME:
+   gw-aws-audit - a collection of tools to audit AWS.
+
+USAGE:
+   gw-aws-audit [global options] command [command options] [arguments...]
+
+VERSION:
+   v1.0.0
+
+AUTHOR:
+   Derek Smith <dsmith@goodwaygroup.com>
+
+COMMANDS:
+   version, v  Print version info
+   s3          S3 related commands
+   rds         RDS related commands
+   ec2         EC2 related commands
+   cw          CloudWatch related commands
+   help, h     Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h     show help (default: false)
+   --version, -v  print the version (default: false)
+
+COPYRIGHT:
+   (c) 2020 Goodway Group
 ```
 
 ```
-$ gw-aws-audit help s3-clear-bucket
-Usage: gw-aws-audit s3-clear-bucket <bucket>
+$ gw-aws-audit help s3 clear-bucket
+Usage: gw-aws-audit s3 clear-bucket <bucket>
 
 Examples:
-  gw-aws-audit s3-clear-bucket athena-results-ASDF1337
+  gw-aws-audit s3 clear-bucket athena-results-ASDF1337
 ```
 
 ## Installation
@@ -31,11 +49,51 @@ Examples:
 $ curl https://i.jpillora.com/GoodwayGroup/gw-aws-audit! | bash
 ```
 
+### Command Categories
+
+There are commands for `s3`, `ec2`, `rds` and `cw`
+
+**s3**
+```
+$ gw-aws-audit s3
+...
+COMMANDS:
+   add-cost-tag                Add s3-cost-name to all S3 buckets
+   metrics                     Get usage metrics
+   clear-bucket, exterminatus  Clear all Objects within a given Bucket
+```
+
+**ec2**
+```
+$ gw-aws-audit ec2
+...
+COMMANDS:
+   enhanced-monitoring  Produce report of Enhanced Monitoring enabled instances
+   detached-volumes     List detached EBS volumes and snapshot counts
+   stopped-hosts        List stopped EC2 hosts and associated EBS volumes
+```
+
+**rds**
+```
+$ gw-aws-audit rds
+...
+COMMANDS:
+   enhanced-monitoring  Produce report of Enhanced Monitoring enabled instances
+```
+
+**cw**
+```
+$ gw-aws-audit cw
+...
+COMMANDS:
+   enhanced-monitoring  Produce report of Enhanced Monitoring enabled EC2 & RDS instances
+```
+
 ### Example Outputs
 
-#### ec2-list-stopped-hosts
+#### ec2 stopped-hosts
 ```
-$ gw-aws-audit ec2-list-stopped-hosts
+$ gw-aws-audit ec2 stopped-hosts
                 INSTANCE ID          NAME            VOLUME                 SIZE (GB)  SNAPSHOTS  MIN SIZE (GB)  COSTS
                 i-09e42474f22039e23  dummy-box-test
                                                      vol-0d4b4a7bc95a4b8e4          8          0              0  $0.80
@@ -43,17 +101,17 @@ $ gw-aws-audit ec2-list-stopped-hosts
                 TOTALS               1 INSTANCES     2 VOLUMES                  16 GB          0           0 GB  $1.60
 ```
 
-#### ec2-list-detached-volumes
+#### ec2 detached-volumes
 ```
-$ gw-aws-audit ec2-list-detached-volumes
+$ gw-aws-audit ec2 detached-volumes
            VOLUME                 SIZE (GB)  SNAPSHOTS  MIN SIZE (GB)  COSTS
            vol-0cc0f6cd3c99bc1cc          8          0              0  $0.80
    TOTALS  1 VOLUMES                   8 GB          0           0 GB  $0.80
 ```
 
-#### monitoring-enabled
+#### cw enhanced-monitoring
 ```
-$ gw-aws-audit monitoring-enabled
+$ gw-aws-audit cw enhanced-monitoring
 Enhanced Metrics can add a cost. See: https://aws.amazon.com/cloudwatch/pricing/
 Checking for EC2 Enhanced Monitoring
 
@@ -73,9 +131,9 @@ Checking for RDS Enhanced Monitoring
  DB INSTANCES                               3
 ```
 
-#### s3-clear-bucket
+#### s3 clear-bucket
 ```
-$ gw-aws-audit s3-clear-bucket yolo
+$ gw-aws-audit s3 clear-bucket --bucket yolo
 -- WARNING -- PAY ATTENTION -- FOR REALS --
 This will delete ALL objects in yolo
 -- THIS ACTION IS NOT REVERSIBLE --
@@ -86,9 +144,9 @@ Proceeding with batch delete for bucket: yolo
 Pages: 198788 Listed: 198788000 Deleted: 198781000 Retries: 18373 DPS: 1921.64
 ```
 
-#### s3-bucket-metrics
+#### s3 metrics
 ```
-$ gw-aws-audit s3-bucket-metrics > out.csv
+$ gw-aws-audit s3 metrics > out.csv
 Starting metrics pull...
 Bucket metric pull complete. Buckets: 207 Processed: 207
 ```
