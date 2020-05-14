@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/thoas/go-funk"
 	"sync"
 	"sync/atomic"
@@ -35,7 +36,7 @@ func AddCostTag() {
 		go func(bucketName *string) {
 			defer wg.Done()
 
-			details := processBucket(s3svc, bucketName)
+			details := processBucket(bucketName)
 			for key := range details {
 				switch key {
 				case "Processed":
@@ -54,11 +55,23 @@ func AddCostTag() {
 	fmt.Printf("\nBucket tagging complete\n")
 }
 
-func processBucket(s3svc *s3.S3, bucketName *string) (details map[string]int) {
-	result, err := s3svc.GetBucketTagging(&s3.GetBucketTaggingInput{
+func processBucket(bucketName *string) (details map[string]int) {
+	sess := session.Must(session.NewSession(&aws.Config{
+		Region: aws.String(endpoints.UsEast1RegionID),
+	}))
+	region, err1 := s3manager.GetBucketRegion(aws.BackgroundContext(), sess, *bucketName, "us-west-2")
+	lib.HandleResponse(err1, true)
+
+	// Create session for region
+	// Create region based s3 service
+	s3svc := s3.New(session.Must(session.NewSession(&aws.Config{
+		Region: aws.String(region),
+	})))
+
+	result, err2 := s3svc.GetBucketTagging(&s3.GetBucketTaggingInput{
 		Bucket: bucketName,
 	})
-	hasTags := handleGetTagsResponse(err)
+	hasTags := handleGetTagsResponse(err2)
 
 	if hasTags {
 		keys := make([]string, 0, len(result.TagSet))
