@@ -7,4 +7,4 @@ const AppRepoOwner string = "GoodwayGroup Tech"
 const AppName string = "gw-aws-audit"
 
 // AppVersion defined current version of this application
-const AppVersion string = "v1.0.0"
+const AppVersion string = "v1.1.0"
