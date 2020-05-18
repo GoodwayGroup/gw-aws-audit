@@ -35,6 +35,16 @@ func main() {
 		HelpName:             info.AppName,
 		Usage:                "a collection of tools to audit AWS.",
 		EnableBashCompletion: true,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "region",
+				Usage:       "AWS region",
+				Required:    false,
+				Value:       "us-east-1",
+				DefaultText: "us-east-1",
+				EnvVars:     []string{"AWS_REGION"},
+			},
+		},
 		Commands: []*cli.Command{
 			{
 				Name:    "version",
@@ -53,7 +63,7 @@ func main() {
 						Name:  "add-cost-tag",
 						Usage: "Add s3-cost-name to all S3 buckets",
 						Action: func(c *cli.Context) error {
-							s3.AddCostTag()
+							s3.AddCostTag(c)
 							return nil
 						},
 					},
@@ -61,7 +71,7 @@ func main() {
 						Name:  "metrics",
 						Usage: "Get usage metrics",
 						Action: func(c *cli.Context) error {
-							s3.GetBucketMetrics()
+							s3.GetBucketMetrics(c)
 							return nil
 						},
 					},
@@ -78,7 +88,7 @@ func main() {
 							},
 						},
 						Action: func(c *cli.Context) error {
-							fmt.Println(c.String("bucket"))
+							s3.ClearBucketObjects(c)
 							return nil
 						},
 					},
@@ -92,7 +102,7 @@ func main() {
 						Name:  "enhanced-monitoring",
 						Usage: "Produce report of Enhanced Monitoring enabled instances",
 						Action: func(c *cli.Context) error {
-							rds.ListMonitoringEnabled()
+							rds.ListMonitoringEnabled(c)
 							return nil
 						},
 					},
@@ -106,7 +116,7 @@ func main() {
 						Name:  "enhanced-monitoring",
 						Usage: "Produce report of Enhanced Monitoring enabled instances",
 						Action: func(c *cli.Context) error {
-							ec2.ListMonitoringEnabled()
+							ec2.ListMonitoringEnabled(c)
 							return nil
 						},
 					},
@@ -114,7 +124,7 @@ func main() {
 						Name:  "detached-volumes",
 						Usage: "List detached EBS volumes and snapshot counts",
 						Action: func(c *cli.Context) error {
-							ec2.ListDetachedVolumes()
+							ec2.ListDetachedVolumes(c)
 							return nil
 						},
 					},
@@ -122,7 +132,7 @@ func main() {
 						Name:  "stopped-hosts",
 						Usage: "List stopped EC2 hosts and associated EBS volumes",
 						Action: func(c *cli.Context) error {
-							ec2.ListStoppedHosts()
+							ec2.ListStoppedHosts(c)
 							return nil
 						},
 					},
@@ -138,9 +148,9 @@ func main() {
 						Action: func(c *cli.Context) error {
 							fmt.Println("Enhanced Metrics can add a cost. See: https://aws.amazon.com/cloudwatch/pricing/")
 							fmt.Printf("Checking for EC2 Enhanced Monitoring\n\n")
-							ec2.ListMonitoringEnabled()
+							ec2.ListMonitoringEnabled(c)
 							fmt.Printf("\n\nChecking for RDS Enhanced Monitoring\n\n")
-							rds.ListMonitoringEnabled()
+							rds.ListMonitoringEnabled(c)
 							return nil
 						},
 					},

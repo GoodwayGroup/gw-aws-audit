@@ -10,15 +10,16 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/thoas/go-funk"
+	"github.com/urfave/cli/v2"
 	"sync"
 	"sync/atomic"
 )
 
-func AddCostTag() {
+func AddCostTag(c *cli.Context) {
 	metrics := lib.Metrics{}
 
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(endpoints.UsEast1RegionID),
+		Region: aws.String(c.String("region")),
 	}))
 	s3svc := s3.New(sess)
 	result, err := s3svc.ListBuckets(&s3.ListBucketsInput{})

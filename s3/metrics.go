@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"github.com/GoodwayGroup/gw-aws-audit/lib"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatch"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/thoas/go-funk"
+	"github.com/urfave/cli/v2"
 	"log"
 	"os"
 	"sync"
@@ -16,12 +16,12 @@ import (
 	"time"
 )
 
-func GetBucketMetrics() {
+func GetBucketMetrics(c *cli.Context) {
 	// create logger to STDERR
 	l := log.New(os.Stderr, "", 0)
 
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(endpoints.UsEast1RegionID),
+		Region: aws.String(c.String("region")),
 	}))
 	s3svc := s3.New(sess)
 	cwsvc := cloudwatch.New(sess)

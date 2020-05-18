@@ -4,22 +4,24 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/remeh/sizedwaitgroup"
 	"github.com/tcnksm/go-input"
+	"github.com/urfave/cli/v2"
 	"os"
 	"sync/atomic"
 	"time"
 )
 
-func ClearBucketObjects(bucketName string) {
+func ClearBucketObjects(c *cli.Context) {
 	ui := &input.UI{
 		Writer: os.Stdout,
 		Reader: os.Stdin,
 	}
+
+	bucketName := c.String("bucket")
 
 	fmt.Println("-- WARNING -- PAY ATTENTION -- FOR REALS --")
 	fmt.Printf("This will delete ALL objects in %s\n", bucketName)
@@ -50,7 +52,7 @@ func ClearBucketObjects(bucketName string) {
 	startTime := time.Now()
 
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(endpoints.UsEast1RegionID),
+		Region: aws.String(c.String("region")),
 	}))
 	s3svc := s3.New(sess)
 
@@ -106,7 +108,7 @@ func ClearBucketObjects(bucketName string) {
 	handleResponse(err, &retries)
 	fmt.Println("Process complete.")
 	dps := float64(deleted) / time.Since(startTime).Seconds()
-	fmt.Printf("Pages: %d Listed: %d Deleted: %d Retries: %d Failed: %d DPS: %.2f", pageNum, listed, deleted, retries, failed, dps)
+	fmt.Printf("Pages: %d Listed: %d Deleted: %d Retries: %d Failed: %d DPS: %.2f\n", pageNum, listed, deleted, retries, failed, dps)
 }
 
 func handleResponse(err error, retries *int64) (hasError bool) {

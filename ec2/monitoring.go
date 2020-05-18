@@ -3,16 +3,16 @@ package ec2
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/jedib0t/go-pretty/table"
+	"github.com/urfave/cli/v2"
 	"os"
 )
 
-func ListMonitoringEnabled() {
+func ListMonitoringEnabled(c *cli.Context) {
 	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(endpoints.UsEast1RegionID),
+		Region: aws.String(c.String("region")),
 	}))
 	client := ec2.New(sess)
 	cnt := 0
