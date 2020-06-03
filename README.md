@@ -14,7 +14,7 @@ USAGE:
    gw-aws-audit [global options] command [command options] [arguments...]
 
 VERSION:
-   v1.0.0
+   v1.2.0
 
 AUTHOR:
    Derek Smith <dsmith@goodwaygroup.com>
