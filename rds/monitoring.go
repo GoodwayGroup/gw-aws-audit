@@ -26,7 +26,7 @@ func ListMonitoringEnabled(c *cli.Context) {
 
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredDark)
+	t.SetStyle(table.StyleLight)
 	t.AppendHeader(table.Row{"DB Instance", "Engine"})
 
 	for _, db := range result.DBInstances {

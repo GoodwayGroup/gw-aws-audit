@@ -42,7 +42,7 @@ func ListStoppedHosts(c *cli.Context) {
 
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredDark)
+	t.SetStyle(table.StyleLight)
 	t.AppendHeader(table.Row{"Instance ID", "Name", "Volume", "Size (GB)", "Snapshots", "min Size (GB)", "Costs"})
 
 	for _, reservations := range results.Reservations {

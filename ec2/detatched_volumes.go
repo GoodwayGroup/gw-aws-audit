@@ -31,7 +31,7 @@ func ListDetachedVolumes(c *cli.Context) {
 
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleColoredDark)
+	t.SetStyle(table.StyleLight)
 	t.AppendHeader(table.Row{"", "Volume", "Size (GB)", "Snapshots", "min Size (GB)", "Costs"})
 
 	for _, volume := range results.Volumes {
