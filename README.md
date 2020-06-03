@@ -148,6 +148,7 @@ Bucket metric pull complete. Buckets: 207 Processed: 207
 * go v1.14+
 * make
 * [github.com/mitchellh/gox](https://github.com/mitchellh/gox)
+* [git-chglog](https://github.com/git-chglog/git-chglog)
 
 ## Deployment
 
@@ -159,7 +160,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Versioning
 
-We employ [auto-changelog](https://www.npmjs.com/package/auto-changelog) to manage the [CHANGELOG.md](CHANGELOG.md). For the versions available, see the [tags on this repository](https://github.com/GoodwayGroup/gwvault/tags).
+We employ [git-chglog](https://github.com/git-chglog/git-chglog) to manage the [CHANGELOG.md](CHANGELOG.md). For the versions available, see the [tags on this repository](https://github.com/GoodwayGroup/gw-aws-audit/tags).
 
 ## Authors
 
