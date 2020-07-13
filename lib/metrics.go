@@ -1,5 +1,6 @@
 package lib
 
+// Generic struct for tracking statistics
 type Metrics struct {
 	Volumes         int
 	SumVolumeSize   int64

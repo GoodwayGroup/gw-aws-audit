@@ -10,6 +10,7 @@ import (
 	"os"
 )
 
+// List all EBS volumes that are in a Detached state, along with predicted associated cost.
 func ListDetachedVolumes(c *cli.Context) {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(c.String("region")),

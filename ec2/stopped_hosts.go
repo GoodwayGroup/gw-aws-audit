@@ -10,6 +10,7 @@ import (
 	"os"
 )
 
+// List all stopped EC2 hosts and attached EBS Volumes for those hosts for a given region.
 func ListStoppedHosts(c *cli.Context) {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(c.String("region")),

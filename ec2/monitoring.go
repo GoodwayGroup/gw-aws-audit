@@ -10,6 +10,7 @@ import (
 	"os"
 )
 
+// List EC2 instances with CW Enhanced Monitoring enabled.
 func ListMonitoringEnabled(c *cli.Context) {
 	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(c.String("region")),

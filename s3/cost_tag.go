@@ -15,6 +15,7 @@ import (
 	"sync/atomic"
 )
 
+// Add the s3-cost-name tag with bucket name as value to ALL S3 Buckets
 func AddCostTag(c *cli.Context) {
 	metrics := lib.Metrics{}
 
@@ -98,27 +99,26 @@ func processBucket(bucketName *string) (details map[string]int) {
 				return map[string]int{"Processed": 1, "Modified": 1}
 			}
 			return map[string]int{"Processed": 1, "Skipped": 1}
-		} else {
-			return map[string]int{"Processed": 1, "Skipped": 1}
-		}
-	} else {
-		newTags := &s3.PutBucketTaggingInput{
-			Bucket: bucketName,
-			Tagging: &s3.Tagging{
-				TagSet: []*s3.Tag{
-					{
-						Key:   aws.String("s3-cost-name"),
-						Value: bucketName,
-					},
-				},
-			},
-		}
-
-		if updateTags(s3svc, newTags) {
-			return map[string]int{"Processed": 1, "Modified": 1}
 		}
 		return map[string]int{"Processed": 1, "Skipped": 1}
 	}
+
+	newTags := &s3.PutBucketTaggingInput{
+		Bucket: bucketName,
+		Tagging: &s3.Tagging{
+			TagSet: []*s3.Tag{
+				{
+					Key:   aws.String("s3-cost-name"),
+					Value: bucketName,
+				},
+			},
+		},
+	}
+
+	if updateTags(s3svc, newTags) {
+		return map[string]int{"Processed": 1, "Modified": 1}
+	}
+	return map[string]int{"Processed": 1, "Skipped": 1}
 }
 
 func updateTags(s3svc *s3.S3, newTags *s3.PutBucketTaggingInput) bool {
@@ -130,13 +130,11 @@ func updateTags(s3svc *s3.S3, newTags *s3.PutBucketTaggingInput) bool {
 				// fmt.Println(aerr.Error())
 				return false
 			}
-		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
-			// fmt.Println(err.Error())
-			return false
 		}
-
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		// fmt.Println(err.Error())
+		return false
 	}
 	return true
 }
@@ -146,16 +144,14 @@ func handleGetTagsResponse(err error) (hasTags bool) {
 		if awsErr, ok := err.(awserr.Error); ok {
 			if awsErr.Code() == "NoSuchTagSet" {
 				return false
-			} else {
-				// Get error details
-				// fmt.Printf("Error for bucket %s", aws.StringValue(bucketName))
-				// fmt.Println("Error:", awsErr.Code(), awsErr.Message())
-				return false
 			}
+			// Get error details
+			// fmt.Printf("Error for bucket %s", aws.StringValue(bucketName))
+			// fmt.Println("Error:", awsErr.Code(), awsErr.Message())
+			return false
 		} else {
 			panic(err)
 		}
-	} else {
-		return true
 	}
+	return true
 }

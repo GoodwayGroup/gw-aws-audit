@@ -15,6 +15,7 @@ import (
 	"time"
 )
 
+// Perform an asynchronous paged bulk delete of ALL objects within a Bucket.
 func ClearBucketObjects(c *cli.Context) {
 	ui := &input.UI{
 		Writer: os.Stdout,
