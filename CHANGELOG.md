@@ -2,6 +2,17 @@
 ## [Unreleased]
 
 
+<a name="v1.3.0"></a>
+## [v1.3.0] - 2020-07-13
+### Features
+- **release:** v1.2.0
+
+### Pull Requests
+- fix(metrics): fix bug in order of columns of s3 metrics report and with the count of objects for a bucket ([#3](https://github.com/GoodwayGroup/gw-aws-audit/issues/3))
+
+
+
+
 <a name="v1.2.0"></a>
 ## [v1.2.0] - 2020-06-03
 ### Chore
@@ -115,7 +126,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.0...HEAD
+[v1.3.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.0.0...v1.1.0
 [v1.0.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/0.5.0...v1.0.0
