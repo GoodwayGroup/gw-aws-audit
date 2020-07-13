@@ -14,16 +14,18 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var version string
+
 func init() {
 	cli.VersionPrinter = func(c *cli.Context) {
-		fmt.Fprintf(c.App.Writer, "%s %s (%s/%s)\n", info.AppName, info.AppVersion, runtime.GOOS, runtime.GOARCH)
+		fmt.Fprintf(c.App.Writer, "%s %s (%s/%s)\n", info.AppName, version, runtime.GOOS, runtime.GOARCH)
 	}
 }
 
 func main() {
 	app := &cli.App{
 		Name:     info.AppName,
-		Version:  info.AppVersion,
+		Version:  version,
 		Compiled: time.Now(),
 		Authors: []*cli.Author{
 			&cli.Author{
@@ -51,7 +53,7 @@ func main() {
 				Aliases: []string{"v"},
 				Usage:   "Print version info",
 				Action: func(c *cli.Context) error {
-					fmt.Printf("%s %s (%s/%s)\n", info.AppName, info.AppVersion, runtime.GOOS, runtime.GOARCH)
+					fmt.Printf("%s %s (%s/%s)\n", info.AppName, version, runtime.GOOS, runtime.GOARCH)
 					return nil
 				},
 			},

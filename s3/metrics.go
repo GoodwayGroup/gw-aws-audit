@@ -16,6 +16,7 @@ import (
 	"time"
 )
 
+// Get ALL S3 Bucket metrics for a given region
 func GetBucketMetrics(c *cli.Context) {
 	// create logger to STDERR
 	l := log.New(os.Stderr, "", 0)
@@ -37,7 +38,7 @@ func GetBucketMetrics(c *cli.Context) {
 	var wg sync.WaitGroup
 	metrics := lib.Metrics{}
 
-	fmt.Println("Bucket,Objects,Size (Bytes),Size (Gigabytes),Bytes per Object,MB per Object,Has Cost Tag")
+	fmt.Println("Bucket,Objects,Size (Bytes),Size (GB),Size (TB),Bytes per Object,MB per Object,Has Cost Tag")
 	for _, bucket := range result.Buckets {
 		wg.Add(1)
 		go func(bucketName *string) {
@@ -115,11 +116,12 @@ func processBucketMetrics(s3svc *s3.S3, cwsvc *cloudwatch.CloudWatch, bucketName
 	lib.HandleResponse(err, true)
 
 	var objectCount float64
-	if len(sizeResult.Datapoints) > 0 {
+	if len(countResult.Datapoints) > 0 {
 		objectCount = aws.Float64Value(countResult.Datapoints[0].Average)
 	}
 
-	gigabytes := sizeInBytes / 1000 / 1000 / 1000
+	sizeInGB := sizeInBytes / 1000 / 1000 / 1000
+	sizeInTB := sizeInBytes / 1000 / 1000 / 1000 / 1000
 	bytesPerObject := sizeInBytes / objectCount
 	megabytesPerObject := sizeInBytes / objectCount / 1000 / 1000
 	if objectCount == 0 {
@@ -132,7 +134,7 @@ func processBucketMetrics(s3svc *s3.S3, cwsvc *cloudwatch.CloudWatch, bucketName
 	}
 
 	// Print to STDOUT
-	fmt.Printf("%s,%.0f,%.0f,%.2f,%.2f,%.2f,%s\n", aws.StringValue(bucketName), sizeInBytes, objectCount, gigabytes, bytesPerObject, megabytesPerObject, hasTag)
+	fmt.Printf("%s,%.0f,%.0f,%.2f,%.2f,%.2f,%.2f,%s\n", aws.StringValue(bucketName), objectCount, sizeInBytes, sizeInGB, sizeInTB, bytesPerObject, megabytesPerObject, hasTag)
 
 	return map[string]int{"Processed": 1}
 }
@@ -155,7 +157,6 @@ func checkCostTag(s3svc *s3.S3, bucketName *string) (hasCostTag bool) {
 		} else {
 			return false
 		}
-	} else {
-		return false
 	}
+	return false
 }

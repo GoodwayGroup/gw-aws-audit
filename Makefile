@@ -1,8 +1,9 @@
 NAME=gw-aws-audit
 
 VERSION=$$(git describe --tags --always)
+SHORT_VERSION=$$(git describe --tags --always | awk -F '-' '{print $$1}')
 
-LDFLAGS=-ldflags=all="-X main.version=${VERSION}"
+LDFLAGS=-ldflags=all="-X main.version=${SHORT_VERSION}"
 
 all: tools build
 

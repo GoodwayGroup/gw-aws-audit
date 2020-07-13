@@ -1,6 +1,8 @@
 # GW AWS Audit Tool
 > NOTE: This is a specialized tool to help with actions to take during an audit of AWS usage.
 
+[![Go Report Card](https://goreportcard.com/badge/GoodwayGroup/gw-aws-audit)](https://goreportcard.com/report/GoodwayGroup/gw-aws-audit)
+
 ## Basic Usage
 
 Useful for clearing **large S3 buckets (many millions of objects)**, identifying egress EBS volumes and tracking S3 spend.

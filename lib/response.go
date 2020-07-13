@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// Generic response AWS response handler
 func HandleResponse(err error, silent bool) (hasError bool) {
 	l := log.New(os.Stderr, "", 0)
 	if err != nil {
@@ -18,7 +19,6 @@ func HandleResponse(err error, silent bool) (hasError bool) {
 		} else {
 			panic(err)
 		}
-	} else {
-		return false
 	}
+	return false
 }
