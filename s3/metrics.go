@@ -7,44 +7,49 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatch"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/thoas/go-funk"
-	"github.com/urfave/cli/v2"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	as "github.com/clok/awssession"
+	"github.com/remeh/sizedwaitgroup"
 	"log"
 	"os"
-	"sync"
 	"sync/atomic"
 	"time"
 )
 
+var (
+	kmetrics = k.Extend("GetBucketMetrics")
+	kpbm = kmetrics.Extend("processBucketMetrics")
+)
+
 // Get ALL S3 Bucket metrics for a given region
-func GetBucketMetrics(c *cli.Context) {
+func GetBucketMetrics() error {
 	// create logger to STDERR
 	l := log.New(os.Stderr, "", 0)
 
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(c.String("region")),
-	}))
+	sess, err := as.New()
+	if err != nil {
+		return err
+	}
 	s3svc := s3.New(sess)
-	cwsvc := cloudwatch.New(sess)
 
 	l.Println("Starting metrics pull...")
 
 	result, err := s3svc.ListBuckets(&s3.ListBucketsInput{})
 	if err != nil {
-		l.Println("Failed to list buckets", err)
-		return
+		l.Println("Failed to list buckets")
+		return err
 	}
 
-	var wg sync.WaitGroup
+	swg := sizedwaitgroup.New(10)
 	metrics := lib.Metrics{}
 
 	fmt.Println("Bucket,Objects,Size (Bytes),Size (GB),Size (TB),Bytes per Object,MB per Object,Has Cost Tag")
+	kmetrics.Printf("number of buckets: %d", len(result.Buckets))
 	for _, bucket := range result.Buckets {
-		wg.Add(1)
 		go func(bucketName *string) {
-			defer wg.Done()
+			defer swg.Done()
 
-			details := processBucketMetrics(s3svc, cwsvc, bucketName)
+			details := processBucketMetrics(bucketName)
 			for key := range details {
 				switch key {
 				case "Processed":
@@ -56,20 +61,39 @@ func GetBucketMetrics(c *cli.Context) {
 				}
 			}
 		}(bucket.Name)
+		swg.Add()
 	}
 
-	wg.Wait()
+	swg.Wait()
 	l.Printf("Bucket metric pull complete. Buckets: %d Processed: %d\n", len(result.Buckets), metrics.Processed)
+	return nil
 }
 
-func processBucketMetrics(s3svc *s3.S3, cwsvc *cloudwatch.CloudWatch, bucketName *string) (details map[string]int) {
+func processBucketMetrics(bucketName *string) (details map[string]int) {
+	kpbm.Printf("%s | processing", *bucketName)
+
+	sess, _ := as.New()
+	region, err := s3manager.GetBucketRegion(aws.BackgroundContext(), sess, *bucketName, "us-west-2")
+	kpbm.Printf("%s | region: %s", *bucketName, region)
+	lib.HandleResponse(err)
+
+	// Create session for region
+	s3svc := s3.New(session.Must(session.NewSession(&aws.Config{
+		Region: aws.String(region),
+	})))
+	cwsvc := cloudwatch.New(sess)
+
 	// Check for s3-cost-name tag
-	hasCostTag := checkCostTag(s3svc, bucketName)
+	_, hasCostTag := checkCostTag(s3svc, bucketName)
+
+	st := time.Now().AddDate(0, 0, -2)
+	et := time.Now().AddDate(0, 0, -1)
+	kpbm.Printf("%s | Start: %s End: %s", *bucketName, st, et)
 
 	// Pull bucket bytes size
 	sizeResult, err := cwsvc.GetMetricStatistics(&cloudwatch.GetMetricStatisticsInput{
-		StartTime: aws.Time(time.Now().AddDate(0, 0, -2)),
-		EndTime:   aws.Time(time.Now().AddDate(0, 0, -1)),
+		StartTime: aws.Time(st),
+		EndTime:   aws.Time(et),
 		Dimensions: []*cloudwatch.Dimension{
 			{
 				Name:  aws.String("BucketName"),
@@ -86,7 +110,7 @@ func processBucketMetrics(s3svc *s3.S3, cwsvc *cloudwatch.CloudWatch, bucketName
 		Statistics: []*string{aws.String("Average")},
 	})
 
-	lib.HandleResponse(err, true)
+	lib.HandleResponse(err)
 
 	var sizeInBytes float64
 	if len(sizeResult.Datapoints) > 0 {
@@ -95,8 +119,8 @@ func processBucketMetrics(s3svc *s3.S3, cwsvc *cloudwatch.CloudWatch, bucketName
 
 	// Pull bucket object counts
 	countResult, err := cwsvc.GetMetricStatistics(&cloudwatch.GetMetricStatisticsInput{
-		StartTime: aws.Time(time.Now().AddDate(0, 0, -2)),
-		EndTime:   aws.Time(time.Now().AddDate(0, 0, -1)),
+		StartTime: aws.Time(st),
+		EndTime:   aws.Time(et),
 		Dimensions: []*cloudwatch.Dimension{
 			{
 				Name:  aws.String("BucketName"),
@@ -113,7 +137,7 @@ func processBucketMetrics(s3svc *s3.S3, cwsvc *cloudwatch.CloudWatch, bucketName
 		Statistics: []*string{aws.String("Average")},
 	})
 
-	lib.HandleResponse(err, true)
+	lib.HandleResponse(err)
 
 	var objectCount float64
 	if len(countResult.Datapoints) > 0 {
@@ -136,27 +160,6 @@ func processBucketMetrics(s3svc *s3.S3, cwsvc *cloudwatch.CloudWatch, bucketName
 	// Print to STDOUT
 	fmt.Printf("%s,%.0f,%.0f,%.2f,%.2f,%.2f,%.2f,%s\n", aws.StringValue(bucketName), objectCount, sizeInBytes, sizeInGB, sizeInTB, bytesPerObject, megabytesPerObject, hasTag)
 
+	kpbm.Printf("%s | done processing", *bucketName)
 	return map[string]int{"Processed": 1}
-}
-
-func checkCostTag(s3svc *s3.S3, bucketName *string) (hasCostTag bool) {
-	result, err := s3svc.GetBucketTagging(&s3.GetBucketTaggingInput{
-		Bucket: bucketName,
-	})
-	hasTags := handleGetTagsResponse(err)
-
-	if hasTags {
-		keys := make([]string, 0, len(result.TagSet))
-
-		for _, tag := range result.TagSet {
-			keys = append(keys, aws.StringValue(tag.Key))
-		}
-
-		if funk.ContainsString(keys, "s3-cost-name") {
-			return true
-		} else {
-			return false
-		}
-	}
-	return false
 }

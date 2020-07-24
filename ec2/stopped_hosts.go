@@ -3,18 +3,24 @@ package ec2
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	as "github.com/clok/awssession"
+	"github.com/clok/kemba"
 	"github.com/jedib0t/go-pretty/table"
-	"github.com/urfave/cli/v2"
 	"os"
 )
 
+var (
+	k = kemba.New("gw-aws-audit:ec2")
+)
+
 // List all stopped EC2 hosts and attached EBS Volumes for those hosts for a given region.
-func ListStoppedHosts(c *cli.Context) {
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(c.String("region")),
-	}))
+func ListStoppedHosts() error {
+	kl := k.Extend("ListStoppedHosts")
+	sess, err := as.New()
+	if err != nil {
+		return err
+	}
 	client := ec2.New(sess)
 	params := &ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
@@ -30,8 +36,8 @@ func ListStoppedHosts(c *cli.Context) {
 	results, err := client.DescribeInstances(params)
 
 	if err != nil {
-		fmt.Println("Failed to list instances", err)
-		return
+		fmt.Println("Failed to list instances")
+		return err
 	}
 
 	var instCnt int64
@@ -46,7 +52,9 @@ func ListStoppedHosts(c *cli.Context) {
 	t.SetStyle(table.StyleLight)
 	t.AppendHeader(table.Row{"Instance ID", "Name", "Volume", "Size (GB)", "Snapshots", "min Size (GB)", "Costs"})
 
+	kl.Printf("found %d reservations", len(results.Reservations))
 	for _, reservations := range results.Reservations {
+		kl.Printf("%2s found %d instances", "└>", len(reservations.Instances))
 		for _, instance := range reservations.Instances {
 			instCnt++
 			var name string
@@ -61,6 +69,7 @@ func ListStoppedHosts(c *cli.Context) {
 				name,
 			})
 
+			kl.Printf("%4s found %d volumes", "└>", len(instance.BlockDeviceMappings))
 			for _, b := range instance.BlockDeviceMappings {
 				volCnt++
 				volParams := &ec2.DescribeVolumesInput{
@@ -68,8 +77,8 @@ func ListStoppedHosts(c *cli.Context) {
 				}
 				volumes, err2 := client.DescribeVolumes(volParams)
 				if err2 != nil {
-					fmt.Println("Failed to list instances", err2)
-					return
+					fmt.Println("Failed to list instances")
+					return err2
 				}
 				volumeSize += aws.Int64Value(volumes.Volumes[0].Size)
 
@@ -93,11 +102,12 @@ func ListStoppedHosts(c *cli.Context) {
 				}
 				snapshots, err3 := client.DescribeSnapshots(snapParams)
 				if err3 != nil {
-					fmt.Println("Failed to list instances", err3)
-					return
+					fmt.Println("Failed to list instances")
+					return err3
 				}
 				numSnaps := len(snapshots.Snapshots)
 				snapCnt += int64(numSnaps)
+				kl.Printf("%6s found %d snapshots", "└>", numSnaps)
 
 				var lsnap int64
 				if numSnaps > 0 {
@@ -128,4 +138,5 @@ func ListStoppedHosts(c *cli.Context) {
 		fmt.Sprintf("$%.2f", float32(volumeCosts)/10),
 	})
 	t.Render()
+	return nil
 }
