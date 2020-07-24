@@ -77,10 +77,14 @@ git tag $VERSION
 note "Building assets to be uploaded"
 make ci
 
+note "Pushing branch: git push origin $(git rev-parse --abbrev-ref HEAD)"
+git push origin $(git rev-parse --abbrev-ref HEAD)
+
+note "Pushing tag: git push origin $VERSION"
+git push origin $VERSION
+
 echo ""
 note "What you still need to do:"
-info "1. Push the branch: git push origin $(git rev-parse --abbrev-ref HEAD)"
-info "2. Push the tag: git push origin $VERSION"
-info "3. Update the release in github with compiled assets."
+info "1. Update the release in github with compiled assets."
 echo ""
 success "Done!"
