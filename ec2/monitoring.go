@@ -3,18 +3,19 @@ package ec2
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	as "github.com/clok/awssession"
 	"github.com/jedib0t/go-pretty/table"
-	"github.com/urfave/cli/v2"
 	"os"
 )
 
 // List EC2 instances with CW Enhanced Monitoring enabled.
-func ListMonitoringEnabled(c *cli.Context) {
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(c.String("region")),
-	}))
+func ListMonitoringEnabled() error {
+	kl := k.Extend("ListMonitoringEnabled")
+	sess, err := as.New()
+	if err != nil {
+		return err
+	}
 	client := ec2.New(sess)
 	cnt := 0
 
@@ -30,8 +31,8 @@ func ListMonitoringEnabled(c *cli.Context) {
 	})
 
 	if err != nil {
-		fmt.Println("Failed to list instances", err)
-		return
+		fmt.Println("Failed to list instances")
+		return err
 	}
 
 	t := table.NewWriter()
@@ -39,23 +40,28 @@ func ListMonitoringEnabled(c *cli.Context) {
 	t.SetStyle(table.StyleLight)
 	t.AppendHeader(table.Row{"Name", "Instance ID"})
 
+	kl.Printf("found %d reservations", len(result.Reservations))
 	for _, reserve := range result.Reservations {
+		kl.Printf("%2s found %d instances", "└>", len(reserve.Instances))
 		if len(reserve.Instances) > 0 {
-			cnt++
+			for _, instance := range reserve.Instances {
+				cnt++
 
-			id := aws.StringValue(reserve.Instances[0].InstanceId)
+				id := aws.StringValue(instance.InstanceId)
 
-			var name string
-			for _, tag := range reserve.Instances[0].Tags {
-				if aws.StringValue(tag.Key) == "Name" {
-					name = aws.StringValue(tag.Value)
+				var name string
+				for _, tag := range reserve.Instances[0].Tags {
+					if aws.StringValue(tag.Key) == "Name" {
+						name = aws.StringValue(tag.Value)
+					}
 				}
+				t.AppendRow([]interface{}{name, id})
 			}
-			t.AppendRow([]interface{}{name, id})
 		}
 	}
 
 	// See: https://aws.amazon.com/cloudwatch/pricing/
 	t.AppendFooter(table.Row{"EC2 Instances", cnt})
 	t.Render()
+	return nil
 }

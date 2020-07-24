@@ -3,25 +3,26 @@ package ec2
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
+	as "github.com/clok/awssession"
 	"github.com/jedib0t/go-pretty/table"
-	"github.com/urfave/cli/v2"
 	"os"
 )
 
 // List all EBS volumes that are in a Detached state, along with predicted associated cost.
-func ListDetachedVolumes(c *cli.Context) {
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(c.String("region")),
-	}))
+func ListDetachedVolumes() error {
+	kl := k.Extend("ListDetachedVolumes")
+	sess, err := as.New()
+	if err != nil {
+		return err
+	}
 	client := ec2.New(sess)
 
 	results, err := client.DescribeVolumes(&ec2.DescribeVolumesInput{})
 
 	if err != nil {
-		fmt.Println("Failed to list instances", err)
-		return
+		fmt.Println("Failed to list instances")
+		return err
 	}
 
 	var volCnt int64
@@ -35,6 +36,7 @@ func ListDetachedVolumes(c *cli.Context) {
 	t.SetStyle(table.StyleLight)
 	t.AppendHeader(table.Row{"", "Volume", "Size (GB)", "Snapshots", "min Size (GB)", "Costs"})
 
+	kl.Printf("found %d reservations", len(results.Volumes))
 	for _, volume := range results.Volumes {
 		if len(volume.Attachments) <= 0 {
 			volCnt++
@@ -43,8 +45,8 @@ func ListDetachedVolumes(c *cli.Context) {
 			}
 			volumes, err2 := client.DescribeVolumes(volParams)
 			if err2 != nil {
-				fmt.Println("Failed to list volumes", err2)
-				return
+				fmt.Println("Failed to list volumes")
+				return err2
 			}
 			volumeSize += aws.Int64Value(volumes.Volumes[0].Size)
 
@@ -68,16 +70,18 @@ func ListDetachedVolumes(c *cli.Context) {
 			}
 			snapshots, err3 := client.DescribeSnapshots(snapParams)
 			if err3 != nil {
-				fmt.Println("Failed to list instances", err3)
-				return
+				fmt.Println("Failed to list instances")
+				return err3
 			}
 			numSnaps := len(snapshots.Snapshots)
 			snapCnt += int64(numSnaps)
+			kl.Printf("%2s found %d snapshots", "└>", numSnaps)
 
 			var lsnap int64
 			if numSnaps > 0 {
 				snapSize += aws.Int64Value(volumes.Volumes[0].Size)
 				lsnap = aws.Int64Value(volumes.Volumes[0].Size)
+				kl.Printf("%4s lsnap: %d snapSize: %d", "└>", lsnap, snapSize)
 			}
 
 			t.AppendRow([]interface{}{
@@ -100,4 +104,5 @@ func ListDetachedVolumes(c *cli.Context) {
 		fmt.Sprintf("$%.2f", float32(volumeCosts)/10),
 	})
 	t.Render()
+	return nil
 }

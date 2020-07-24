@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/cenkalti/backoff/v4"
+	as "github.com/clok/awssession"
+	"github.com/clok/kemba"
 	"github.com/remeh/sizedwaitgroup"
 	"github.com/tcnksm/go-input"
 	"github.com/urfave/cli/v2"
@@ -15,8 +16,14 @@ import (
 	"time"
 )
 
+var (
+	k    = kemba.New("gw-aws-audit:s3")
+	kcbo = k.Extend("ClearBucketObjects")
+	khr  = kcbo.Extend("handleResponse")
+)
+
 // Perform an asynchronous paged bulk delete of ALL objects within a Bucket.
-func ClearBucketObjects(c *cli.Context) {
+func ClearBucketObjects(c *cli.Context) error {
 	ui := &input.UI{
 		Writer: os.Stdout,
 		Reader: os.Stdin,
@@ -52,12 +59,13 @@ func ClearBucketObjects(c *cli.Context) {
 	swg := sizedwaitgroup.New(7)
 	startTime := time.Now()
 
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(c.String("region")),
-	}))
+	sess, err := as.New()
+	if err != nil {
+		return err
+	}
 	s3svc := s3.New(sess)
 
-	err := s3svc.ListObjectsV2Pages(&s3.ListObjectsV2Input{
+	err = s3svc.ListObjectsV2Pages(&s3.ListObjectsV2Input{
 		Bucket:  &bucketName,
 		MaxKeys: aws.Int64(1000),
 	},
@@ -98,6 +106,7 @@ func ClearBucketObjects(c *cli.Context) {
 
 				swg.Add()
 				atomic.AddInt64(&pageNum, 1)
+				kcbo.Printf("%d Objects: %d lastPage: %t", pageNum, len(page.Contents), lastPage)
 				dps := float64(deleted) / time.Since(startTime).Seconds()
 				fmt.Printf("\rPages: %d Listed: %d Deleted: %d Retries: %d Failed: %d DPS: %.2f", pageNum, listed, deleted, retries, failed, dps)
 			}
@@ -110,13 +119,18 @@ func ClearBucketObjects(c *cli.Context) {
 	fmt.Println("Process complete.")
 	dps := float64(deleted) / time.Since(startTime).Seconds()
 	fmt.Printf("Pages: %d Listed: %d Deleted: %d Retries: %d Failed: %d DPS: %.2f\n", pageNum, listed, deleted, retries, failed, dps)
+
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func handleResponse(err error, retries *int64) (hasError bool) {
 	if err != nil {
-		if _, ok := err.(awserr.Error); ok {
-			// Get error details
-			// fmt.Printf("\nError Code: %s Message: %s\nRetrying...\n", awsErr.Code(), awsErr.Message())
+		if awsErr, ok := err.(awserr.Error); ok {
+			khr.Printf("AWS Error Code: %s", awsErr.Code())
+			khr.Printf("AWS Error Message: %s", awsErr.Message())
 			atomic.AddInt64(retries, 1)
 			return true
 		} else {

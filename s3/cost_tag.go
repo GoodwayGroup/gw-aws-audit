@@ -5,38 +5,48 @@ import (
 	"github.com/GoodwayGroup/gw-aws-audit/lib"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	as "github.com/clok/awssession"
+	"github.com/remeh/sizedwaitgroup"
 	"github.com/thoas/go-funk"
-	"github.com/urfave/cli/v2"
-	"sync"
 	"sync/atomic"
 )
 
+var (
+	kact = k.Extend("AddCostTag")
+	ktag = k.Extend("checkCostTag")
+	kup = k.Extend("updateTags")
+	khtr = k.Extend("handleGetTagsResponse")
+	kproc = kact.Extend("processBucket")
+)
+
 // Add the s3-cost-name tag with bucket name as value to ALL S3 Buckets
-func AddCostTag(c *cli.Context) {
+func AddCostTag() error {
 	metrics := lib.Metrics{}
 
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(c.String("region")),
-	}))
-	s3svc := s3.New(sess)
-	result, err := s3svc.ListBuckets(&s3.ListBucketsInput{})
+	sess, err := as.New()
 	if err != nil {
-		fmt.Println("Failed to list buckets", err)
-		return
+		return err
+	}
+	s3svc := s3.New(sess)
+
+	var result *s3.ListBucketsOutput
+	result, err = s3svc.ListBuckets(&s3.ListBucketsInput{})
+	if err != nil {
+		fmt.Println("Failed to list buckets")
+		return err
 	}
 
 	// create and start new bar
 	numBuckets := len(result.Buckets)
+	kact.Printf("number of buckets: %d", numBuckets)
 
-	var wg sync.WaitGroup
+	swg := sizedwaitgroup.New(10)
 	for _, bucket := range result.Buckets {
-		wg.Add(1)
 		go func(bucketName *string) {
-			defer wg.Done()
+			defer swg.Done()
 
 			details := processBucket(bucketName)
 			for key := range details {
@@ -51,18 +61,20 @@ func AddCostTag(c *cli.Context) {
 			}
 			fmt.Printf("\rBuckets: %d Processed: %d Updated: %d Skipped %d", numBuckets, metrics.Processed, metrics.Modified, metrics.Skipped)
 		}(bucket.Name)
+		swg.Add()
 	}
 
-	wg.Wait()
+	swg.Wait()
 	fmt.Printf("\nBucket tagging complete\n")
+	return nil
 }
 
 func processBucket(bucketName *string) (details map[string]int) {
-	sess := session.Must(session.NewSession(&aws.Config{
-		Region: aws.String(endpoints.UsEast1RegionID),
-	}))
-	region, err1 := s3manager.GetBucketRegion(aws.BackgroundContext(), sess, *bucketName, "us-west-2")
-	lib.HandleResponse(err1, true)
+	kproc.Printf("%s | processing", *bucketName)
+	sess, _ := as.New()
+	region, err := s3manager.GetBucketRegion(aws.BackgroundContext(), sess, *bucketName, "us-west-2")
+	kproc.Printf("%s | region: %s", *bucketName, region)
+	lib.HandleResponse(err)
 
 	// Create session for region
 	// Create region based s3 service
@@ -70,74 +82,100 @@ func processBucket(bucketName *string) (details map[string]int) {
 		Region: aws.String(region),
 	})))
 
-	result, err2 := s3svc.GetBucketTagging(&s3.GetBucketTaggingInput{
-		Bucket: bucketName,
-	})
-	hasTags := handleGetTagsResponse(err2)
+	if tagSet, hasCostTag := checkCostTag(s3svc, bucketName); !hasCostTag {
+		if tagSet != nil {
+			kproc.Printf("%s | hasTags: %# v", *bucketName, tagSet)
+			keys := make([]string, 0, len(tagSet))
 
-	if hasTags {
-		keys := make([]string, 0, len(result.TagSet))
-
-		for _, tag := range result.TagSet {
-			keys = append(keys, aws.StringValue(tag.Key))
-		}
-
-		if !funk.ContainsString(keys, "s3-cost-name") {
-			result.TagSet = append(result.TagSet, &s3.Tag{
-				Key:   aws.String("s3-cost-name"),
-				Value: bucketName,
-			})
-
-			newTags := &s3.PutBucketTaggingInput{
-				Bucket: bucketName,
-				Tagging: &s3.Tagging{
-					TagSet: result.TagSet,
-				},
+			for _, tag := range tagSet {
+				keys = append(keys, aws.StringValue(tag.Key))
 			}
 
-			if updateTags(s3svc, newTags) {
-				return map[string]int{"Processed": 1, "Modified": 1}
-			}
-			return map[string]int{"Processed": 1, "Skipped": 1}
-		}
-		return map[string]int{"Processed": 1, "Skipped": 1}
-	}
-
-	newTags := &s3.PutBucketTaggingInput{
-		Bucket: bucketName,
-		Tagging: &s3.Tagging{
-			TagSet: []*s3.Tag{
-				{
+			if !funk.ContainsString(keys, "s3-cost-name") {
+				tagSet = append(tagSet, &s3.Tag{
 					Key:   aws.String("s3-cost-name"),
 					Value: bucketName,
+				})
+
+				newTags := &s3.PutBucketTaggingInput{
+					Bucket: bucketName,
+					Tagging: &s3.Tagging{
+						TagSet: tagSet,
+					},
+				}
+
+				if updateTags(s3svc, newTags) {
+					return map[string]int{"Processed": 1, "Modified": 1}
+				}
+				return map[string]int{"Processed": 1, "Skipped": 1}
+			}
+			kproc.Printf("%s | s3-cost-name found", *bucketName)
+			return map[string]int{"Processed": 1, "Skipped": 1}
+		}
+
+		kproc.Printf("%s | no tags found", *bucketName)
+		newTags := &s3.PutBucketTaggingInput{
+			Bucket: bucketName,
+			Tagging: &s3.Tagging{
+				TagSet: []*s3.Tag{
+					{
+						Key:   aws.String("s3-cost-name"),
+						Value: bucketName,
+					},
 				},
 			},
-		},
+		}
+
+		if updateTags(s3svc, newTags) {
+			return map[string]int{"Processed": 1, "Modified": 1}
+		}
 	}
 
-	if updateTags(s3svc, newTags) {
-		return map[string]int{"Processed": 1, "Modified": 1}
-	}
+	kproc.Printf("%s | done processing", *bucketName)
 	return map[string]int{"Processed": 1, "Skipped": 1}
 }
 
 func updateTags(s3svc *s3.S3, newTags *s3.PutBucketTaggingInput) bool {
 	_, err := s3svc.PutBucketTagging(newTags)
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			default:
-				// fmt.Println(aerr.Error())
-				return false
-			}
+		if awsErr, ok := err.(awserr.Error); ok {
+			kup.Printf("AWS Error Code: %s", awsErr.Code())
+			kup.Printf("AWS Error Message: %s", awsErr.Message())
+			kup.Log(awsErr)
+			return false
 		}
-		// Print the error, cast err to awserr.Error to get the Code and
-		// Message from an error.
-		// fmt.Println(err.Error())
+
+		kup.Log(err)
 		return false
 	}
 	return true
 }
+
+func checkCostTag(s3svc *s3.S3, bucketName *string) ([]*s3.Tag, bool) {
+	result, err := s3svc.GetBucketTagging(&s3.GetBucketTaggingInput{
+		Bucket: bucketName,
+	})
+	hasTags := handleGetTagsResponse(err)
+
+	if hasTags {
+		ktag.Printf("%s | hasTags: %# v", *bucketName, result.TagSet)
+		keys := make([]string, 0, len(result.TagSet))
+
+		for _, tag := range result.TagSet {
+			keys = append(keys, aws.StringValue(tag.Key))
+		}
+
+		if funk.ContainsString(keys, "s3-cost-name") {
+			kproc.Printf("%s | s3-cost-name found", *bucketName)
+			return result.TagSet, true
+		} else {
+			kproc.Printf("%s | s3-cost-name not found", *bucketName)
+			return result.TagSet, false
+		}
+	}
+	return nil, false
+}
+
 
 func handleGetTagsResponse(err error) (hasTags bool) {
 	if err != nil {
@@ -145,9 +183,9 @@ func handleGetTagsResponse(err error) (hasTags bool) {
 			if awsErr.Code() == "NoSuchTagSet" {
 				return false
 			}
-			// Get error details
-			// fmt.Printf("Error for bucket %s", aws.StringValue(bucketName))
-			// fmt.Println("Error:", awsErr.Code(), awsErr.Message())
+			khtr.Printf("AWS Error Code: %s", awsErr.Code())
+			khtr.Printf("AWS Error Message: %s", awsErr.Message())
+			khtr.Log(awsErr)
 			return false
 		} else {
 			panic(err)

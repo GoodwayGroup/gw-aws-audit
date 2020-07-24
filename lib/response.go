@@ -2,19 +2,20 @@ package lib
 
 import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"log"
-	"os"
+	"github.com/clok/kemba"
+)
+
+var (
+	k = kemba.New("gw-aws-audit:lib:HandleResponse")
 )
 
 // Generic response AWS response handler
-func HandleResponse(err error, silent bool) (hasError bool) {
-	l := log.New(os.Stderr, "", 0)
+func HandleResponse(err error) (hasError bool) {
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
-			// Get error details
-			if !silent {
-				l.Printf("\nError Code: %s Message: %s\n", awsErr.Code(), awsErr.Message())
-			}
+			k.Printf("AWS Error Code: %s", awsErr.Code())
+			k.Printf("AWS Error Message: %s", awsErr.Message())
+			k.Log(awsErr)
 			return true
 		} else {
 			panic(err)
