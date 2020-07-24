@@ -2,6 +2,18 @@
 ## [Unreleased]
 
 
+<a name="v1.3.1"></a>
+## [v1.3.1] - 2020-07-24
+### Chore
+- update release script
+
+### Features
+- **release:** v1.3.0
+
+### Tech Debt
+- **logging:** improved logging using kemba
+
+
 <a name="v1.3.0"></a>
 ## [v1.3.0] - 2020-07-13
 ### Features
@@ -126,7 +138,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.1...HEAD
+[v1.3.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.0...v1.3.1
 [v1.3.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.0.0...v1.1.0
