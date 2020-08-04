@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go v1.33.12
 	github.com/cenkalti/backoff/v4 v4.0.2
 	github.com/clok/awssession v0.1.2
-	github.com/clok/kemba v0.5.0
+	github.com/clok/kemba v0.6.3
 	github.com/go-openapi/strfmt v0.19.5 // indirect
 	github.com/hashicorp/go-version v1.2.1 // indirect
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
