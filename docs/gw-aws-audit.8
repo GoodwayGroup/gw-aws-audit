@@ -1,0 +1,193 @@
+.nh
+.TH gw\-aws\-audit 8
+
+.SH NAME
+.PP
+gw\-aws\-audit \- a collection of tools to audit AWS.
+
+
+.SH SYNOPSIS
+.PP
+gw\-aws\-audit
+
+
+.SH COMMAND TREE
+.RS
+.IP \(bu 2
+s3
+\[la]#s3\[ra]
+.RS
+.IP \(bu 2
+add\-cost\-tag
+\[la]#add-cost-tag\[ra]
+.IP \(bu 2
+metrics
+\[la]#metrics\[ra]
+.IP \(bu 2
+clear\-bucket, exterminatus
+\[la]#clear-bucket-exterminatus\[ra]
+
+.RE
+
+.IP \(bu 2
+rds
+\[la]#rds\[ra]
+.RS
+.IP \(bu 2
+enhanced\-monitoring
+\[la]#enhanced-monitoring\[ra]
+
+.RE
+
+.IP \(bu 2
+ec2
+\[la]#ec2\[ra]
+.RS
+.IP \(bu 2
+enhanced\-monitoring
+\[la]#enhanced-monitoring\[ra]
+.IP \(bu 2
+detached\-volumes
+\[la]#detached-volumes\[ra]
+.IP \(bu 2
+stopped\-hosts
+\[la]#stopped-hosts\[ra]
+
+.RE
+
+.IP \(bu 2
+cw
+\[la]#cw\[ra]
+.RS
+.IP \(bu 2
+enhanced\-monitoring
+\[la]#enhanced-monitoring\[ra]
+
+.RE
+
+.IP \(bu 2
+install\-manpage
+\[la]#install-manpage\[ra]
+.IP \(bu 2
+version, v
+\[la]#version-v\[ra]
+
+.RE
+
+.PP
+\fBUsage\fP:
+
+.PP
+.RS
+
+.nf
+gw\-aws\-audit [GLOBAL OPTIONS] command [COMMAND OPTIONS] [ARGUMENTS...]
+
+.fi
+.RE
+
+
+.SH COMMANDS
+.SH s3
+.PP
+S3 related commands
+
+.SS add\-cost\-tag
+.PP
+Add s3\-cost\-name to all S3 buckets
+
+.PP
+.RS
+
+.nf
+Idempotent action that will add the `s3\-cost\-name` tag to ALL S3 buckets for a
+given account.
+
+The value will be the Bucket name.
+
+.fi
+.RE
+
+.SS metrics
+.PP
+Get usage metrics
+
+.PP
+.RS
+
+.nf
+Prints out a CSV report to STDOUT to help track usage across all buckets for a
+given account.
+
+Metrics per Bucket:
+
+Objects (count)
+Size (Bytes)
+Size (GB)
+Size (TB)
+Bytes per Object
+MB per Object
+Has Cost Tag
+
+.fi
+.RE
+
+.SS clear\-bucket, exterminatus
+.PP
+Clear all Objects within a given Bucket
+
+.PP
+.RS
+
+.nf
+Efficiently delete all objects within a bucket.
+
+This process will run multiple paged deletes in parallel. It will handle API
+throttling from AWS with an exponential backoff with retry. 
+
+.fi
+.RE
+
+.PP
+\fB\-\-bucket, \-b\fP="": Bucket to clear
+
+.SH rds
+.PP
+RDS related commands
+
+.SS enhanced\-monitoring
+.PP
+Produce report of Enhanced Monitoring enabled instances
+
+.SH ec2
+.PP
+EC2 related commands
+
+.SS enhanced\-monitoring
+.PP
+Produce report of Enhanced Monitoring enabled instances
+
+.SS detached\-volumes
+.PP
+List detached EBS volumes and snapshot counts
+
+.SS stopped\-hosts
+.PP
+List stopped EC2 hosts and associated EBS volumes
+
+.SH cw
+.PP
+CloudWatch related commands
+
+.SS enhanced\-monitoring
+.PP
+Produce report of Enhanced Monitoring enabled EC2 \& RDS instances
+
+.SH install\-manpage
+.PP
+Generate and install man page
+
+.SH version, v
+.PP
+Print version info
+
