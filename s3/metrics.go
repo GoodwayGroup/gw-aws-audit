@@ -18,7 +18,7 @@ import (
 
 var (
 	kmetrics = k.Extend("GetBucketMetrics")
-	kpbm = kmetrics.Extend("processBucketMetrics")
+	kpbm     = kmetrics.Extend("processBucketMetrics")
 )
 
 // Get ALL S3 Bucket metrics for a given region

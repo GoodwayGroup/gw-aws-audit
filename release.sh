@@ -67,6 +67,16 @@ fi
 
 h1 "Preparing release of $VERSION"
 
+h2 "Updating docs"
+make docs
+if [[ "$(git status -s docs/gwsm.* 2>/dev/null | wc -l)" == "0" ]]; then
+  note "No changes to docs"
+else
+  note "Committing changes to docs"
+  git add docs/gw-aws-audit.*
+  git commit -m "chore(docs): updating docs for version $VERSION"
+fi
+
 h2 "Updating CHANGELOG.md"
 git-chglog --next-tag $VERSION -o CHANGELOG.md && git add CHANGELOG.md
 git commit -m "feat(release): $VERSION"
@@ -87,4 +97,3 @@ echo ""
 note "What you still need to do:"
 info "1. Update the release in github with compiled assets."
 echo ""
-success "Done!"

@@ -15,10 +15,10 @@ import (
 )
 
 var (
-	kact = k.Extend("AddCostTag")
-	ktag = k.Extend("checkCostTag")
-	kup = k.Extend("updateTags")
-	khtr = k.Extend("handleGetTagsResponse")
+	kact  = k.Extend("AddCostTag")
+	ktag  = k.Extend("checkCostTag")
+	kup   = k.Extend("updateTags")
+	khtr  = k.Extend("handleGetTagsResponse")
 	kproc = kact.Extend("processBucket")
 )
 
@@ -175,7 +175,6 @@ func checkCostTag(s3svc *s3.S3, bucketName *string) ([]*s3.Tag, bool) {
 	}
 	return nil, false
 }
-
 
 func handleGetTagsResponse(err error) (hasTags bool) {
 	if err != nil {

@@ -5,6 +5,8 @@
 
 ## Basic Usage
 
+Please see [the docs for details on the commands.](./docs/gw-aws-audit.md)
+
 Useful for clearing **large S3 buckets (many millions of objects)**, identifying egress EBS volumes and tracking S3 spend.
 
 ```
@@ -15,23 +17,20 @@ NAME:
 USAGE:
    gw-aws-audit [global options] command [command options] [arguments...]
 
-VERSION:
-   v1.2.0
-
 AUTHOR:
    Derek Smith <dsmith@goodwaygroup.com>
 
 COMMANDS:
-   version, v  Print version info
-   s3          S3 related commands
-   rds         RDS related commands
-   ec2         EC2 related commands
-   cw          CloudWatch related commands
-   help, h     Shows a list of commands or help for one command
+   s3               S3 related commands
+   rds              RDS related commands
+   ec2              EC2 related commands
+   cw               CloudWatch related commands
+   install-manpage  Generate and install man page
+   version, v       Print version info
+   help, h          Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --help, -h     show help (default: false)
-   --version, -v  print the version (default: false)
+   --help, -h  show help (default: false)
 
 COPYRIGHT:
    (c) 2020 Goodway Group

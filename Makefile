@@ -35,9 +35,13 @@ package: xbuild
 		echo $$f; \
 	done
 
+docs:
+	DOCS_MD=1 go run ./main.go > docs/gw-aws-audit.md
+	DOCS_MAN=1 go run ./main.go > docs/gw-aws-audit.8
+
 clean:
 	@rm -rf bin/ && rm -rf build/
 
 ci: tools package
 
-.PHONY: all tools build xbuild package clean ci
+.PHONY: all tools build xbuild package clean ci docs
