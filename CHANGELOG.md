@@ -2,10 +2,19 @@
 ## [Unreleased]
 
 
+<a name="v1.4.0"></a>
+## [v1.4.0] - 2020-08-11
+### Chore
+- **docs:** update docs out put and manpage generation
+
+
 <a name="v1.3.3"></a>
 ## [v1.3.3] - 2020-08-04
 ### Chore
 - update dependencies
+
+### Features
+- **release:** v1.3.3
 
 
 <a name="v1.3.2"></a>
@@ -154,7 +163,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.3...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.4.0...HEAD
+[v1.4.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.3...v1.4.0
 [v1.3.3]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.2...v1.3.3
 [v1.3.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.1...v1.3.2
 [v1.3.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.0...v1.3.1
