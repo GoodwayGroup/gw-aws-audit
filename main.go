@@ -6,13 +6,12 @@ import (
 	"github.com/GoodwayGroup/gw-aws-audit/info"
 	"github.com/GoodwayGroup/gw-aws-audit/rds"
 	"github.com/GoodwayGroup/gw-aws-audit/s3"
-	"io/ioutil"
+	"github.com/clok/cdocs"
+	"github.com/urfave/cli/v2"
 	"log"
 	"os"
 	"runtime"
 	"time"
-
-	"github.com/urfave/cli/v2"
 )
 
 var version string
@@ -24,6 +23,13 @@ func init() {
 }
 
 func main() {
+	im, err := cdocs.InstallManpageCommand(&cdocs.InstallManpageCommandInput{
+		AppName: info.AppName,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	app := &cli.App{
 		Name:     info.AppName,
 		Version:  version,
@@ -193,18 +199,7 @@ throttling from AWS with an exponential backoff with retry.
 					},
 				},
 			},
-			{
-				Name:  "install-manpage",
-				Usage: "Generate and install man page",
-				Action: func(c *cli.Context) error {
-					mp, _ := info.ToMan(c.App)
-					err := ioutil.WriteFile("/usr/local/share/man/man8/gw-aws-audit.8", []byte(mp), 0644)
-					if err != nil {
-						return cli.NewExitError(fmt.Sprintf("Unable to install man page: %e", err), 2)
-					}
-					return nil
-				},
-			},
+			im,
 			{
 				Name:    "version",
 				Aliases: []string{"v"},
@@ -218,7 +213,7 @@ throttling from AWS with an exponential backoff with retry.
 	}
 
 	if os.Getenv("DOCS_MD") != "" {
-		docs, err := info.ToMarkdown(app)
+		docs, err := cdocs.ToMarkdown(app)
 		if err != nil {
 			panic(err)
 		}
@@ -227,7 +222,7 @@ throttling from AWS with an exponential backoff with retry.
 	}
 
 	if os.Getenv("DOCS_MAN") != "" {
-		docs, err := info.ToMan(app)
+		docs, err := cdocs.ToMan(app)
 		if err != nil {
 			panic(err)
 		}
@@ -235,7 +230,7 @@ throttling from AWS with an exponential backoff with retry.
 		return
 	}
 
-	err := app.Run(os.Args)
+	err = app.Run(os.Args)
 	if err != nil {
 		log.Fatal(err)
 	}
