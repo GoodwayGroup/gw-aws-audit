@@ -13,6 +13,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.7 // indirect
 	github.com/remeh/sizedwaitgroup v1.0.0
 	github.com/tcnksm/go-input v0.0.0-20180404061846-548a7d7a8ee8
-	github.com/thoas/go-funk v0.6.0
+	github.com/thoas/go-funk v0.7.0
 	github.com/urfave/cli/v2 v2.2.0
 )
