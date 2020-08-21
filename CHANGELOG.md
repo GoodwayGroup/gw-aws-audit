@@ -2,10 +2,56 @@
 ## [Unreleased]
 
 
+<a name="v1.5.1"></a>
+## [v1.5.1] - 2020-08-21
+### Chore
+- **deps:** udpate clok/kemba, clok/awssession, clok/cdocs, jedib0t/go-pretty/v6 and aws/aws-sdk-go
+- **deps:** add renovate.json
+- **renovate:** clean up dupe config
+- **renovate:** add renovate.json
+
+### Pull Requests
+- chore(deps): update module aws/aws-sdk-go to v1.34.8 ([#6](https://github.com/GoodwayGroup/gw-aws-audit/issues/6))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+- chore(deps): update module thoas/go-funk to v0.7.0 ([#8](https://github.com/GoodwayGroup/gw-aws-audit/issues/8))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+- chore(deps): update module jedib0t/go-pretty to v6 ([#9](https://github.com/GoodwayGroup/gw-aws-audit/issues/9))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+- chore(deps): update module clok/awssession to v0.1.4 ([#7](https://github.com/GoodwayGroup/gw-aws-audit/issues/7))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+
+
 <a name="v1.5.0"></a>
 ## [v1.5.0] - 2020-08-13
 ### Chore
 - **docs:** updating docs for version v1.4.0
+
+### Features
+- **release:** v1.5.0
 
 ### Fest
 - **cdocs:** integrate cdocs library
@@ -175,7 +221,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.5.1...HEAD
+[v1.5.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.3...v1.4.0
 [v1.3.3]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.2...v1.3.3
