@@ -68,7 +68,7 @@ h1 "Preparing release of $VERSION"
 
 h2 "Updating docs"
 make docs
-if [[ "$(git status -s docs/gwsm.* 2>/dev/null | wc -l)" == "0" ]]; then
+if [[ "$(git status -s docs/gw-aws-audit.* 2>/dev/null | wc -l)" == "0" ]]; then
   note "No changes to docs"
 else
   note "Committing changes to docs"
