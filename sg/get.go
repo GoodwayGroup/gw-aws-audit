@@ -1,0 +1,132 @@
+package sg
+
+import (
+	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/ec2"
+	as "github.com/clok/awssession"
+	"github.com/clok/kemba"
+	"strings"
+)
+
+var (
+	ksg = kemba.New("gw-aws-audit:sg")
+)
+
+type securityGroup struct {
+	id       string
+	name     string
+	attached map[string]int
+}
+
+func getAllSecurityGroups() (map[string]*securityGroup, error) {
+	kl := ksg.Extend("get-all-sg")
+	sess, err := as.New()
+	if err != nil {
+		return nil, err
+	}
+	client := ec2.New(sess)
+
+	var results *ec2.DescribeSecurityGroupsOutput
+	results, err = client.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{
+		MaxResults: aws.Int64(1000),
+	})
+	if err != nil {
+		fmt.Println("Failed to list Security Groups")
+		return nil, err
+	}
+
+	kl.Printf("found %d security groups", len(results.SecurityGroups))
+	secGroups := make(map[string]*securityGroup, len(results.SecurityGroups))
+	for _, sec := range results.SecurityGroups {
+		secGroups[aws.StringValue(sec.GroupId)] = &securityGroup{
+			id:   aws.StringValue(sec.GroupId),
+			name: aws.StringValue(sec.GroupName),
+		}
+	}
+
+	return secGroups, nil
+}
+
+func detectAttachedSecurityGroups(sgs map[string]*securityGroup) error {
+	kl := ksg.Extend("detect-attached")
+	sess, err := as.New()
+	if err != nil {
+		return err
+	}
+	client := ec2.New(sess)
+
+	var results *ec2.DescribeNetworkInterfacesOutput
+	results, err = client.DescribeNetworkInterfaces(&ec2.DescribeNetworkInterfacesInput{
+		MaxResults: aws.Int64(1000),
+	})
+	if err != nil {
+		fmt.Println("Failed to list instances")
+		return err
+	}
+
+	kl.Printf("found %d Network Interfaces", len(results.NetworkInterfaces))
+	for _, network := range results.NetworkInterfaces {
+		kl.Printf("%2s found %d security groups", "└>", len(network.Groups))
+		if len(network.Groups) == 0 {
+			kl.Extend("no-groups").Log(network)
+		}
+		for i, sec := range network.Groups {
+			id := aws.StringValue(sec.GroupId)
+
+			var owner string
+			if network.Attachment != nil {
+				if aws.StringValue(network.Attachment.InstanceOwnerId) == "amazon-aws" {
+					owner = aws.StringValue(network.InterfaceType)
+				} else if strings.HasPrefix(aws.StringValue(network.Attachment.InstanceOwnerId), "amazon-") {
+					owner = strings.Split(aws.StringValue(network.Attachment.InstanceOwnerId), "amazon-")[1]
+				} else if strings.Contains(strings.ToLower(aws.StringValue(network.Description)), "eks") {
+					owner = "eks"
+				} else if strings.Contains(strings.ToLower(aws.StringValue(network.Description)), "efs") {
+					owner = "efs"
+				} else if strings.HasPrefix(aws.StringValue(network.Attachment.InstanceId), "i-") {
+					owner = "ec2"
+				} else if network.Attachment.InstanceId == nil {
+					owner = aws.StringValue(network.InterfaceType)
+				} else {
+					owner = aws.StringValue(network.Attachment.InstanceOwnerId)
+				}
+			} else {
+				owner = "unknown"
+			}
+
+			if _, ok := sgs[id]; !ok {
+				fmt.Printf("Found SG that was not in original list: %# v", sec)
+			} else {
+				if sgs[id].attached == nil {
+					sgs[id].attached = map[string]int{}
+				}
+				sgs[id].attached[owner] += 1
+			}
+
+			stub := "├─"
+			if i == len(network.Groups)-1 {
+				stub = "└>"
+			}
+			kl.Printf("%6s %s -> %s", stub, id, aws.StringValue(sec.GroupName))
+		}
+	}
+
+	kl.Extend("dump").Log(sgs)
+
+	return nil
+}
+
+func getAnnotatedSegurityGroups() (map[string]*securityGroup, error) {
+	// get all sgs in a region
+	sgs, err := getAllSecurityGroups()
+	if err != nil {
+		return nil, err
+	}
+
+	err = detectAttachedSecurityGroups(sgs)
+	if err != nil {
+		return nil, err
+	}
+	return sgs, nil
+}

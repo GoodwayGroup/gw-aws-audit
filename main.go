@@ -6,6 +6,7 @@ import (
 	"github.com/GoodwayGroup/gw-aws-audit/info"
 	"github.com/GoodwayGroup/gw-aws-audit/rds"
 	"github.com/GoodwayGroup/gw-aws-audit/s3"
+	"github.com/GoodwayGroup/gw-aws-audit/sg"
 	"github.com/clok/cdocs"
 	"github.com/urfave/cli/v2"
 	"log"
@@ -167,6 +168,43 @@ throttling from AWS with an exponential backoff with retry.
 						Usage: "List stopped EC2 hosts and associated EBS volumes",
 						Action: func(c *cli.Context) error {
 							err := ec2.ListStoppedHosts()
+							if err != nil {
+								return cli.NewExitError(err, 2)
+							}
+							return nil
+						},
+					},
+				},
+			},
+			{
+				Name:  "sg",
+				Usage: "Security Group related commands",
+				Subcommands: []*cli.Command{
+					{
+						Name:  "detached",
+						Usage: "generate a report of all Security Groups that are NOT attached to an instance",
+						UsageText: `
+This command will scan the EC2 NetworkInterfaces to determine what
+Security Groups are NOT attached/assigned in AWS.
+
+`,
+						Action: func(context *cli.Context) error {
+							err := sg.ListDetachedSecurityGroups()
+							if err != nil {
+								return cli.NewExitError(err, 2)
+							}
+							return nil
+						},
+					},
+					{
+						Name:  "attached",
+						Usage: "generate a report of all Security Groups that are attached to an instance",
+						UsageText: `
+This command will scan the EC2 NetworkInterfaces to determine what
+Security Groups are attached/assigned in AWS.
+`,
+						Action: func(context *cli.Context) error {
+							err := sg.ListAttachedSecurityGroups()
 							if err != nil {
 								return cli.NewExitError(err, 2)
 							}
