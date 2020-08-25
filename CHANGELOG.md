@@ -2,6 +2,12 @@
 ## [Unreleased]
 
 
+<a name="v1.6.1"></a>
+## [v1.6.1] - 2020-08-25
+### Chore
+- updated release script to include publish to github
+
+
 <a name="v1.6.0"></a>
 ## [v1.6.0] - 2020-08-25
 ### Chore
@@ -9,6 +15,7 @@
 - **make:** don't update go.mod with gox
 
 ### Features
+- **release:** v1.6.0
 - **sg:** added Security Group attach/detach reports
 
 
@@ -234,7 +241,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.1...HEAD
+[v1.6.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.0...v1.6.1
 [v1.6.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.5.1...v1.6.0
 [v1.5.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.4.0...v1.5.0
