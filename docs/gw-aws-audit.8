@@ -56,6 +56,19 @@ stopped\-hosts
 .RE
 
 .IP \(bu 2
+sg
+\[la]#sg\[ra]
+.RS
+.IP \(bu 2
+detached
+\[la]#detached\[ra]
+.IP \(bu 2
+attached
+\[la]#attached\[ra]
+
+.RE
+
+.IP \(bu 2
 cw
 \[la]#cw\[ra]
 .RS
@@ -175,6 +188,39 @@ List detached EBS volumes and snapshot counts
 .PP
 List stopped EC2 hosts and associated EBS volumes
 
+.SH sg
+.PP
+Security Group related commands
+
+.SS detached
+.PP
+generate a report of all Security Groups that are NOT attached to an instance
+
+.PP
+.RS
+
+.nf
+This command will scan the EC2 NetworkInterfaces to determine what
+Security Groups are NOT attached/assigned in AWS.
+
+
+.fi
+.RE
+
+.SS attached
+.PP
+generate a report of all Security Groups that are attached to an instance
+
+.PP
+.RS
+
+.nf
+This command will scan the EC2 NetworkInterfaces to determine what
+Security Groups are attached/assigned in AWS.
+
+.fi
+.RE
+
 .SH cw
 .PP
 CloudWatch related commands
@@ -186,6 +232,14 @@ Produce report of Enhanced Monitoring enabled EC2 \& RDS instances
 .SH install\-manpage
 .PP
 Generate and install man page
+
+.PP
+.RS
+
+.PP
+NOTE: Windows is not supported
+
+.RE
 
 .SH version, v
 .PP

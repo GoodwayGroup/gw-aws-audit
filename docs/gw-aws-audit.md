@@ -17,6 +17,9 @@ gw-aws-audit
     - [enhanced-monitoring](#enhanced-monitoring)
     - [detached-volumes](#detached-volumes)
     - [stopped-hosts](#stopped-hosts)
+- [sg](#sg)
+    - [detached](#detached)
+    - [attached](#attached)
 - [cw](#cw)
     - [enhanced-monitoring](#enhanced-monitoring)
 - [install-manpage](#install-manpage)
@@ -100,6 +103,29 @@ List detached EBS volumes and snapshot counts
 
 List stopped EC2 hosts and associated EBS volumes
 
+## sg
+
+Security Group related commands
+
+### detached
+
+generate a report of all Security Groups that are NOT attached to an instance
+
+```
+This command will scan the EC2 NetworkInterfaces to determine what
+Security Groups are NOT attached/assigned in AWS.
+
+```
+
+### attached
+
+generate a report of all Security Groups that are attached to an instance
+
+```
+This command will scan the EC2 NetworkInterfaces to determine what
+Security Groups are attached/assigned in AWS.
+```
+
 ## cw
 
 CloudWatch related commands
@@ -111,6 +137,8 @@ Produce report of Enhanced Monitoring enabled EC2 & RDS instances
 ## install-manpage
 
 Generate and install man page
+
+>NOTE: Windows is not supported
 
 ## version, v
 
