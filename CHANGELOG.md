@@ -2,6 +2,16 @@
 ## [Unreleased]
 
 
+<a name="v1.6.0"></a>
+## [v1.6.0] - 2020-08-25
+### Chore
+- **deps:** bump version of kemba and aws-sdk-go
+- **make:** don't update go.mod with gox
+
+### Features
+- **sg:** added Security Group attach/detach reports
+
+
 <a name="v1.5.1"></a>
 ## [v1.5.1] - 2020-08-21
 ### Chore
@@ -9,6 +19,9 @@
 - **deps:** add renovate.json
 - **renovate:** clean up dupe config
 - **renovate:** add renovate.json
+
+### Features
+- **release:** v1.5.1
 
 ### Pull Requests
 - chore(deps): update module aws/aws-sdk-go to v1.34.8 ([#6](https://github.com/GoodwayGroup/gw-aws-audit/issues/6))
@@ -221,7 +234,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.0...HEAD
+[v1.6.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.5.1...v1.6.0
 [v1.5.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.3...v1.4.0
