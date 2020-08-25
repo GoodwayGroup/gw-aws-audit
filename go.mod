@@ -3,12 +3,11 @@ module github.com/GoodwayGroup/gw-aws-audit
 go 1.14
 
 require (
-	github.com/aws/aws-sdk-go v1.34.9
+	github.com/aws/aws-sdk-go v1.34.10
 	github.com/cenkalti/backoff/v4 v4.0.2
 	github.com/clok/awssession v0.1.5
 	github.com/clok/cdocs v0.2.2
-	github.com/clok/kemba v0.6.4
-	github.com/go-openapi/strfmt v0.19.5 // indirect
+	github.com/clok/kemba v0.7.1
 	github.com/jedib0t/go-pretty/v6 v6.0.4
 	github.com/remeh/sizedwaitgroup v1.0.0
 	github.com/tcnksm/go-input v0.0.0-20180404061846-548a7d7a8ee8
