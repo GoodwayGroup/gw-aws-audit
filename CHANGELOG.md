@@ -2,6 +2,16 @@
 ## [Unreleased]
 
 
+<a name="v1.7.0"></a>
+## [v1.7.0] - 2020-08-26
+### Chore
+- linting
+
+### Features
+- **helper:** added audit.sh helper tool
+- **sg:** add security group summary metrics
+
+
 <a name="v1.6.2"></a>
 ## [v1.6.2] - 2020-08-25
 ### Bug Fixes
@@ -9,6 +19,9 @@
 
 ### Chore
 - **docs:** updating docs for version v1.6.2
+
+### Features
+- **release:** v1.6.2
 
 
 <a name="v1.6.1"></a>
@@ -253,7 +266,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.2...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.7.0...HEAD
+[v1.7.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.2...v1.7.0
 [v1.6.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.1...v1.6.2
 [v1.6.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.0...v1.6.1
 [v1.6.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.5.1...v1.6.0
