@@ -24,6 +24,7 @@ COMMANDS:
    s3               S3 related commands
    rds              RDS related commands
    ec2              EC2 related commands
+   sg               Security Group related commands
    cw               CloudWatch related commands
    install-manpage  Generate and install man page
    version, v       Print version info
@@ -42,9 +43,50 @@ COPYRIGHT:
 $ curl https://i.jpillora.com/GoodwayGroup/gw-aws-audit! | bash
 ```
 
+## Audit helper script
+
+There is a bash helper script in the repo at [audit.sh](audit.sh). This tool is useful in running an audit across many regions at once.
+
+```
+$ ./audit.sh
+
+audit.sh helper script for gw-aws-audit
+
+Usage:
+    audit.sh [gw-aws-audit commands]
+
+Examples:
+> This will run the 'gw-aws-audit sg detached' command for every region in the US (default)
+
+    $ audit.sh sg detached
+
+> This will run the 'gw-aws-audit ec2 stopped-hosts' for ONLY the us-west-2 region
+
+    $ AWS_REGION=us-west-2 audit.sh ec2 stopped-hosts
+
+> This will run the 'gw-aws-audit ec2 stopped-hosts' for every region in the EU
+
+    $ REGION=eu audit.sh ec2 stopped-hosts
+
+> This will run the 'gw-aws-audit cw monitoring' using a specific version of the tool.
+
+    $ BIN_PATH=./bin/gw-aws-audit audit.sh cw monitoring
+
+Note: REGION env values (default: US):
+US: us-east-1 us-east-2 us-west-1 us-west-2
+EU: eu-central-1 eu-west-1 eu-west-2 eu-west-3 eu-south-1 eu-north-1
+AP: ap-east-1 ap-south-1 ap-northeast-3 ap-northeast-2 ap-southeast-1 ap-southeast-2 ap-northeast-1
+CH: cn-north-1 cn-northwest-1
+ROW: af-south-1 me-south-1 sa-east-2
+ALL: All of the above combined
+
+You can also set AWS_REGION and that will supersede the value of REGION
+✔ Have fun!
+```
+
 ### Command Categories
 
-There are commands for `s3`, `ec2`, `rds` and `cw`
+There are commands for `s3`, `ec2`, `rds`, `sg` and `cw`
 
 **s3**
 ```
