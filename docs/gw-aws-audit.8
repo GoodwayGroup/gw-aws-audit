@@ -52,6 +52,9 @@ detached\-volumes
 .IP \(bu 2
 stopped\-hosts
 \[la]#stopped-hosts\[ra]
+.IP \(bu 2
+pem\-keys
+\[la]#pem-keys\[ra]
 
 .RE
 
@@ -65,6 +68,9 @@ detached
 .IP \(bu 2
 attached
 \[la]#attached\[ra]
+.IP \(bu 2
+cidr
+\[la]#cidr\[ra]
 
 .RE
 
@@ -188,6 +194,10 @@ List detached EBS volumes and snapshot counts
 .PP
 List stopped EC2 hosts and associated EBS volumes
 
+.SS pem\-keys
+.PP
+List instances and PEM key used at time of creation
+
 .SH sg
 .PP
 Security Group related commands
@@ -220,6 +230,37 @@ Security Groups are attached/assigned in AWS.
 
 .fi
 .RE
+
+.SS cidr
+.PP
+generate a report comparing SG rules with input CIDR blocks
+
+.PP
+.RS
+
+.nf
+$ gw\-aws\-audit sg cidr \-\-allowed 10.176.0.0/16,10.175.0.0/16 \-\-alert 174.0.0.0/8,1.2.3.4/32
+
+This command will generate a report detecting the port to CIDR mapping rules 
+for attached Security Groups. 
+
+A list of Approved CIDRs is required. This is typically the CIDR block associated
+with your VPC.
+
+.fi
+.RE
+
+.PP
+\fB\-\-alert, \-b\fP="": CIDR blocks that will cause an alert (csv) (default: 174.0.0.0/8)
+
+.PP
+\fB\-\-approved, \-a\fP="": CIDR blocks that are approved (csv)
+
+.PP
+\fB\-\-ignore\-ports, \-p\fP="": Ports that can be ignored (csv) (default: 80,443)
+
+.PP
+\fB\-\-warn, \-w\fP="": CIDR blocks that will cause a warning (csv) (default: 204.0.0.0/8)
 
 .SH cw
 .PP

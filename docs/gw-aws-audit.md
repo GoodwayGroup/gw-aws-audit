@@ -17,9 +17,11 @@ gw-aws-audit
     - [enhanced-monitoring](#enhanced-monitoring)
     - [detached-volumes](#detached-volumes)
     - [stopped-hosts](#stopped-hosts)
+    - [pem-keys](#pem-keys)
 - [sg](#sg)
     - [detached](#detached)
     - [attached](#attached)
+    - [cidr](#cidr)
 - [cw](#cw)
     - [enhanced-monitoring](#enhanced-monitoring)
 - [install-manpage](#install-manpage)
@@ -103,6 +105,10 @@ List detached EBS volumes and snapshot counts
 
 List stopped EC2 hosts and associated EBS volumes
 
+### pem-keys
+
+List instances and PEM key used at time of creation
+
 ## sg
 
 Security Group related commands
@@ -125,6 +131,28 @@ generate a report of all Security Groups that are attached to an instance
 This command will scan the EC2 NetworkInterfaces to determine what
 Security Groups are attached/assigned in AWS.
 ```
+
+### cidr
+
+generate a report comparing SG rules with input CIDR blocks
+
+```
+$ gw-aws-audit sg cidr --allowed 10.176.0.0/16,10.175.0.0/16 --alert 174.0.0.0/8,1.2.3.4/32
+
+This command will generate a report detecting the port to CIDR mapping rules 
+for attached Security Groups. 
+
+A list of Approved CIDRs is required. This is typically the CIDR block associated
+with your VPC.
+```
+
+**--alert, -b**="": CIDR blocks that will cause an alert (csv) (default: 174.0.0.0/8)
+
+**--approved, -a**="": CIDR blocks that are approved (csv)
+
+**--ignore-ports, -p**="": Ports that can be ignored (csv) (default: 80,443)
+
+**--warn, -w**="": CIDR blocks that will cause a warning (csv) (default: 204.0.0.0/8)
 
 ## cw
 
