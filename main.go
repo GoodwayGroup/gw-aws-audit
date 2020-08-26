@@ -222,6 +222,52 @@ Security Groups are attached/assigned in AWS.
 							return nil
 						},
 					},
+					{
+						Name:  "cidr",
+						Usage: "generate a report comparing SG rules with input CIDR blocks",
+						UsageText: `
+$ gw-aws-audit sg cidr --allowed 10.176.0.0/16,10.175.0.0/16 --alert 174.0.0.0/8,1.2.3.4/32
+
+This command will generate a report detecting the port to CIDR mapping rules 
+for attached Security Groups. 
+
+A list of Approved CIDRs is required. This is typically the CIDR block associated
+with your VPC.
+`,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "approved",
+								Aliases:  []string{"a"},
+								Usage:    "CIDR blocks that are approved (csv)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "warn",
+								Aliases: []string{"w"},
+								Usage:   "CIDR blocks that will cause a warning (csv)",
+								Value:   "204.0.0.0/8",
+							},
+							&cli.StringFlag{
+								Name:    "alert",
+								Aliases: []string{"b"},
+								Usage:   "CIDR blocks that will cause an alert (csv)",
+								Value:   "174.0.0.0/8",
+							},
+							&cli.StringFlag{
+								Name:    "ignore-ports",
+								Aliases: []string{"p"},
+								Usage:   "Ports that can be ignored (csv)",
+								Value:   "80,443",
+							},
+						},
+						Action: func(context *cli.Context) error {
+							err := sg.GenerateCIDRReport(context)
+							if err != nil {
+								return cli.NewExitError(err, 2)
+							}
+							return nil
+						},
+					},
 				},
 			},
 			{
