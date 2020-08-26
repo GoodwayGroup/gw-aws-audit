@@ -2,6 +2,16 @@
 ## [Unreleased]
 
 
+<a name="v1.8.0"></a>
+## [v1.8.0] - 2020-08-26
+### Chore
+- **docs:** updating docs for version v1.8.0
+
+### Features
+- **ec2:** added task to generate a report of pem key usage
+- **sg:** CIDR and port reporting for attached security groups
+
+
 <a name="v1.7.0"></a>
 ## [v1.7.0] - 2020-08-26
 ### Chore
@@ -9,6 +19,7 @@
 
 ### Features
 - **helper:** added audit.sh helper tool
+- **release:** v1.7.0
 - **sg:** add security group summary metrics
 
 
@@ -266,7 +277,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.0...HEAD
+[v1.8.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.2...v1.7.0
 [v1.6.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.1...v1.6.2
 [v1.6.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.0...v1.6.1
