@@ -70,7 +70,7 @@ CHINA="cn-north-1 cn-northwest-1"
 ROW="af-south-1 me-south-1 sa-east-2"
 ALL="$US $EU $AP $ROW $CHINA"
 
-if [[ "x$1x" = "xx" || "$1" = "-h" || "$1" = "--help" ]]; then
+if [[ "x$1x" == "xx" || "$1" == "-h" || "$1" == "--help" ]]; then
   h1 "audit.sh helper script for gw-aws-audit"
   h2 "Usage:"
   cat <<EOF
