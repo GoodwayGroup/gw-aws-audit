@@ -174,6 +174,17 @@ throttling from AWS with an exponential backoff with retry.
 							return nil
 						},
 					},
+					{
+						Name:  "pem-keys",
+						Usage: "List instances and PEM key used at time of creation",
+						Action: func(c *cli.Context) error {
+							err := ec2.ListPemKeyUsage()
+							if err != nil {
+								return cli.NewExitError(err, 2)
+							}
+							return nil
+						},
+					},
 				},
 			},
 			{

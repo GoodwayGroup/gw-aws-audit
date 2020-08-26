@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-// List all EBS volumes that are in a Detached state, along with predicted associated cost.
+// ListDetachedVolumes will list all EBS volumes that are in a Detached state, along with predicted associated cost.
 func ListDetachedVolumes() error {
 	kl := k.Extend("ListDetachedVolumes")
 	sess, err := as.New()

@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-// List EC2 instances with CW Enhanced Monitoring enabled.
+// ListMonitoringEnabled will list EC2 instances with CW Enhanced Monitoring enabled.
 func ListMonitoringEnabled() error {
 	kl := k.Extend("ListMonitoringEnabled")
 	sess, err := as.New()

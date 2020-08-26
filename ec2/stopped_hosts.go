@@ -14,7 +14,7 @@ var (
 	k = kemba.New("gw-aws-audit:ec2")
 )
 
-// List all stopped EC2 hosts and attached EBS Volumes for those hosts for a given region.
+// ListStoppedHosts will list all stopped EC2 hosts and attached EBS Volumes for those hosts for a given region.
 func ListStoppedHosts() error {
 	kl := k.Extend("ListStoppedHosts")
 	sess, err := as.New()
