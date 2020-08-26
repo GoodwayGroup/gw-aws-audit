@@ -17,6 +17,7 @@ type securityGroup struct {
 	id       string
 	name     string
 	attached map[string]int
+	rules    map[string][]*ec2.IpRange
 }
 
 func getAllSecurityGroups() (map[string]*securityGroup, error) {
@@ -39,9 +40,29 @@ func getAllSecurityGroups() (map[string]*securityGroup, error) {
 	kl.Printf("found %d security groups", len(results.SecurityGroups))
 	secGroups := make(map[string]*securityGroup, len(results.SecurityGroups))
 	for _, sec := range results.SecurityGroups {
+		rules := map[string][]*ec2.IpRange{}
+		for _, rule := range sec.IpPermissions {
+			var pstr string
+			if rule.FromPort != nil {
+				if aws.Int64Value(rule.FromPort) == 0 {
+					pstr = "ALL"
+				} else {
+					pstr = fmt.Sprintf("%d", aws.Int64Value(rule.FromPort))
+				}
+			} else {
+				pstr = "ALL"
+			}
+			if _, ok := rules[pstr]; !ok {
+				rules[pstr] = rule.IpRanges
+			} else {
+				rules[pstr] = append(rules[pstr], rule.IpRanges...)
+			}
+		}
+
 		secGroups[aws.StringValue(sec.GroupId)] = &securityGroup{
-			id:   aws.StringValue(sec.GroupId),
-			name: aws.StringValue(sec.GroupName),
+			id:    aws.StringValue(sec.GroupId),
+			name:  aws.StringValue(sec.GroupName),
+			rules: rules,
 		}
 	}
 

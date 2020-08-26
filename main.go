@@ -19,7 +19,7 @@ var version string
 
 func init() {
 	cli.VersionPrinter = func(c *cli.Context) {
-		fmt.Fprintf(c.App.Writer, "%s %s (%s/%s)\n", info.AppName, version, runtime.GOOS, runtime.GOARCH)
+		_, _ = fmt.Fprintf(c.App.Writer, "%s %s (%s/%s)\n", info.AppName, version, runtime.GOOS, runtime.GOARCH)
 	}
 }
 
@@ -36,7 +36,7 @@ func main() {
 		Version:  version,
 		Compiled: time.Now(),
 		Authors: []*cli.Author{
-			&cli.Author{
+			{
 				Name:  "Derek Smith",
 				Email: "dsmith@goodwaygroup.com",
 			},
