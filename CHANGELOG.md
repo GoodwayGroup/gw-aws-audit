@@ -2,6 +2,13 @@
 ## [Unreleased]
 
 
+<a name="v1.8.1"></a>
+## [v1.8.1] - 2020-08-27
+### Chore
+- **docs:** updating docs for version v1.8.1
+- **sg:** add port 3 to ignored ports list
+
+
 <a name="v1.8.0"></a>
 ## [v1.8.0] - 2020-08-26
 ### Chore
@@ -9,6 +16,7 @@
 
 ### Features
 - **ec2:** added task to generate a report of pem key usage
+- **release:** v1.8.0
 - **sg:** CIDR and port reporting for attached security groups
 
 
@@ -277,7 +285,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.1...HEAD
+[v1.8.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.2...v1.7.0
 [v1.6.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.1...v1.6.2
