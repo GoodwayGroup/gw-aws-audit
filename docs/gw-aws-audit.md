@@ -150,7 +150,7 @@ with your VPC.
 
 **--approved, -a**="": CIDR blocks that are approved (csv)
 
-**--ignore-ports, -p**="": Ports that can be ignored (csv) (default: 80,443)
+**--ignore-ports, -p**="": Ports that can be ignored (csv) (default: 80,443,3)
 
 **--warn, -w**="": CIDR blocks that will cause a warning (csv) (default: 204.0.0.0/8)
 
