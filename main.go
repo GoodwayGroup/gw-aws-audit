@@ -257,7 +257,7 @@ with your VPC.
 								Name:    "ignore-ports",
 								Aliases: []string{"p"},
 								Usage:   "Ports that can be ignored (csv)",
-								Value:   "80,443",
+								Value:   "80,443,3",
 							},
 						},
 						Action: func(context *cli.Context) error {
