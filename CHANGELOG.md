@@ -2,6 +2,15 @@
 ## [Unreleased]
 
 
+<a name="v1.9.1"></a>
+## [v1.9.1] - 2020-08-31
+### Bug Fixes
+- addressed bug that was causing SGs to be skipped in processing
+
+### Chore
+- **deps:** update module aws/aws-sdk-go to v1.34.14
+
+
 <a name="v1.9.0"></a>
 ## [v1.9.0] - 2020-08-31
 ### Chore
@@ -11,6 +20,7 @@
 - **lint:** clean up some formatting concerns
 
 ### Features
+- **release:** v1.9.0
 - **sg:** added port command to generate report of exposure of a port across Security Groups
 
 
@@ -300,7 +310,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.9.1...HEAD
+[v1.9.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.9.0...v1.9.1
 [v1.9.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.1...v1.9.0
 [v1.8.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.7.0...v1.8.0
