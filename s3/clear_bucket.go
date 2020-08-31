@@ -40,7 +40,7 @@ func ClearBucketObjects(c *cli.Context) error {
 		// Validate input
 		ValidateFunc: func(s string) error {
 			if s != bucketName {
-				return fmt.Errorf("Input must be %s to coninue. Exiting.", bucketName)
+				return fmt.Errorf("input must be %s to coninue. exiting", bucketName)
 			}
 
 			return nil
@@ -133,10 +133,9 @@ func handleResponse(err error, retries *int64) (hasError bool) {
 			khr.Printf("AWS Error Message: %s", awsErr.Message())
 			atomic.AddInt64(retries, 1)
 			return true
-		} else {
-			panic(err)
 		}
-	} else {
-		return false
+		// TODO: refactor to remove panic
+		panic(err)
 	}
+	return false
 }

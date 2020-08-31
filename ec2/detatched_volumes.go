@@ -38,7 +38,7 @@ func ListDetachedVolumes() error {
 
 	kl.Printf("found %d reservations", len(results.Volumes))
 	for _, volume := range results.Volumes {
-		if len(volume.Attachments) <= 0 {
+		if len(volume.Attachments) == 0 {
 			volCnt++
 			volParams := &ec2.DescribeVolumesInput{
 				VolumeIds: []*string{volume.VolumeId},

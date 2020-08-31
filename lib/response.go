@@ -17,9 +17,9 @@ func HandleResponse(err error) (hasError bool) {
 			k.Printf("AWS Error Message: %s", awsErr.Message())
 			k.Log(awsErr)
 			return true
-		} else {
-			panic(err)
 		}
+		// TODO: refactor to remove panic
+		panic(err)
 	}
 	return false
 }

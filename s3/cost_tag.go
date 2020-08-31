@@ -168,10 +168,9 @@ func checkCostTag(s3svc *s3.S3, bucketName *string) ([]*s3.Tag, bool) {
 		if funk.ContainsString(keys, "s3-cost-name") {
 			kproc.Printf("%s | s3-cost-name found", *bucketName)
 			return result.TagSet, true
-		} else {
-			kproc.Printf("%s | s3-cost-name not found", *bucketName)
-			return result.TagSet, false
 		}
+		kproc.Printf("%s | s3-cost-name not found", *bucketName)
+		return result.TagSet, false
 	}
 	return nil, false
 }
@@ -186,9 +185,9 @@ func handleGetTagsResponse(err error) (hasTags bool) {
 			khtr.Printf("AWS Error Message: %s", awsErr.Message())
 			khtr.Log(awsErr)
 			return false
-		} else {
-			panic(err)
 		}
+		// TODO: refactor to remove panic
+		panic(err)
 	}
 	return true
 }
