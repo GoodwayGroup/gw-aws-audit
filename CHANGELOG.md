@@ -2,11 +2,26 @@
 ## [Unreleased]
 
 
+<a name="v1.9.0"></a>
+## [v1.9.0] - 2020-08-31
+### Chore
+- add github lint action
+- **deps:** update module aws/aws-sdk-go to v1.34.13
+- **docs:** updating docs for version v1.9.0
+- **lint:** clean up some formatting concerns
+
+### Features
+- **sg:** added port command to generate report of exposure of a port across Security Groups
+
+
 <a name="v1.8.1"></a>
 ## [v1.8.1] - 2020-08-27
 ### Chore
 - **docs:** updating docs for version v1.8.1
 - **sg:** add port 3 to ignored ports list
+
+### Features
+- **release:** v1.8.1
 
 
 <a name="v1.8.0"></a>
@@ -285,7 +300,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.1...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.9.0...HEAD
+[v1.9.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.1...v1.9.0
 [v1.8.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.7.0...v1.8.0
 [v1.7.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.6.2...v1.7.0
