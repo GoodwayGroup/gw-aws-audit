@@ -71,6 +71,9 @@ attached
 .IP \(bu 2
 cidr
 \[la]#cidr\[ra]
+.IP \(bu 2
+port
+\[la]#port\[ra]
 
 .RE
 
@@ -254,10 +257,46 @@ with your VPC.
 \fB\-\-alert, \-b\fP="": CIDR blocks that will cause an alert (csv) (default: 174.0.0.0/8)
 
 .PP
+\fB\-\-all\fP: Process ALL Security Groups, not just attached
+
+.PP
 \fB\-\-approved, \-a\fP="": CIDR blocks that are approved (csv)
 
 .PP
 \fB\-\-ignore\-ports, \-p\fP="": Ports that can be ignored (csv) (default: 80,443,3)
+
+.PP
+\fB\-\-warn, \-w\fP="": CIDR blocks that will cause a warning (csv) (default: 204.0.0.0/8)
+
+.SS port
+.PP
+generate a report comparing SG rules with input CIDR blocks on a specific port
+
+.PP
+.RS
+
+.nf
+$ gw\-aws\-audit sg ports \-\-ports 22,3306 \-\-allowed 10.176.0.0/16,10.175.0.0/16 \-\-alert 174.0.0.0/8,1.2.3.4/32
+
+This command will generate a report for a set of PORTS for attached Security Groups.
+
+A list of Approved CIDRs is required. This is typically the CIDR block associated
+with your VPC.
+
+.fi
+.RE
+
+.PP
+\fB\-\-alert, \-b\fP="": CIDR blocks that will cause an alert (csv) (default: 174.0.0.0/8)
+
+.PP
+\fB\-\-all\fP: Process ALL Security Groups, not just attached
+
+.PP
+\fB\-\-approved, \-a\fP="": CIDR blocks that are approved (csv)
+
+.PP
+\fB\-\-ports, \-p\fP="": Ports to generate report on (csv) (default: 22)
 
 .PP
 \fB\-\-warn, \-w\fP="": CIDR blocks that will cause a warning (csv) (default: 204.0.0.0/8)

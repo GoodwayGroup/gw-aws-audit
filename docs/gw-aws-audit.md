@@ -22,6 +22,7 @@ gw-aws-audit
     - [detached](#detached)
     - [attached](#attached)
     - [cidr](#cidr)
+    - [port](#port)
 - [cw](#cw)
     - [enhanced-monitoring](#enhanced-monitoring)
 - [install-manpage](#install-manpage)
@@ -148,9 +149,34 @@ with your VPC.
 
 **--alert, -b**="": CIDR blocks that will cause an alert (csv) (default: 174.0.0.0/8)
 
+**--all**: Process ALL Security Groups, not just attached
+
 **--approved, -a**="": CIDR blocks that are approved (csv)
 
 **--ignore-ports, -p**="": Ports that can be ignored (csv) (default: 80,443,3)
+
+**--warn, -w**="": CIDR blocks that will cause a warning (csv) (default: 204.0.0.0/8)
+
+### port
+
+generate a report comparing SG rules with input CIDR blocks on a specific port
+
+```
+$ gw-aws-audit sg ports --ports 22,3306 --allowed 10.176.0.0/16,10.175.0.0/16 --alert 174.0.0.0/8,1.2.3.4/32
+
+This command will generate a report for a set of PORTS for attached Security Groups.
+
+A list of Approved CIDRs is required. This is typically the CIDR block associated
+with your VPC.
+```
+
+**--alert, -b**="": CIDR blocks that will cause an alert (csv) (default: 174.0.0.0/8)
+
+**--all**: Process ALL Security Groups, not just attached
+
+**--approved, -a**="": CIDR blocks that are approved (csv)
+
+**--ports, -p**="": Ports to generate report on (csv) (default: 22)
 
 **--warn, -w**="": CIDR blocks that will cause a warning (csv) (default: 204.0.0.0/8)
 
