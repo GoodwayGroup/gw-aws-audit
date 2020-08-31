@@ -50,7 +50,7 @@ func ListPemKeyUsage() error {
 		for _, instance := range reservations.Instances {
 			if instance.KeyName == nil {
 				kl.Printf("Skipping host, no PEM Key found: %s", aws.StringValue(instance.InstanceId))
-				break
+				continue
 			}
 
 			var name string

@@ -96,7 +96,7 @@ func processSecurityGroups(securityGroups []*securityGroup, groupedCIDRs *groupe
 					if ipv4Net.IP.String() == "0.0.0.0" {
 						kl.Printf("%s\t%s\t%s", "FULL", ipv4Net.String(), port)
 						mappedSGs.addToWideOpen(sec, portToIPValue)
-						break
+						continue
 					}
 
 					switch {
