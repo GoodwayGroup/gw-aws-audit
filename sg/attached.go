@@ -13,7 +13,7 @@ import (
 // ListAttachedSecurityGroups generates a report listing out all Security Groups
 // that are attached to a Network Interface
 func ListAttachedSecurityGroups() error {
-	sgs, err := getAnnotatedSegurityGroups()
+	sgs, err := getAnnotatedSecurityGroups()
 	if err != nil {
 		return err
 	}

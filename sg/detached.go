@@ -11,7 +11,7 @@ import (
 // ListDetachedSecurityGroups generates a report listing out all Security Groups
 // that are NOT attached to a Network Interface
 func ListDetachedSecurityGroups() error {
-	sgs, err := getAnnotatedSegurityGroups()
+	sgs, err := getAnnotatedSecurityGroups()
 	if err != nil {
 		return err
 	}

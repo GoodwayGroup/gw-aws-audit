@@ -13,13 +13,6 @@ var (
 	ksg = kemba.New("gw-aws-audit:sg")
 )
 
-type securityGroup struct {
-	id       string
-	name     string
-	attached map[string]int
-	rules    map[string][]*ec2.IpRange
-}
-
 func getAllSecurityGroups() (map[string]*securityGroup, error) {
 	kl := ksg.Extend("get-all-sg")
 	sess, err := as.New()
@@ -97,19 +90,20 @@ func detectAttachedSecurityGroups(sgs map[string]*securityGroup) error {
 
 			var owner string
 			if network.Attachment != nil {
-				if aws.StringValue(network.Attachment.InstanceOwnerId) == "amazon-aws" {
+				switch ownerID := aws.StringValue(network.Attachment.InstanceOwnerId); {
+				case ownerID == "amazon-aws":
 					owner = aws.StringValue(network.InterfaceType)
-				} else if strings.HasPrefix(aws.StringValue(network.Attachment.InstanceOwnerId), "amazon-") {
-					owner = strings.Split(aws.StringValue(network.Attachment.InstanceOwnerId), "amazon-")[1]
-				} else if strings.Contains(strings.ToLower(aws.StringValue(network.Description)), "eks") {
+				case strings.HasPrefix(ownerID, "amazon-"):
+					owner = strings.Split(ownerID, "amazon-")[1]
+				case strings.Contains(strings.ToLower(aws.StringValue(network.Description)), "eks"):
 					owner = "eks"
-				} else if strings.Contains(strings.ToLower(aws.StringValue(network.Description)), "efs") {
+				case strings.Contains(strings.ToLower(aws.StringValue(network.Description)), "efs"):
 					owner = "efs"
-				} else if strings.HasPrefix(aws.StringValue(network.Attachment.InstanceId), "i-") {
+				case strings.HasPrefix(aws.StringValue(network.Attachment.InstanceId), "i-"):
 					owner = "ec2"
-				} else if network.Attachment.InstanceId == nil {
+				case network.Attachment.InstanceId == nil:
 					owner = aws.StringValue(network.InterfaceType)
-				} else {
+				default:
 					owner = aws.StringValue(network.Attachment.InstanceOwnerId)
 				}
 			} else {
@@ -122,7 +116,7 @@ func detectAttachedSecurityGroups(sgs map[string]*securityGroup) error {
 				if sgs[id].attached == nil {
 					sgs[id].attached = map[string]int{}
 				}
-				sgs[id].attached[owner] += 1
+				sgs[id].attached[owner]++
 			}
 
 			stub := "├─"
@@ -138,7 +132,7 @@ func detectAttachedSecurityGroups(sgs map[string]*securityGroup) error {
 	return nil
 }
 
-func getAnnotatedSegurityGroups() (map[string]*securityGroup, error) {
+func getAnnotatedSecurityGroups() (map[string]*securityGroup, error) {
 	// get all sgs in a region
 	sgs, err := getAllSecurityGroups()
 	if err != nil {

@@ -259,9 +259,64 @@ with your VPC.
 								Usage:   "Ports that can be ignored (csv)",
 								Value:   "80,443,3",
 							},
+							&cli.BoolFlag{
+								Name:  "all",
+								Usage: "Process ALL Security Groups, not just attached",
+								Value: false,
+							},
 						},
 						Action: func(context *cli.Context) error {
 							err := sg.GenerateCIDRReport(context)
+							if err != nil {
+								return cli.NewExitError(err, 2)
+							}
+							return nil
+						},
+					},
+					{
+						Name:  "port",
+						Usage: "generate a report comparing SG rules with input CIDR blocks on a specific port",
+						UsageText: `
+$ gw-aws-audit sg ports --ports 22,3306 --allowed 10.176.0.0/16,10.175.0.0/16 --alert 174.0.0.0/8,1.2.3.4/32
+
+This command will generate a report for a set of PORTS for attached Security Groups.
+
+A list of Approved CIDRs is required. This is typically the CIDR block associated
+with your VPC.
+`,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:    "ports",
+								Aliases: []string{"p"},
+								Usage:   "Ports to generate report on (csv)",
+								Value:   "22",
+							},
+							&cli.StringFlag{
+								Name:     "approved",
+								Aliases:  []string{"a"},
+								Usage:    "CIDR blocks that are approved (csv)",
+								Required: true,
+							},
+							&cli.StringFlag{
+								Name:    "warn",
+								Aliases: []string{"w"},
+								Usage:   "CIDR blocks that will cause a warning (csv)",
+								Value:   "204.0.0.0/8",
+							},
+							&cli.StringFlag{
+								Name:    "alert",
+								Aliases: []string{"b"},
+								Usage:   "CIDR blocks that will cause an alert (csv)",
+								Value:   "174.0.0.0/8",
+							},
+							&cli.BoolFlag{
+								Name:  "all",
+								Usage: "Process ALL Security Groups, not just attached",
+								Value: false,
+							},
+						},
+						Action: func(context *cli.Context) error {
+							err := sg.GeneratePortReport(context)
 							if err != nil {
 								return cli.NewExitError(err, 2)
 							}
