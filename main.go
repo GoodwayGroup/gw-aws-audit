@@ -259,6 +259,10 @@ with your VPC.
 								Usage:   "Ports that can be ignored (csv)",
 								Value:   "80,443,3,4,3-4",
 							},
+							&cli.StringFlag{
+								Name:  "ignore-protocols",
+								Usage: "Protocols to ignore. Can be tcp,udp,icmp (csv)",
+							},
 							&cli.BoolFlag{
 								Name:  "all",
 								Usage: "Process ALL Security Groups, not just attached",
@@ -308,6 +312,10 @@ with your VPC.
 								Aliases: []string{"b"},
 								Usage:   "CIDR blocks that will cause an alert (csv)",
 								Value:   "174.0.0.0/8",
+							},
+							&cli.StringFlag{
+								Name:  "ignore-protocols",
+								Usage: "Protocols to ignore. Can be tcp,udp,icmp (csv)",
 							},
 							&cli.BoolFlag{
 								Name:  "all",

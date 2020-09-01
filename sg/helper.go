@@ -28,7 +28,7 @@ func getFuncName(f interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(f).Pointer()).Name()
 }
 
-func generateReport(c *cli.Context, checkFxn func(a []string, b string) bool, ports []string) error {
+func generateReport(c *cli.Context, checkFxn func(a []string, b string) bool, ports []string, ignoredProtocols map[string]bool) error {
 	kl := ksg.Extend("generateReport")
 	kl.Printf("generating report with settings - checkFxn: %s ports: %# v", getFuncName(checkFxn), ports)
 	sgs, err := getAnnotatedSecurityGroups()
@@ -48,7 +48,7 @@ func generateReport(c *cli.Context, checkFxn func(a []string, b string) bool, po
 		return err
 	}
 
-	mappedSGs, err := processSecurityGroups(securityGroups, groupedCIDRs, checkFxn, ports)
+	mappedSGs, err := processSecurityGroups(securityGroups, groupedCIDRs, checkFxn, ports, ignoredProtocols)
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func parseToken(token string) (port string, protocol string, sgIDs string) {
 	return parts[0], parts[1], parts[2]
 }
 
-func processSecurityGroups(securityGroups []*securityGroup, groupedCIDRs *groupedIPBlockRules, checkFxn func(a []string, b string) bool, ports []string) (*groupedSecurityGroups, error) {
+func processSecurityGroups(securityGroups []*securityGroup, groupedCIDRs *groupedIPBlockRules, checkFxn func(a []string, b string) bool, ports []string, ignoredProtocols map[string]bool) (*groupedSecurityGroups, error) {
 	kl := ksg.Extend("processSecurityGroups")
 	mappedSGs := newGroupedSecurityGroups()
 
@@ -107,6 +107,12 @@ func processSecurityGroups(securityGroups []*securityGroup, groupedCIDRs *groupe
 	for _, sec := range securityGroups {
 		for token, rule := range sec.rules {
 			port, proto, sgIDs := parseToken(token)
+
+			if _, ok := ignoredProtocols[proto]; ok {
+				kl.Printf("Skipping protocol: %s", proto)
+				continue
+			}
+
 			switch {
 			case rule == nil:
 				for _, sgID := range strings.Split(sgIDs, ",") {

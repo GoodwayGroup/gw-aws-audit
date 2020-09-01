@@ -22,7 +22,13 @@ func GeneratePortReport(c *cli.Context) error {
 	checkPorts := strings.Split(c.String("ports"), ",")
 	fmt.Printf("----\n Ports: %s\n----\n\n", checkPorts)
 
-	err := generateReport(c, portInList, checkPorts)
+	kl.Log(c.String("ignore-protocols"))
+	var ignoredProtocols = make(map[string]bool)
+	for _, v := range strings.Split(c.String("ignore-protocols"), ",") {
+		ignoredProtocols[v] = true
+	}
+
+	err := generateReport(c, portInList, checkPorts, ignoredProtocols)
 	if err != nil {
 		return err
 	}

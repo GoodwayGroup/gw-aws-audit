@@ -22,7 +22,13 @@ func GenerateCIDRReport(c *cli.Context) error {
 	ignoredPorts := strings.Split(c.String("ignore-ports"), ",")
 	fmt.Printf("----\nIgnored ports: %s\n----\n\n", ignoredPorts)
 
-	err := generateReport(c, portNotInList, ignoredPorts)
+	kl.Log(c.String("ignore-protocols"))
+	var ignoredProtocols = make(map[string]bool)
+	for _, v := range strings.Split(c.String("ignore-protocols"), ",") {
+		ignoredProtocols[v] = true
+	}
+
+	err := generateReport(c, portNotInList, ignoredPorts, ignoredProtocols)
 	if err != nil {
 		return err
 	}
