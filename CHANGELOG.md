@@ -2,6 +2,16 @@
 ## [Unreleased]
 
 
+<a name="v1.10.0"></a>
+## [v1.10.0] - 2020-09-01
+### Chore
+- **docs:** updating docs for version v1.10.0
+
+### Features
+- **protocol:** add flags to filter out specific protocols
+- **sg:** add mapping of known AWS IP blocks to reports
+
+
 <a name="v1.9.1"></a>
 ## [v1.9.1] - 2020-08-31
 ### Bug Fixes
@@ -9,6 +19,9 @@
 
 ### Chore
 - **deps:** update module aws/aws-sdk-go to v1.34.14
+
+### Features
+- **release:** v1.9.1
 
 
 <a name="v1.9.0"></a>
@@ -310,7 +323,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.9.1...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.10.0...HEAD
+[v1.10.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.9.1...v1.10.0
 [v1.9.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.9.0...v1.9.1
 [v1.9.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.1...v1.9.0
 [v1.8.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.0...v1.8.1
