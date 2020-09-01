@@ -199,7 +199,7 @@ This command will scan the EC2 NetworkInterfaces to determine what
 Security Groups are NOT attached/assigned in AWS.
 
 `,
-						Action: func(context *cli.Context) error {
+						Action: func(c *cli.Context) error {
 							err := sg.ListDetachedSecurityGroups()
 							if err != nil {
 								return cli.NewExitError(err, 2)
@@ -214,7 +214,7 @@ Security Groups are NOT attached/assigned in AWS.
 This command will scan the EC2 NetworkInterfaces to determine what
 Security Groups are attached/assigned in AWS.
 `,
-						Action: func(context *cli.Context) error {
+						Action: func(c *cli.Context) error {
 							err := sg.ListAttachedSecurityGroups()
 							if err != nil {
 								return cli.NewExitError(err, 2)
@@ -257,7 +257,7 @@ with your VPC.
 								Name:    "ignore-ports",
 								Aliases: []string{"p"},
 								Usage:   "Ports that can be ignored (csv)",
-								Value:   "80,443,3",
+								Value:   "80,443,3,4,3-4",
 							},
 							&cli.BoolFlag{
 								Name:  "all",
@@ -265,8 +265,8 @@ with your VPC.
 								Value: false,
 							},
 						},
-						Action: func(context *cli.Context) error {
-							err := sg.GenerateCIDRReport(context)
+						Action: func(c *cli.Context) error {
+							err := sg.GenerateCIDRReport(c)
 							if err != nil {
 								return cli.NewExitError(err, 2)
 							}
@@ -317,6 +317,21 @@ with your VPC.
 						},
 						Action: func(context *cli.Context) error {
 							err := sg.GeneratePortReport(context)
+							if err != nil {
+								return cli.NewExitError(err, 2)
+							}
+							return nil
+						},
+					},
+					{
+						Name:  "amazon",
+						Usage: "generate a report of allow SG with rules mapped to known AWS IPs",
+						UsageText: `
+This method loads the current version of https://ip-ranges.amazonaws.com/ip-ranges.json
+and compares the CIDR blocks against all Security Groups.
+`,
+						Action: func(c *cli.Context) error {
+							err := sg.GenerateExternalAWSIPReport()
 							if err != nil {
 								return cli.NewExitError(err, 2)
 							}

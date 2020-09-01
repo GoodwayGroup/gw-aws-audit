@@ -8,8 +8,10 @@ import (
 )
 
 type portToIP struct {
-	port string
-	ip   string
+	port   string
+	ip     string
+	proto  string
+	prefix *Prefix
 }
 
 type securityGroup struct {
@@ -32,6 +34,8 @@ type groupedSecurityGroups struct {
 	warning  map[*securityGroup][]*portToIP
 	unknown  map[*securityGroup][]*portToIP
 	wideOpen map[*securityGroup][]*portToIP
+	amazon   map[*securityGroup][]*portToIP
+	sg       map[*securityGroup][]*portToIP
 }
 
 func newGroupedSecurityGroups() *groupedSecurityGroups {
@@ -40,6 +44,8 @@ func newGroupedSecurityGroups() *groupedSecurityGroups {
 	gsg.warning = map[*securityGroup][]*portToIP{}
 	gsg.unknown = map[*securityGroup][]*portToIP{}
 	gsg.wideOpen = map[*securityGroup][]*portToIP{}
+	gsg.amazon = map[*securityGroup][]*portToIP{}
+	gsg.sg = map[*securityGroup][]*portToIP{}
 	return &gsg
 }
 
@@ -75,6 +81,22 @@ func (csg *groupedSecurityGroups) addToWideOpen(sec *securityGroup, value *portT
 	}
 }
 
+func (csg *groupedSecurityGroups) addToAmazon(sec *securityGroup, value *portToIP) {
+	if _, ok := csg.amazon[sec]; !ok {
+		csg.amazon[sec] = []*portToIP{value}
+	} else {
+		csg.amazon[sec] = append(csg.amazon[sec], value)
+	}
+}
+
+func (csg *groupedSecurityGroups) addToSG(sec *securityGroup, value *portToIP) {
+	if _, ok := csg.sg[sec]; !ok {
+		csg.sg[sec] = []*portToIP{value}
+	} else {
+		csg.sg[sec] = append(csg.sg[sec], value)
+	}
+}
+
 type groupedIPBlockRules struct {
 	approved []*net.IPNet
 	warning  []*net.IPNet
@@ -99,4 +121,55 @@ func (g *groupedIPBlockRules) addToWarning(cidr *net.IPNet) {
 
 func (g *groupedIPBlockRules) addToAlert(cidr *net.IPNet) {
 	g.alert = append(g.alert, cidr)
+}
+
+type AWSIPRanges struct {
+	SyncToken    string        `json:"syncToken"`
+	CreateDate   string        `json:"createDate"`
+	Prefixes     []*Prefix     `json:"prefixes"`
+	IPv6Prefixes []*IPv6Prefix `json:"ipv6_prefixes"`
+}
+
+type Prefix struct {
+	IPPrefix           string `json:"ip_prefix"`
+	Region             string `json:"region"`
+	NetworkBorderGroup string `json:"network_border_group"`
+	Service            string `json:"service"`
+}
+
+func (p *Prefix) GetCIDR() (*net.IPNet, error) {
+	_, ipv4Net, err := net.ParseCIDR(p.IPPrefix)
+	if err != nil {
+		return nil, err
+	}
+	return ipv4Net, err
+}
+
+func (p *Prefix) GetService() string {
+	switch p.Service {
+	case "AMAZON":
+		return "EC2"
+	default:
+		return p.Service
+	}
+}
+
+type IPv6Prefix struct {
+	IPv6Prefix         string `json:"ipv6_prefix"`
+	Region             string `json:"region"`
+	NetworkBorderGroup string `json:"network_border_group"`
+	Service            string `json:"service"`
+}
+
+func (p *IPv6Prefix) GetCIDR() (*net.IPNet, error) {
+	_, ipv6Net, err := net.ParseCIDR(p.IPv6Prefix)
+	if err != nil {
+		return nil, err
+	}
+	return ipv6Net, err
+}
+
+type AWSIPs struct {
+	list  []*net.IPNet
+	table map[*net.IPNet]*Prefix
 }

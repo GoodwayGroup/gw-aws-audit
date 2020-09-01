@@ -1,15 +1,18 @@
 package sg
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/urfave/cli/v2"
 	"net"
+	"net/http"
 	"os"
 	"reflect"
 	"runtime"
 	"strings"
+	"time"
 )
 
 func isCiderIn(input *net.IPNet, cidrs []*net.IPNet) bool {
@@ -50,9 +53,21 @@ func generateReport(c *cli.Context, checkFxn func(a []string, b string) bool, po
 		return err
 	}
 
+	if len(mappedSGs.amazon) > 0 {
+		fmt.Println("AMAZON: CIDR rules that are mapping to external Amazon IPs")
+		printAmazonTable(mappedSGs.amazon)
+		fmt.Println("")
+	}
+
 	if len(mappedSGs.unknown) > 0 {
 		fmt.Println("UNKNOWN: It is not known if these are allowed or not based on filters provided.")
 		printTable(mappedSGs.unknown)
+		fmt.Println("")
+	}
+
+	if len(mappedSGs.sg) > 0 {
+		fmt.Println("SECURITY GROUP: CIDR rules that are mapping Security Groups to other Security Groups")
+		printTable(mappedSGs.sg)
 		fmt.Println("")
 	}
 
@@ -75,13 +90,33 @@ func generateReport(c *cli.Context, checkFxn func(a []string, b string) bool, po
 	return nil
 }
 
+func parseToken(token string) (port string, protocol string, sgIDs string) {
+	parts := strings.Split(token, "::")
+	return parts[0], parts[1], parts[2]
+}
+
 func processSecurityGroups(securityGroups []*securityGroup, groupedCIDRs *groupedIPBlockRules, checkFxn func(a []string, b string) bool, ports []string) (*groupedSecurityGroups, error) {
 	kl := ksg.Extend("processSecurityGroups")
 	mappedSGs := newGroupedSecurityGroups()
 
+	awsIPs, err := getAWSIPRanges()
+	if err != nil {
+		return nil, err
+	}
+
 	for _, sec := range securityGroups {
-		for port, rule := range sec.rules {
-			if checkFxn(ports, port) {
+		for token, rule := range sec.rules {
+			port, proto, sgIDs := parseToken(token)
+			switch {
+			case rule == nil:
+				for _, sgID := range strings.Split(sgIDs, ",") {
+					mappedSGs.addToSG(sec, &portToIP{
+						port:  port,
+						ip:    sgID,
+						proto: proto,
+					})
+				}
+			case checkFxn(ports, port):
 				for _, ip := range rule {
 					_, ipv4Net, err := net.ParseCIDR(aws.StringValue(ip.CidrIp))
 					if err != nil {
@@ -89,13 +124,21 @@ func processSecurityGroups(securityGroups []*securityGroup, groupedCIDRs *groupe
 					}
 
 					portToIPValue := &portToIP{
-						port: port,
-						ip:   ipv4Net.String(),
+						port:  port,
+						proto: proto,
+						ip:    ipv4Net.String(),
 					}
 
 					if ipv4Net.IP.String() == "0.0.0.0" {
 						kl.Printf("%s\t%s\t%s", "FULL", ipv4Net.String(), port)
 						mappedSGs.addToWideOpen(sec, portToIPValue)
+						continue
+					}
+
+					if prefix, ok := findAWSCidr(ipv4Net, awsIPs); ok {
+						kl.Printf("%s\t%s\t%s\t%s\t%s\n", ip.String(), port, prefix.IPPrefix, prefix.Service, prefix.Region)
+						portToIPValue.prefix = prefix
+						mappedSGs.addToAmazon(sec, portToIPValue)
 						continue
 					}
 
@@ -113,7 +156,7 @@ func processSecurityGroups(securityGroups []*securityGroup, groupedCIDRs *groupe
 						mappedSGs.addToUnknown(sec, portToIPValue)
 					}
 				}
-			} else {
+			default:
 				kl.Printf("skipping port %s", port)
 			}
 		}
@@ -163,7 +206,7 @@ func printTable(data map[*securityGroup][]*portToIP) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleLight)
-	t.AppendHeader(table.Row{"ID", "Name", "Attachments", "Port", "IP"})
+	t.AppendHeader(table.Row{"ID", "Name", "Attachments", "Port", "Proto", "IP"})
 
 	for sec, portToIps := range data {
 		for i, pti := range portToIps {
@@ -180,9 +223,58 @@ func printTable(data map[*securityGroup][]*portToIP) {
 				name,
 				usage,
 				pti.port,
+				pti.proto,
 				pti.ip,
 			})
 		}
+		t.AppendSeparator()
 	}
 	t.Render()
+}
+
+func printAmazonTable(data map[*securityGroup][]*portToIP) {
+	t := table.NewWriter()
+	t.SetOutputMirror(os.Stdout)
+	t.SetStyle(table.StyleLight)
+	t.AppendHeader(table.Row{"ID", "Name", "Attachments", "Port", "Proto", "IP", "Block", "Service", "Region"})
+
+	for sec, portToIps := range data {
+		for i, pti := range portToIps {
+			id := ""
+			name := ""
+			usage := ""
+			if i == 0 {
+				id = sec.id
+				name = sec.name
+				usage = sec.getAttachmentsAsString()
+			}
+			t.AppendRow([]interface{}{
+				id,
+				name,
+				usage,
+				pti.port,
+				pti.proto,
+				pti.ip,
+				pti.prefix.IPPrefix,
+				pti.prefix.GetService(),
+				pti.prefix.Region,
+			})
+		}
+		t.AppendSeparator()
+	}
+	t.Render()
+}
+
+func getJSON(url string, target interface{}) error {
+	client := &http.Client{
+		Timeout: 10 * time.Second,
+	}
+
+	res, err := client.Get(url)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	return json.NewDecoder(res.Body).Decode(target)
 }

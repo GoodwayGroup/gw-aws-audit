@@ -8,6 +8,9 @@ import (
 )
 
 func portNotInList(ports []string, port string) bool {
+	if strings.HasPrefix(port, "sg-") {
+		return true
+	}
 	return !funk.ContainsString(ports, port)
 }
 

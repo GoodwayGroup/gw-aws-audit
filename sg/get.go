@@ -35,20 +35,31 @@ func getAllSecurityGroups() (map[string]*securityGroup, error) {
 	for _, sec := range results.SecurityGroups {
 		rules := map[string][]*ec2.IpRange{}
 		for _, rule := range sec.IpPermissions {
-			var pstr string
-			if rule.FromPort != nil {
-				if aws.Int64Value(rule.FromPort) == 0 {
-					pstr = "ALL"
-				} else {
-					pstr = fmt.Sprintf("%d", aws.Int64Value(rule.FromPort))
-				}
-			} else {
-				pstr = "ALL"
+			var t = make([]string, len(rule.UserIdGroupPairs))
+			for i, u := range rule.UserIdGroupPairs {
+				t[i] = aws.StringValue(u.GroupId)
 			}
-			if _, ok := rules[pstr]; !ok {
-				rules[pstr] = rule.IpRanges
+
+			var token string
+			switch {
+			case rule.FromPort == nil && rule.IpRanges == nil:
+				token = buildPortToken("ALL", "", rule.IpProtocol, t)
+			case aws.Int64Value(rule.FromPort) != aws.Int64Value(rule.ToPort):
+				token = buildPortToken(fmt.Sprintf("%d", aws.Int64Value(rule.FromPort)), fmt.Sprintf("%d", aws.Int64Value(rule.ToPort)), rule.IpProtocol, t)
+			case aws.Int64Value(rule.FromPort) == 0:
+				token = buildPortToken("ALL", "", rule.IpProtocol, t)
+			case aws.Int64Value(rule.FromPort) == -1:
+				token = buildPortToken("ALL", "", rule.IpProtocol, t)
+			case rule.IpRanges == nil:
+				token = buildPortToken(fmt.Sprintf("%d", aws.Int64Value(rule.FromPort)), "", rule.IpProtocol, t)
+			default:
+				token = buildPortToken(fmt.Sprintf("%d", aws.Int64Value(rule.FromPort)), "", rule.IpProtocol, nil)
+			}
+
+			if _, ok := rules[token]; !ok {
+				rules[token] = rule.IpRanges
 			} else {
-				rules[pstr] = append(rules[pstr], rule.IpRanges...)
+				rules[token] = append(rules[token], rule.IpRanges...)
 			}
 		}
 
@@ -60,6 +71,34 @@ func getAllSecurityGroups() (map[string]*securityGroup, error) {
 	}
 
 	return secGroups, nil
+}
+
+func buildPortToken(fromPort string, toPort string, proto *string, securityGroups []string) string {
+	var parts = make([]string, 3)
+
+	switch {
+	case fromPort != "" && toPort != "":
+		parts[0] = fmt.Sprintf("%s-%s", fromPort, toPort)
+	case fromPort != "":
+		parts[0] = fromPort
+	default:
+		parts[0] = "UNKNOWN"
+	}
+
+	switch {
+	case proto == nil:
+		parts[1] = "NONE"
+	case aws.StringValue(proto) == "-1":
+		parts[1] = "ALL"
+	default:
+		parts[1] = aws.StringValue(proto)
+	}
+
+	if securityGroups != nil {
+		parts[2] = strings.Join(securityGroups, ",")
+	}
+
+	return strings.Join(parts, "::")
 }
 
 func detectAttachedSecurityGroups(sgs map[string]*securityGroup) error {
