@@ -74,6 +74,9 @@ cidr
 .IP \(bu 2
 port
 \[la]#port\[ra]
+.IP \(bu 2
+amazon
+\[la]#amazon\[ra]
 
 .RE
 
@@ -263,7 +266,10 @@ with your VPC.
 \fB\-\-approved, \-a\fP="": CIDR blocks that are approved (csv)
 
 .PP
-\fB\-\-ignore\-ports, \-p\fP="": Ports that can be ignored (csv) (default: 80,443,3)
+\fB\-\-ignore\-ports, \-p\fP="": Ports that can be ignored (csv) (default: 80,443,3,4,3\-4)
+
+.PP
+\fB\-\-ignore\-protocols\fP="": Protocols to ignore. Can be tcp,udp,icmp (csv)
 
 .PP
 \fB\-\-warn, \-w\fP="": CIDR blocks that will cause a warning (csv) (default: 204.0.0.0/8)
@@ -296,10 +302,27 @@ with your VPC.
 \fB\-\-approved, \-a\fP="": CIDR blocks that are approved (csv)
 
 .PP
+\fB\-\-ignore\-protocols\fP="": Protocols to ignore. Can be tcp,udp,icmp (csv)
+
+.PP
 \fB\-\-ports, \-p\fP="": Ports to generate report on (csv) (default: 22)
 
 .PP
 \fB\-\-warn, \-w\fP="": CIDR blocks that will cause a warning (csv) (default: 204.0.0.0/8)
+
+.SS amazon
+.PP
+generate a report of allow SG with rules mapped to known AWS IPs
+
+.PP
+.RS
+
+.nf
+This method loads the current version of https://ip\-ranges.amazonaws.com/ip\-ranges.json
+and compares the CIDR blocks against all Security Groups.
+
+.fi
+.RE
 
 .SH cw
 .PP

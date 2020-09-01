@@ -23,6 +23,7 @@ gw-aws-audit
     - [attached](#attached)
     - [cidr](#cidr)
     - [port](#port)
+    - [amazon](#amazon)
 - [cw](#cw)
     - [enhanced-monitoring](#enhanced-monitoring)
 - [install-manpage](#install-manpage)
@@ -153,7 +154,9 @@ with your VPC.
 
 **--approved, -a**="": CIDR blocks that are approved (csv)
 
-**--ignore-ports, -p**="": Ports that can be ignored (csv) (default: 80,443,3)
+**--ignore-ports, -p**="": Ports that can be ignored (csv) (default: 80,443,3,4,3-4)
+
+**--ignore-protocols**="": Protocols to ignore. Can be tcp,udp,icmp (csv)
 
 **--warn, -w**="": CIDR blocks that will cause a warning (csv) (default: 204.0.0.0/8)
 
@@ -176,9 +179,20 @@ with your VPC.
 
 **--approved, -a**="": CIDR blocks that are approved (csv)
 
+**--ignore-protocols**="": Protocols to ignore. Can be tcp,udp,icmp (csv)
+
 **--ports, -p**="": Ports to generate report on (csv) (default: 22)
 
 **--warn, -w**="": CIDR blocks that will cause a warning (csv) (default: 204.0.0.0/8)
+
+### amazon
+
+generate a report of allow SG with rules mapped to known AWS IPs
+
+```
+This method loads the current version of https://ip-ranges.amazonaws.com/ip-ranges.json
+and compares the CIDR blocks against all Security Groups.
+```
 
 ## cw
 
