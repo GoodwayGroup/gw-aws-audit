@@ -77,6 +77,9 @@ port
 .IP \(bu 2
 amazon
 \[la]#amazon\[ra]
+.IP \(bu 2
+direct\-ip\-mapping, dim
+\[la]#direct-ip-mapping-dim\[ra]
 
 .RE
 
@@ -320,6 +323,22 @@ generate a report of allow SG with rules mapped to known AWS IPs
 .nf
 This method loads the current version of https://ip\-ranges.amazonaws.com/ip\-ranges.json
 and compares the CIDR blocks against all Security Groups.
+
+.fi
+.RE
+
+.SS direct\-ip\-mapping, dim
+.PP
+generate report of Security Groups with direct mappings to EC2 instances
+
+.PP
+.RS
+
+.nf
+This method will generate a report comparing all Security Groups with all 
+EC2 instances to determine where you have a direct IP mapping.
+
+This will note Internal and External IP usage as well.
 
 .fi
 .RE

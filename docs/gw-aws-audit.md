@@ -24,6 +24,7 @@ gw-aws-audit
     - [cidr](#cidr)
     - [port](#port)
     - [amazon](#amazon)
+    - [direct-ip-mapping, dim](#direct-ip-mapping-dim)
 - [cw](#cw)
     - [enhanced-monitoring](#enhanced-monitoring)
 - [install-manpage](#install-manpage)
@@ -192,6 +193,17 @@ generate a report of allow SG with rules mapped to known AWS IPs
 ```
 This method loads the current version of https://ip-ranges.amazonaws.com/ip-ranges.json
 and compares the CIDR blocks against all Security Groups.
+```
+
+### direct-ip-mapping, dim
+
+generate report of Security Groups with direct mappings to EC2 instances
+
+```
+This method will generate a report comparing all Security Groups with all 
+EC2 instances to determine where you have a direct IP mapping.
+
+This will note Internal and External IP usage as well.
 ```
 
 ## cw
