@@ -2,6 +2,15 @@
 ## [Unreleased]
 
 
+<a name="v1.11.0"></a>
+## [v1.11.0] - 2020-09-03
+### Chore
+- **docs:** updating docs for version v1.11.0
+
+### Features
+- **sg:** added direct-ip-mapping command
+
+
 <a name="v1.10.0"></a>
 ## [v1.10.0] - 2020-09-01
 ### Chore
@@ -9,6 +18,7 @@
 
 ### Features
 - **protocol:** add flags to filter out specific protocols
+- **release:** v1.10.0
 - **sg:** add mapping of known AWS IP blocks to reports
 
 
@@ -323,7 +333,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.11.0...HEAD
+[v1.11.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.10.0...v1.11.0
 [v1.10.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.9.1...v1.10.0
 [v1.9.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.9.0...v1.9.1
 [v1.9.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.8.1...v1.9.0
