@@ -346,6 +346,24 @@ and compares the CIDR blocks against all Security Groups.
 							return nil
 						},
 					},
+					{
+						Name:    "direct-ip-mapping",
+						Aliases: []string{"dim"},
+						Usage:   "generate report of Security Groups with direct mappings to EC2 instances",
+						UsageText: `
+This method will generate a report comparing all Security Groups with all 
+EC2 instances to determine where you have a direct IP mapping.
+
+This will note Internal and External IP usage as well.
+`,
+						Action: func(c *cli.Context) error {
+							err := sg.GenerateMappedEC2Report()
+							if err != nil {
+								return cli.NewExitError(err, 2)
+							}
+							return nil
+						},
+					},
 				},
 			},
 			{
