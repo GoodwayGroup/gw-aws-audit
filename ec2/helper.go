@@ -79,3 +79,52 @@ func GetEC2IPs() ([]*Info, error) {
 	}
 	return info, nil
 }
+
+func GetInterfaceIPs() ([]*Info, error) {
+	kl := k.Extend("GetInterfaceIPs")
+	sess, err := as.New()
+	if err != nil {
+		return nil, err
+	}
+	client := ec2.New(sess)
+
+	results, err := client.DescribeNetworkInterfaces(&ec2.DescribeNetworkInterfacesInput{})
+
+	if err != nil {
+		fmt.Println("Failed to list interfaces")
+		return nil, err
+	}
+
+	kl.Log(results)
+
+	kl.Printf("found %d interfaces", len(results.NetworkInterfaces))
+	var info []*Info
+	for _, nic := range results.NetworkInterfaces {
+		var name string
+		for _, tag := range nic.TagSet {
+			if aws.StringValue(tag.Key) == "Name" {
+				name = aws.StringValue(tag.Value)
+			}
+		}
+
+		if name == "" {
+			name = aws.StringValue(nic.Description)
+		}
+
+		var externalIP string
+		if nic.Association != nil {
+			externalIP = aws.StringValue(nic.Association.PublicIp)
+		}
+
+		info = append(info, &Info{
+			ID:         aws.StringValue(nic.NetworkInterfaceId),
+			Name:       name,
+			State:      aws.StringValue(nic.Status),
+			InternalIP: aws.StringValue(nic.PrivateIpAddress),
+			ExternalIP: externalIP,
+		})
+	}
+	kl.Log(info)
+
+	return info, nil
+}

@@ -147,10 +147,19 @@ func GenerateMappedEC2Report() error {
 		}
 	}
 
-	allInfo, err := ec2.GetEC2IPs()
+	ec2Info, err := ec2.GetEC2IPs()
 	if err != nil {
 		return err
 	}
+
+	nicInfo, err := ec2.GetInterfaceIPs()
+	if err != nil {
+		return err
+	}
+
+	allInfo := append(ec2Info, nicInfo...)
+
+	kl.Log(allInfo)
 
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
