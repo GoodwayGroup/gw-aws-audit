@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/GoodwayGroup/gw-aws-audit/ec2"
+	"github.com/GoodwayGroup/gw-aws-audit/iam"
 	"github.com/GoodwayGroup/gw-aws-audit/info"
 	"github.com/GoodwayGroup/gw-aws-audit/rds"
 	"github.com/GoodwayGroup/gw-aws-audit/s3"
@@ -361,6 +362,18 @@ This will note Internal and External IP usage as well.
 							if err != nil {
 								return cli.NewExitError(err, 2)
 							}
+							return nil
+						},
+					},
+				},
+			},
+			{
+				Name: "iam",
+				Subcommands: []*cli.Command{
+					{
+						Name: "list-users",
+						Action: func(context *cli.Context) error {
+							iam.ListUsers()
 							return nil
 						},
 					},
