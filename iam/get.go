@@ -7,9 +7,12 @@ import (
 	as "github.com/clok/awssession"
 	"github.com/clok/kemba"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
+	"github.com/logrusorgru/aurora/v3"
 	"github.com/remeh/sizedwaitgroup"
 	"os"
 	"sort"
+	"strings"
 )
 
 var (
@@ -27,24 +30,34 @@ func ListUsers() error {
 
 	// sort user list
 	sort.Slice(data, func(i, j int) bool {
-		return data[i].UserName() < data[j].UserName()
+		return strings.ToLower(data[i].UserName()) < strings.ToLower(data[j].UserName())
 	})
 
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleLight)
 	t.AppendHeader(table.Row{
+		"",
+		"",
+		"",
+		"",
+		"",
+		"Access Key Details",
+	})
+	t.AppendHeader(table.Row{
 		"User",
 		"Status",
 		"Age",
 		"Console",
 		"Last Login",
-		"Key Count",
-		"Key ID",
-		"Status",
-		"Age",
-		"Last Used",
-		"Service",
+		aurora.Gray(8, "KEY ID | STATUS | AGE | LAST USED | SERVICE"),
+	})
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 2, Align: text.AlignRight, AlignHeader: text.AlignRight},
+		{Number: 3, Align: text.AlignRight, AlignHeader: text.AlignRight},
+		{Number: 4, Align: text.AlignRight, AlignHeader: text.AlignRight},
+		{Number: 5, Align: text.AlignRight, AlignHeader: text.AlignRight},
+		{Number: 6, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
 	})
 
 	for _, user := range data {
@@ -55,21 +68,19 @@ func ListUsers() error {
 			formattedYesNo(user.HasConsoleAccess()),
 			user.FormattedLastLoginDateDuration(),
 			formattedKeyCount(user.AccessKeysCount()),
-			"",
-			"",
-			"",
-			"",
-			"",
 		})
 		if len(user.accessKeys) > 0 {
+			st := table.NewWriter()
+			st.SetStyle(table.StyleLight)
+			st.Style().Options = table.OptionsNoBorders
+			st.SetColumnConfigs([]table.ColumnConfig{
+				{Number: 2, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
+				{Number: 3, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
+				{Number: 4, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
+				{Number: 5, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
+			})
 			for _, key := range user.accessKeys {
-				t.AppendRow([]interface{}{
-					"",
-					"",
-					"",
-					"",
-					"",
-					"",
+				st.AppendRow([]interface{}{
 					aws.StringValue(key.id),
 					formattedStatus(aws.StringValue(key.status)),
 					dateDuration(aws.TimeValue(key.createdDate), 1),
@@ -77,6 +88,14 @@ func ListUsers() error {
 					aws.StringValue(key.lastUsed.ServiceName),
 				})
 			}
+			t.AppendRow(table.Row{
+				"",
+				"",
+				"",
+				"",
+				"",
+				st.Render(),
+			})
 		}
 		t.AppendSeparator()
 	}
@@ -102,7 +121,7 @@ func getAllUsersWithAccessKeyData() ([]*iamUser, error) {
 		return nil, err
 	}
 
-	swg := sizedwaitgroup.New(20)
+	swg := sizedwaitgroup.New(15)
 
 	users := make([]*iamUser, len(results.Users))
 	kl.Printf("found %d users", len(results.Users))

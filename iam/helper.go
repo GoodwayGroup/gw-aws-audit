@@ -1,6 +1,7 @@
 package iam
 
 import (
+	"fmt"
 	"github.com/hako/durafmt"
 	"github.com/logrusorgru/aurora/v3"
 	"time"
@@ -18,11 +19,11 @@ func formattedYesNo(v bool) string {
 func formattedKeyCount(v int) string {
 	switch {
 	case v == 0:
-		return aurora.Green(v).String()
+		return fmt.Sprintf("%s API Keys", aurora.Green(v).String())
 	case v == 1:
-		return aurora.Yellow(v).String()
+		return fmt.Sprintf("%s API Key", aurora.Yellow(v).String())
 	default:
-		return aurora.Red(v).String()
+		return fmt.Sprintf("%s API Keys", aurora.Red(v).String())
 	}
 }
 

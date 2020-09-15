@@ -19,6 +19,10 @@ type iamUser struct {
 	accessKeys       []*accessKey
 }
 
+func (u iamUser) ARN() string {
+	return aws.StringValue(u.arn)
+}
+
 func (u iamUser) UserName() string {
 	return aws.StringValue(u.userName)
 }
@@ -61,6 +65,7 @@ func (u iamUser) AccessKeysCount() int {
 	return len(u.accessKeys)
 }
 
+// TODO: Make the Status more robust
 func (u iamUser) CheckStatus() string {
 	switch {
 	case !u.HasConsoleAccess() && !u.HasAccessKeys():
