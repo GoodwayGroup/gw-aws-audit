@@ -371,9 +371,15 @@ This will note Internal and External IP usage as well.
 				Name: "iam",
 				Subcommands: []*cli.Command{
 					{
+						// TODO: rename
 						Name: "list-users",
+						// TODO: Add Usage
+						// TODO: Add UsageText with column definitions
 						Action: func(context *cli.Context) error {
-							iam.ListUsers()
+							err := iam.ListUsers()
+							if err != nil {
+								return cli.NewExitError(err, 2)
+							}
 							return nil
 						},
 					},
