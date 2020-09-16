@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/GoodwayGroup/gw-aws-audit/ec2"
+	"github.com/GoodwayGroup/gw-aws-audit/iam"
 	"github.com/GoodwayGroup/gw-aws-audit/info"
 	"github.com/GoodwayGroup/gw-aws-audit/rds"
 	"github.com/GoodwayGroup/gw-aws-audit/s3"
@@ -358,6 +359,75 @@ This will note Internal and External IP usage as well.
 `,
 						Action: func(c *cli.Context) error {
 							err := sg.GenerateMappedEC2Report()
+							if err != nil {
+								return cli.NewExitError(err, 2)
+							}
+							return nil
+						},
+					},
+				},
+			},
+			{
+				Name: "iam",
+				Subcommands: []*cli.Command{
+					{
+						Name:    "user-report",
+						Aliases: []string{"ur"},
+						Usage:   "generates report of IAM Users and Access Key Usage",
+						UsageText: `
+This action will generate a report for all Users within an AWS account with the details
+specific user authentication methods.
+
+┌──────────────┬────────┬───────────┬─────────┬────────────┬─────────────────────────────────────────────────────────────────────────┐
+│              │        │           │         │            │                           ACCESS KEY DETAILS                            │
+│ USER         │ STATUS │       AGE │ CONSOLE │ LAST LOGIN │               KEY ID | STATUS | AGE | LAST USED | SERVICE               │
+├──────────────┼────────┼───────────┼─────────┼────────────┼─────────────────────────────────────────────────────────────────────────┤
+│ user12345    │   PASS │  123 days │      NO │       NONE │                               0 API Keys                                │
+├──────────────┼────────┼───────────┼─────────┼────────────┼─────────────────────────────────────────────────────────────────────────┤
+│ bot-user-123 │   WARN │  236 days │      NO │       NONE │                               2 API Keys                                │
+│              │        │           │         │            │ AKIAIOSFODNN6EXAMPLE │ Active │ 229 days │   229 days 22 hours   │ s3   │
+│              │        │           │         │            │ AKIAIOSFODNN5EXAMPLE │ Active │ 228 days │ 51 minutes 24 seconds │ sts  │
+├──────────────┼────────┼───────────┼─────────┼────────────┼─────────────────────────────────────────────────────────────────────────┤
+│ userAOK123   │   FAIL │   43 days │     YES │     5 days │                               1 API Key                                 │
+│              │        │           │         │            │   AKIAIOSFODNN3EXAMPLE │ Active │ 43 days │ 22 hours 5 minutes │ ec2    │
+└──────────────┴────────┴───────────┴─────────┴────────────┴─────────────────────────────────────────────────────────────────────────┘
+
+USER [string]:
+  - The user name
+
+STATUS [enum]:
+  - PASS: When a does NOT have Console Access and has NO Access Keys
+  - FAIL: When a User has Console Access
+  - WARN: When a User does NOT have Console Acces, but does have at least 1 Access Key
+  - UNKNOWN: Catch all for cases not handled.
+
+AGE [duration]:
+  - Time since User was created
+
+CONSOLE [bool]:
+  - Does the User have Console Access? YES/NO
+
+LAST LOGIN [duration]:
+  - Time since User was created
+  - NONE if the User does not have Console Access or if the User has NEVER logged in.
+
+ACCESS KEY DETAILS [sub table]:
+  - Primary header row is the number of Access Keys associated with the User
+
+  KEY ID [string]:
+    - The AWS_ACCESS_KEY_ID
+
+  STATUS [enum]:
+    - Active/Inactive
+
+  LAST USED [duration]:
+    - Time since the Access Key was last used.
+
+  SERVICE [string]:
+    - The last AWS Service that the Access Key was used to access at the "LAST USED" time.
+`,
+						Action: func(context *cli.Context) error {
+							err := iam.ListUsers()
 							if err != nil {
 								return cli.NewExitError(err, 2)
 							}
