@@ -9,15 +9,20 @@ import (
 )
 
 type iamUser struct {
-	arn              *string
+	arn      *string
+	userName *string
+	userID   *string
+	// TODO: Deprecate hasPassword
 	hasPassword      bool
 	hasConsoleAccess bool
 	passwordLastUsed *time.Time
 	createDate       *time.Time
-	userName         *string
-	userID           *string
 	accessKeys       []*accessKey
 }
+
+var (
+	nilTime = time.Time{}
+)
 
 func (u iamUser) ARN() string {
 	return aws.StringValue(u.arn)
@@ -40,7 +45,7 @@ func (u iamUser) LastLogin() time.Time {
 }
 
 func (u iamUser) LastLoginDuration() string {
-	if u.LastLogin().Year() < 2000 {
+	if u.LastLogin() == nilTime {
 		return ""
 	}
 	return durafmt.Parse(time.Since(u.LastLogin())).LimitToUnit("days").LimitFirstN(1).String()
@@ -51,7 +56,7 @@ func (u iamUser) CreatedDate() time.Time {
 }
 
 func (u iamUser) CreatedDateDuration() string {
-	if u.CreatedDate().Year() < 2000 {
+	if u.CreatedDate() == nilTime {
 		return ""
 	}
 	return durafmt.Parse(time.Since(u.CreatedDate())).LimitToUnit("days").LimitFirstN(1).String()
