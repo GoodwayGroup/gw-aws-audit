@@ -2,9 +2,40 @@
 ## [Unreleased]
 
 
+<a name="v1.13.0"></a>
+## [v1.13.0] - 2020-09-15
+### Chore
+- **docs:** updating docs for version v1.13.0
+
+### Pull Requests
+- chore(deps): update module aws/aws-sdk-go to v1.34.24 ([#17](https://github.com/GoodwayGroup/gw-aws-audit/issues/17))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+- feat(iam): added user-report action to report on console access and api keys ([#18](https://github.com/GoodwayGroup/gw-aws-audit/issues/18))
+
+
+###### Squashed Commits:
+```
+* feat(iam): adding user and key info
+
+* feat(iam): added base command to cli
+
+* feat(iam): list-users reports on console access, api keys and overall status
+
+* feat(iam): updated user-report useage text
+```
+
+
+
 <a name="v1.12.0"></a>
 ## [v1.12.0] - 2020-09-11
 ### Features
+- **release:** v1.12.0
 - **sg dim:** added network interfaces to the direct IP mapping
 
 
@@ -340,7 +371,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.12.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.0...HEAD
+[v1.13.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.12.0...v1.13.0
 [v1.12.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.11.0...v1.12.0
 [v1.11.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.10.0...v1.11.0
 [v1.10.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.9.1...v1.10.0
