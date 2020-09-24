@@ -78,7 +78,13 @@ func (u iamUser) CheckStatus() string {
 	case u.HasConsoleAccess():
 		return "fail"
 	case u.HasAccessKeys():
-		return "warn"
+		status := "pass"
+		for _, ak := range u.accessKeys {
+			if status == "pass" && aws.StringValue(ak.status) != "Inactive" {
+				status = "warn"
+			}
+		}
+		return status
 	default:
 		return "unknown"
 	}

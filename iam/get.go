@@ -1,6 +1,7 @@
 package iam
 
 import (
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/iam"
@@ -19,7 +20,7 @@ var (
 	kiam = kemba.New("gw-aws-audit:iam")
 )
 
-func ListUsers() error {
+func ListUsers(showOnly string) error {
 	kl := kiam.Extend("list-users")
 	data, err := getAllUsersWithAccessKeyData()
 	if err != nil {
@@ -53,22 +54,39 @@ func ListUsers() error {
 		aurora.Gray(8, "KEY ID | STATUS | AGE | LAST USED | SERVICE"),
 	})
 	t.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 1, AlignFooter: text.AlignCenter},
 		{Number: 2, Align: text.AlignRight, AlignHeader: text.AlignRight},
 		{Number: 3, Align: text.AlignRight, AlignHeader: text.AlignRight},
 		{Number: 4, Align: text.AlignRight, AlignHeader: text.AlignRight},
 		{Number: 5, Align: text.AlignRight, AlignHeader: text.AlignRight},
-		{Number: 6, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
+		{Number: 6, Align: text.AlignCenter, AlignHeader: text.AlignCenter, AlignFooter: text.AlignCenter},
 	})
 
+	summaryStats := map[string]int{
+		"pass":          0,
+		"warn":          0,
+		"fail":          0,
+		"totalKeys":     0,
+		"activeKeys":    0,
+		"inactiveKeys":  0,
+		"consoleAccess": 0,
+	}
 	for _, user := range data {
-		t.AppendRow([]interface{}{
-			user.UserName(),
-			user.FormattedCheckStatus(),
-			user.CreatedDateDuration(),
-			formattedYesNo(user.HasConsoleAccess()),
-			user.FormattedLastLoginDateDuration(),
-			formattedKeyCount(user.AccessKeysCount()),
-		})
+		if user.HasConsoleAccess() {
+			summaryStats["consoleAccess"] += 1
+		}
+		summaryStats[user.CheckStatus()] += 1
+
+		if showOnly == "" || showOnly == user.CheckStatus() {
+			t.AppendRow([]interface{}{
+				user.UserName(),
+				user.FormattedCheckStatus(),
+				user.CreatedDateDuration(),
+				formattedYesNo(user.HasConsoleAccess()),
+				user.FormattedLastLoginDateDuration(),
+				formattedKeyCount(user.AccessKeysCount()),
+			})
+		}
 		if len(user.accessKeys) > 0 {
 			st := table.NewWriter()
 			st.SetStyle(table.StyleLight)
@@ -79,7 +97,14 @@ func ListUsers() error {
 				{Number: 4, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
 				{Number: 5, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
 			})
+			summaryStats["totalKeys"] += len(user.accessKeys)
 			for _, key := range user.accessKeys {
+				switch aws.StringValue(key.status) {
+				case "Active":
+					summaryStats["activeKeys"] += 1
+				case "Inactive":
+					summaryStats["inactiveKeys"] += 1
+				}
 				st.AppendRow([]interface{}{
 					aws.StringValue(key.id),
 					formattedStatus(aws.StringValue(key.status)),
@@ -88,17 +113,26 @@ func ListUsers() error {
 					aws.StringValue(key.lastUsed.ServiceName),
 				})
 			}
-			t.AppendRow(table.Row{
-				"",
-				"",
-				"",
-				"",
-				"",
-				st.Render(),
-			})
+			if showOnly == "" || showOnly == user.CheckStatus() {
+				t.AppendRow(table.Row{
+					"",
+					"",
+					"",
+					"",
+					"",
+					st.Render(),
+				})
+			}
 		}
-		t.AppendSeparator()
+		if showOnly == "" || showOnly == user.CheckStatus() {
+			t.AppendSeparator()
+		}
 	}
+
+	f1 := fmt.Sprintf("PASS: %d WARN: %d FAIL: %d", summaryStats["pass"], summaryStats["warn"], summaryStats["fail"])
+	f2 := fmt.Sprintf("%d / %d", summaryStats["consoleAccess"], len(data))
+	f3 := fmt.Sprintf("ACTIVE: %d INACTIVE: %d TOTAL: %d", summaryStats["activeKeys"], summaryStats["inactiveKeys"], summaryStats["totalKeys"])
+	t.AppendFooter(table.Row{f1, "", "", f2, f2, f3}, table.RowConfig{AutoMerge: true})
 	t.Render()
 
 	return nil

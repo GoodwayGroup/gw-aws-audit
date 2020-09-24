@@ -9,10 +9,12 @@ import (
 	"github.com/GoodwayGroup/gw-aws-audit/s3"
 	"github.com/GoodwayGroup/gw-aws-audit/sg"
 	"github.com/clok/cdocs"
+	"github.com/thoas/go-funk"
 	"github.com/urfave/cli/v2"
 	"log"
 	"os"
 	"runtime"
+	"strings"
 	"time"
 )
 
@@ -396,9 +398,9 @@ USER [string]:
   - The user name
 
 STATUS [enum]:
-  - PASS: When a does NOT have Console Access and has NO Access Keys
+  - PASS: When a does NOT have Console Access and has NO Access Keys or only INACTIVE Access Keys
   - FAIL: When a User has Console Access
-  - WARN: When a User does NOT have Console Acces, but does have at least 1 Access Key
+  - WARN: When a User does NOT have Console Access, but does have at least 1 ACTIVE Access Key
   - UNKNOWN: Catch all for cases not handled.
 
 AGE [duration]:
@@ -426,8 +428,23 @@ ACCESS KEY DETAILS [sub table]:
   SERVICE [string]:
     - The last AWS Service that the Access Key was used to access at the "LAST USED" time.
 `,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:  "show-only",
+								Usage: "filter results to show only pass, warn or fail",
+							},
+						},
 						Action: func(context *cli.Context) error {
-							err := iam.ListUsers()
+							showOnly := ""
+							if context.String("show-only") != "" {
+								showOnly = strings.ToLower(context.String("show-only"))
+							}
+							allowedFilters := []string{"", "pass", "warn", "fail"}
+							if !funk.ContainsString(allowedFilters, showOnly) {
+								return cli.NewExitError(fmt.Sprintf("Invalid value for show-only. Must be one of: %v", allowedFilters), 3)
+							}
+
+							err := iam.ListUsers(showOnly)
 							if err != nil {
 								return cli.NewExitError(err, 2)
 							}
@@ -472,6 +489,7 @@ ACCESS KEY DETAILS [sub table]:
 			},
 		},
 	}
+	app.EnableBashCompletion = true
 
 	if os.Getenv("DOCS_MD") != "" {
 		docs, err := cdocs.ToMarkdown(app)
