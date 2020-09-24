@@ -2,10 +2,23 @@
 ## [Unreleased]
 
 
+<a name="v1.13.1"></a>
+## [v1.13.1] - 2020-09-24
+### Chore
+- **docs:** updating docs for version v1.13.1
+- **tests:** update tests for types
+
+### Features
+- **iam:** updated check status pass conditions for user-report and added summary output
+
+
 <a name="v1.13.0"></a>
 ## [v1.13.0] - 2020-09-15
 ### Chore
 - **docs:** updating docs for version v1.13.0
+
+### Features
+- **release:** v1.13.0
 
 ### Pull Requests
 - chore(deps): update module aws/aws-sdk-go to v1.34.24 ([#17](https://github.com/GoodwayGroup/gw-aws-audit/issues/17))
@@ -371,7 +384,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.1...HEAD
+[v1.13.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.0...v1.13.1
 [v1.13.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.12.0...v1.13.0
 [v1.12.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.11.0...v1.12.0
 [v1.11.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.10.0...v1.11.0
