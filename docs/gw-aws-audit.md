@@ -237,9 +237,9 @@ USER [string]:
   - The user name
 
 STATUS [enum]:
-  - PASS: When a does NOT have Console Access and has NO Access Keys
+  - PASS: When a does NOT have Console Access and has NO Access Keys or only INACTIVE Access Keys
   - FAIL: When a User has Console Access
-  - WARN: When a User does NOT have Console Acces, but does have at least 1 Access Key
+  - WARN: When a User does NOT have Console Access, but does have at least 1 ACTIVE Access Key
   - UNKNOWN: Catch all for cases not handled.
 
 AGE [duration]:
@@ -267,6 +267,8 @@ ACCESS KEY DETAILS [sub table]:
   SERVICE [string]:
     - The last AWS Service that the Access Key was used to access at the "LAST USED" time.
 ```
+
+**--show-only**="": filter results to show only pass, warn or fail
 
 ## cw
 
