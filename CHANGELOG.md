@@ -2,6 +2,34 @@
 ## [Unreleased]
 
 
+<a name="v1.14.0"></a>
+## [v1.14.0] - 2020-09-30
+### Chore
+- **docs:** updating docs for version v1.14.0
+
+### Pull Requests
+- feat(rds): add public command to generate report of publicly exposed RDS instances ([#20](https://github.com/GoodwayGroup/gw-aws-audit/issues/20))
+
+
+###### Squashed Commits:
+```
+* feat(rds): add public command to generate report of publicly exposed RDS instances
+
+* chore(rds): added UsageText to the public command
+
+* chore: fix lint errors
+```
+
+- chore(deps): update module aws/aws-sdk-go to v1.35.0 ([#19](https://github.com/GoodwayGroup/gw-aws-audit/issues/19))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+
+
 <a name="v1.13.1"></a>
 ## [v1.13.1] - 2020-09-24
 ### Chore
@@ -10,6 +38,7 @@
 
 ### Features
 - **iam:** updated check status pass conditions for user-report and added summary output
+- **release:** v1.13.1
 
 
 <a name="v1.13.0"></a>
@@ -384,7 +413,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.1...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.0...HEAD
+[v1.14.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.1...v1.14.0
 [v1.13.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.0...v1.13.1
 [v1.13.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.12.0...v1.13.0
 [v1.12.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.11.0...v1.12.0
