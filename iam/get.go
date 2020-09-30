@@ -73,9 +73,9 @@ func ListUsers(showOnly string) error {
 	}
 	for _, user := range data {
 		if user.HasConsoleAccess() {
-			summaryStats["consoleAccess"] += 1
+			summaryStats["consoleAccess"]++
 		}
-		summaryStats[user.CheckStatus()] += 1
+		summaryStats[user.CheckStatus()]++
 
 		if showOnly == "" || showOnly == user.CheckStatus() {
 			t.AppendRow([]interface{}{
@@ -101,9 +101,9 @@ func ListUsers(showOnly string) error {
 			for _, key := range user.accessKeys {
 				switch aws.StringValue(key.status) {
 				case "Active":
-					summaryStats["activeKeys"] += 1
+					summaryStats["activeKeys"]++
 				case "Inactive":
-					summaryStats["inactiveKeys"] += 1
+					summaryStats["inactiveKeys"]++
 				}
 				st.AppendRow([]interface{}{
 					aws.StringValue(key.id),
