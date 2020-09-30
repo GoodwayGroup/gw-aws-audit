@@ -36,7 +36,7 @@ func generateReport(c *cli.Context, checkFxn func(a []string, b string) bool, po
 		return err
 	}
 
-	var securityGroups []*securityGroup
+	var securityGroups []*SecurityGroup
 	for _, sg := range sgs {
 		if sg.attached != nil || c.Bool("all") {
 			securityGroups = append(securityGroups, sg)
@@ -95,7 +95,7 @@ func parseToken(token string) (port string, protocol string, sgIDs string) {
 	return parts[0], parts[1], parts[2]
 }
 
-func processSecurityGroups(securityGroups []*securityGroup, groupedCIDRs *groupedIPBlockRules, checkFxn func(a []string, b string) bool, ports []string, ignoredProtocols map[string]bool) (*groupedSecurityGroups, error) {
+func processSecurityGroups(securityGroups []*SecurityGroup, groupedCIDRs *groupedIPBlockRules, checkFxn func(a []string, b string) bool, ports []string, ignoredProtocols map[string]bool) (*groupedSecurityGroups, error) {
 	kl := ksg.Extend("processSecurityGroups")
 	mappedSGs := newGroupedSecurityGroups()
 
@@ -208,7 +208,7 @@ func generateIPBlockRules(c *cli.Context) (*groupedIPBlockRules, error) {
 	return groupedCIDRs, nil
 }
 
-func printTable(data map[*securityGroup][]*portToIP) {
+func printTable(data map[*SecurityGroup][]*portToIP) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleLight)
@@ -222,7 +222,7 @@ func printTable(data map[*securityGroup][]*portToIP) {
 			if i == 0 {
 				id = sec.id
 				name = sec.name
-				usage = sec.getAttachmentsAsString()
+				usage = sec.GetAttachmentsAsString()
 			}
 			t.AppendRow([]interface{}{
 				id,
@@ -238,7 +238,7 @@ func printTable(data map[*securityGroup][]*portToIP) {
 	t.Render()
 }
 
-func printAmazonTable(data map[*securityGroup][]*portToIP) {
+func printAmazonTable(data map[*SecurityGroup][]*portToIP) {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleLight)
@@ -252,7 +252,7 @@ func printAmazonTable(data map[*securityGroup][]*portToIP) {
 			if i == 0 {
 				id = sec.id
 				name = sec.name
-				usage = sec.getAttachmentsAsString()
+				usage = sec.GetAttachmentsAsString()
 			}
 			t.AppendRow([]interface{}{
 				id,

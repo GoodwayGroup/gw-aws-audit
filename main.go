@@ -138,6 +138,17 @@ throttling from AWS with an exponential backoff with retry.
 							return nil
 						},
 					},
+					{
+						Name:  "public",
+						Usage: "Produce report of instances that have public interfaces attached",
+						Action: func(c *cli.Context) error {
+							err := rds.ListPublicInterfaces()
+							if err != nil {
+								return cli.NewExitError(err, 2)
+							}
+							return nil
+						},
+					},
 				},
 			},
 			{
