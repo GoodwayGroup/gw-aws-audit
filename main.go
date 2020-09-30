@@ -141,6 +141,23 @@ throttling from AWS with an exponential backoff with retry.
 					{
 						Name:  "public",
 						Usage: "Produce report of instances that have public interfaces attached",
+						UsageText: `
+Produces a report that displays a list RDS servers that are configured as Publicly Accessible.
+
+The report contains:
+
+DB INSTANCE:
+    - Name of the instance
+
+ENGINE:
+    - RDS DB engine
+
+SECURITY GROUPS:
+    - Security Group ID
+    - Security Group Name
+    - Inbound Port
+    - CIDR rules applied to the Port
+`,
 						Action: func(c *cli.Context) error {
 							err := rds.ListPublicInterfaces()
 							if err != nil {
