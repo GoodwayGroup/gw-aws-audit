@@ -18,7 +18,7 @@ func ListAttachedSecurityGroups() error {
 		return err
 	}
 
-	var attached []*securityGroup
+	var attached []*SecurityGroup
 	for _, sg := range sgs {
 		if sg.attached != nil {
 			attached = append(attached, sg)

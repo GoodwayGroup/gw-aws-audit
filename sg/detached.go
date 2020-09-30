@@ -16,7 +16,7 @@ func ListDetachedSecurityGroups() error {
 		return err
 	}
 
-	var detached []*securityGroup
+	var detached []*SecurityGroup
 	for _, sg := range sgs {
 		if sg.attached == nil {
 			detached = append(detached, sg)

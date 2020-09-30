@@ -13,17 +13,19 @@ var (
 	ksg = kemba.New("gw-aws-audit:sg")
 )
 
-func getAllSecurityGroups() (map[string]*securityGroup, error) {
-	kl := ksg.Extend("get-all-sg")
+// GetSecurityGroups will retrieve a list of Security Group IDs with mapped ports
+func GetSecurityGroups(sgIDs []*string) (map[string]*SecurityGroup, error) {
+	kl := ksg.Extend("get-sg")
 	sess, err := as.New()
 	if err != nil {
 		return nil, err
 	}
 	client := ec2.New(sess)
 
+	kl.Printf("retrieving SG IDs: %# v", sgIDs)
 	var results *ec2.DescribeSecurityGroupsOutput
 	results, err = client.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{
-		MaxResults: aws.Int64(1000),
+		GroupIds: sgIDs,
 	})
 	if err != nil {
 		fmt.Println("Failed to list Security Groups")
@@ -31,7 +33,13 @@ func getAllSecurityGroups() (map[string]*securityGroup, error) {
 	}
 
 	kl.Printf("found %d security groups", len(results.SecurityGroups))
-	secGroups := make(map[string]*securityGroup, len(results.SecurityGroups))
+	secGroups := processSecurityGroupsResponse(results)
+
+	return secGroups, nil
+}
+
+func processSecurityGroupsResponse(results *ec2.DescribeSecurityGroupsOutput) map[string]*SecurityGroup {
+	secGroups := make(map[string]*SecurityGroup, len(results.SecurityGroups))
 	for _, sec := range results.SecurityGroups {
 		rules := map[string][]*ec2.IpRange{}
 		for _, rule := range sec.IpPermissions {
@@ -63,12 +71,34 @@ func getAllSecurityGroups() (map[string]*securityGroup, error) {
 			}
 		}
 
-		secGroups[aws.StringValue(sec.GroupId)] = &securityGroup{
+		secGroups[aws.StringValue(sec.GroupId)] = &SecurityGroup{
 			id:    aws.StringValue(sec.GroupId),
 			name:  aws.StringValue(sec.GroupName),
 			rules: rules,
 		}
 	}
+	return secGroups
+}
+
+func getAllSecurityGroups() (map[string]*SecurityGroup, error) {
+	kl := ksg.Extend("get-all-sg")
+	sess, err := as.New()
+	if err != nil {
+		return nil, err
+	}
+	client := ec2.New(sess)
+
+	var results *ec2.DescribeSecurityGroupsOutput
+	results, err = client.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{
+		MaxResults: aws.Int64(1000),
+	})
+	if err != nil {
+		fmt.Println("Failed to list Security Groups")
+		return nil, err
+	}
+
+	kl.Printf("found %d security groups", len(results.SecurityGroups))
+	secGroups := processSecurityGroupsResponse(results)
 
 	return secGroups, nil
 }
@@ -101,7 +131,7 @@ func buildPortToken(fromPort string, toPort string, proto *string, securityGroup
 	return strings.Join(parts, "::")
 }
 
-func detectAttachedSecurityGroups(sgs map[string]*securityGroup) error {
+func detectAttachedSecurityGroups(sgs map[string]*SecurityGroup) error {
 	kl := ksg.Extend("detect-attached")
 	sess, err := as.New()
 	if err != nil {
@@ -171,7 +201,7 @@ func detectAttachedSecurityGroups(sgs map[string]*securityGroup) error {
 	return nil
 }
 
-func getAnnotatedSecurityGroups() (map[string]*securityGroup, error) {
+func getAnnotatedSecurityGroups() (map[string]*SecurityGroup, error) {
 	// get all sgs in a region
 	sgs, err := getAllSecurityGroups()
 	if err != nil {

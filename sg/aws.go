@@ -23,7 +23,7 @@ func GenerateExternalAWSIPReport() error {
 		return err
 	}
 
-	var securityGroups []*securityGroup
+	var securityGroups []*SecurityGroup
 	for _, sg := range sgs {
 		securityGroups = append(securityGroups, sg)
 	}
