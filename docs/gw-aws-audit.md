@@ -13,6 +13,7 @@ gw-aws-audit
     - [clear-bucket, exterminatus](#clear-bucket-exterminatus)
 - [rds](#rds)
     - [enhanced-monitoring](#enhanced-monitoring)
+    - [public](#public)
 - [ec2](#ec2)
     - [enhanced-monitoring](#enhanced-monitoring)
     - [detached-volumes](#detached-volumes)
@@ -93,6 +94,28 @@ RDS related commands
 ### enhanced-monitoring
 
 Produce report of Enhanced Monitoring enabled instances
+
+### public
+
+Produce report of instances that have public interfaces attached
+
+```
+Produces a report that displays a list RDS servers that are configured as Publicly Accessible.
+
+The report contains:
+
+DB INSTANCE:
+    - Name of the instance
+
+ENGINE:
+    - RDS DB engine
+
+SECURITY GROUPS:
+    - Security Group ID
+    - Security Group Name
+    - Inbound Port
+    - CIDR rules applied to the Port
+```
 
 ## ec2
 

@@ -36,6 +36,9 @@ rds
 .IP \(bu 2
 enhanced\-monitoring
 \[la]#enhanced-monitoring\[ra]
+.IP \(bu 2
+public
+\[la]#public\[ra]
 
 .RE
 
@@ -196,6 +199,33 @@ RDS related commands
 .SS enhanced\-monitoring
 .PP
 Produce report of Enhanced Monitoring enabled instances
+
+.SS public
+.PP
+Produce report of instances that have public interfaces attached
+
+.PP
+.RS
+
+.nf
+Produces a report that displays a list RDS servers that are configured as Publicly Accessible.
+
+The report contains:
+
+DB INSTANCE:
+    \- Name of the instance
+
+ENGINE:
+    \- RDS DB engine
+
+SECURITY GROUPS:
+    \- Security Group ID
+    \- Security Group Name
+    \- Inbound Port
+    \- CIDR rules applied to the Port
+
+.fi
+.RE
 
 .SH ec2
 .PP
