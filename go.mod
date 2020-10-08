@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/aws/aws-sdk-go v1.35.0
-	github.com/cenkalti/backoff/v4 v4.0.2
+	github.com/cenkalti/backoff/v4 v4.1.0
 	github.com/clok/awssession v0.1.5
 	github.com/clok/cdocs v0.2.2
 	github.com/clok/kemba v0.7.1
