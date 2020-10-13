@@ -2,10 +2,19 @@
 ## [Unreleased]
 
 
+<a name="v1.14.1"></a>
+## [v1.14.1] - 2020-10-13
+### Chore
+- **deps:** updated aws/aws-sdk-go, cenkalti/backoff/v4 and jedib0t/go-pretty/v6
+
+
 <a name="v1.14.0"></a>
 ## [v1.14.0] - 2020-09-30
 ### Chore
 - **docs:** updating docs for version v1.14.0
+
+### Features
+- **release:** v1.14.0
 
 ### Pull Requests
 - feat(rds): add public command to generate report of publicly exposed RDS instances ([#20](https://github.com/GoodwayGroup/gw-aws-audit/issues/20))
@@ -413,7 +422,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.1...HEAD
+[v1.14.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.0...v1.14.1
 [v1.14.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.1...v1.14.0
 [v1.13.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.0...v1.13.1
 [v1.13.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.12.0...v1.13.0
