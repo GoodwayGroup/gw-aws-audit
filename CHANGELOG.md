@@ -2,10 +2,55 @@
 ## [Unreleased]
 
 
+<a name="v1.14.2"></a>
+## [v1.14.2] - 2020-12-29
+### Chore
+- **deps:** update module aws/aws-sdk-go to v1.36.17
+- **deps:** update module urfave/cli/v2 to v2.3.0
+- **deps:** update awssession to v0.1.5 and cdocs to v0.2.3
+
+### Pull Requests
+- chore(deps): update module aws/aws-sdk-go to v1.36.13 ([#27](https://github.com/GoodwayGroup/gw-aws-audit/issues/27))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+- chore(deps): update actions/setup-go action to v2 ([#26](https://github.com/GoodwayGroup/gw-aws-audit/issues/26))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+- chore(deps): update actions/checkout action to v2 ([#25](https://github.com/GoodwayGroup/gw-aws-audit/issues/25))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+- chore(deps): update module aws/aws-sdk-go to v1.35.17 ([#24](https://github.com/GoodwayGroup/gw-aws-audit/issues/24))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+
+
 <a name="v1.14.1"></a>
 ## [v1.14.1] - 2020-10-13
 ### Chore
 - **deps:** updated aws/aws-sdk-go, cenkalti/backoff/v4 and jedib0t/go-pretty/v6
+
+### Features
+- **release:** v1.14.1
 
 
 <a name="v1.14.0"></a>
@@ -422,7 +467,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.1...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.2...HEAD
+[v1.14.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.1...v1.14.2
 [v1.14.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.0...v1.14.1
 [v1.14.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.1...v1.14.0
 [v1.13.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.0...v1.13.1
