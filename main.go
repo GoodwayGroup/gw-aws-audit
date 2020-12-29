@@ -65,7 +65,7 @@ The value will be the Bucket name.
 						Action: func(c *cli.Context) error {
 							err := s3.AddCostTag()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -90,7 +90,7 @@ Has Cost Tag
 						Action: func(c *cli.Context) error {
 							err := s3.GetBucketMetrics()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -116,7 +116,7 @@ throttling from AWS with an exponential backoff with retry.
 						Action: func(c *cli.Context) error {
 							err := s3.ClearBucketObjects(c)
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -133,7 +133,7 @@ throttling from AWS with an exponential backoff with retry.
 						Action: func(c *cli.Context) error {
 							err := rds.ListMonitoringEnabled()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -161,7 +161,7 @@ SECURITY GROUPS:
 						Action: func(c *cli.Context) error {
 							err := rds.ListPublicInterfaces()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -178,7 +178,7 @@ SECURITY GROUPS:
 						Action: func(c *cli.Context) error {
 							err := ec2.ListMonitoringEnabled()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -189,7 +189,7 @@ SECURITY GROUPS:
 						Action: func(c *cli.Context) error {
 							err := ec2.ListDetachedVolumes()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -200,7 +200,7 @@ SECURITY GROUPS:
 						Action: func(c *cli.Context) error {
 							err := ec2.ListStoppedHosts()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -211,7 +211,7 @@ SECURITY GROUPS:
 						Action: func(c *cli.Context) error {
 							err := ec2.ListPemKeyUsage()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -233,7 +233,7 @@ Security Groups are NOT attached/assigned in AWS.
 						Action: func(c *cli.Context) error {
 							err := sg.ListDetachedSecurityGroups()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -248,7 +248,7 @@ Security Groups are attached/assigned in AWS.
 						Action: func(c *cli.Context) error {
 							err := sg.ListAttachedSecurityGroups()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -303,7 +303,7 @@ with your VPC.
 						Action: func(c *cli.Context) error {
 							err := sg.GenerateCIDRReport(c)
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -357,7 +357,7 @@ with your VPC.
 						Action: func(context *cli.Context) error {
 							err := sg.GeneratePortReport(context)
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -372,7 +372,7 @@ and compares the CIDR blocks against all Security Groups.
 						Action: func(c *cli.Context) error {
 							err := sg.GenerateExternalAWSIPReport()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -390,7 +390,7 @@ This will note Internal and External IP usage as well.
 						Action: func(c *cli.Context) error {
 							err := sg.GenerateMappedEC2Report()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -469,12 +469,12 @@ ACCESS KEY DETAILS [sub table]:
 							}
 							allowedFilters := []string{"", "pass", "warn", "fail"}
 							if !funk.ContainsString(allowedFilters, showOnly) {
-								return cli.NewExitError(fmt.Sprintf("Invalid value for show-only. Must be one of: %v", allowedFilters), 3)
+								return cli.Exit(fmt.Sprintf("Invalid value for show-only. Must be one of: %v", allowedFilters), 3)
 							}
 
 							err := iam.ListUsers(showOnly)
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
@@ -493,12 +493,12 @@ ACCESS KEY DETAILS [sub table]:
 							fmt.Printf("Checking for EC2 Enhanced Monitoring\n\n")
 							err := ec2.ListMonitoringEnabled()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							fmt.Printf("\n\nChecking for RDS Enhanced Monitoring\n\n")
 							err = rds.ListMonitoringEnabled()
 							if err != nil {
-								return cli.NewExitError(err, 2)
+								return cli.Exit(err, 2)
 							}
 							return nil
 						},
