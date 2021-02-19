@@ -3,7 +3,7 @@ module github.com/GoodwayGroup/gw-aws-audit
 go 1.14
 
 require (
-	github.com/aws/aws-sdk-go v1.36.28
+	github.com/aws/aws-sdk-go v1.37.15
 	github.com/cenkalti/backoff/v4 v4.1.0
 	github.com/clok/awssession v0.1.6
 	github.com/clok/cdocs v0.2.3
