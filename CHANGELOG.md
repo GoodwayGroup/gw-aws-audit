@@ -2,12 +2,52 @@
 ## [Unreleased]
 
 
+<a name="v1.14.3"></a>
+## [v1.14.3] - 2021-03-03
+### Chore
+- **github actions:** add go proxy warming
+- **renovate:** add extension for group:allNonMajor
+- **renovate:** add gomodTidy option
+
+### Pull Requests
+- fix(deps): update all non-major dependencies ([#40](https://github.com/GoodwayGroup/gw-aws-audit/issues/40))
+
+
+- chore(deps): update module stretchr/testify to v1.7.0 ([#32](https://github.com/GoodwayGroup/gw-aws-audit/issues/32))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+- chore(deps): update module aws/aws-sdk-go to v1.36.28 ([#31](https://github.com/GoodwayGroup/gw-aws-audit/issues/31))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+- chore(deps): update module aws/aws-sdk-go to v1.36.18 ([#30](https://github.com/GoodwayGroup/gw-aws-audit/issues/30))
+
+
+###### Squashed Commits:
+```
+Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
+```
+
+
+
 <a name="v1.14.2"></a>
 ## [v1.14.2] - 2020-12-29
 ### Chore
 - **deps:** update module aws/aws-sdk-go to v1.36.17
 - **deps:** update module urfave/cli/v2 to v2.3.0
 - **deps:** update awssession to v0.1.5 and cdocs to v0.2.3
+
+### Features
+- **release:** v1.14.2
 
 ### Pull Requests
 - chore(deps): update module aws/aws-sdk-go to v1.36.13 ([#27](https://github.com/GoodwayGroup/gw-aws-audit/issues/27))
@@ -467,7 +507,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.2...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.3...HEAD
+[v1.14.3]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.2...v1.14.3
 [v1.14.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.1...v1.14.2
 [v1.14.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.0...v1.14.1
 [v1.14.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.13.1...v1.14.0
