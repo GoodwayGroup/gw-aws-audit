@@ -190,16 +190,32 @@ Bucket metric pull complete. Buckets: 207 Processed: 207
 
 * go v1.14+
 * make
-* [github.com/mitchellh/gox](https://github.com/mitchellh/gox)
 * [git-chglog](https://github.com/git-chglog/git-chglog)
+* [goreleaser](https://goreleaser.com/install/)
 
 ## Deployment
 
 Run `./release.sh $VERSION`
 
+This will update docs, changelog, add the tag, push main and the tag to the repo. The `goreleaser` action will publish the binaries to the Github Release.
+
+If you want to simulate the `goreleaser` process, run the following command:
+
+```
+$ curl -sL https://git.io/goreleaser | bash -s -- --rm-dist --skip-publish --snapshot
+```
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+1. Fork the [GoodwayGroup/gw-aws-audit](https://github.com/GoodwayGroup/gw-aws-audit) repo
+1. Use `go >= 1.16`
+1. Branch & Code
+1. Run linters :broom: `golangci-lint run`
+    - The project uses [golangci-lint](https://golangci-lint.run/usage/install/#local-installation)
+1. Commit with a Conventional Commit
+1. Open a PR
 
 ## Versioning
 
