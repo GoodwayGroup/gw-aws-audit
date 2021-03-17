@@ -19,8 +19,8 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/fzipp/gocyclo v0.3.1/go.mod h1:DJHO6AUmbdqj2ET4Z9iArSuwWgYDRryYt2wASxc7x3E=
 github.com/gookit/color v1.3.8 h1:w2WcSwaCa1ojRWO60Mm4GJUJomBNKR9G+x9DwaaCL1c=
 github.com/gookit/color v1.3.8/go.mod h1:R3ogXq2B9rTbXoSHJ1HyUVAZ3poOJHpd9nQmyGZsfvQ=
-github.com/hako/durafmt v0.0.0-20200710122514-c0fb7b4da026 h1:BpJ2o0OR5FV7vrkDYfXYVJQeMNWa8RhklZOpW2ITAIQ=
-github.com/hako/durafmt v0.0.0-20200710122514-c0fb7b4da026/go.mod h1:5Scbynm8dF1XAPwIwkGPqzkM/shndPm79Jd1003hTjE=
+github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd h1:FsX+T6wA8spPe4c1K9vi7T0LvNCO1TTqiL8u7Wok2hw=
+github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd/go.mod h1:VzxiSdG6j1pi7rwGm/xYI5RbtpBgM8sARDXlvEvxlu0=
 github.com/jedib0t/go-pretty/v6 v6.1.0 h1:NVS2PT3ZvzMb47DzS50cmsK6xkf8SSyLfroSSIG20JI=
 github.com/jedib0t/go-pretty/v6 v6.1.0/go.mod h1:+nE9fyyHGil+PuISTCrp7avEdo6bqoMwqZnuiK2r2a0=
 github.com/jmespath/go-jmespath v0.4.0 h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=

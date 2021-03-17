@@ -8,7 +8,7 @@ require (
 	github.com/clok/awssession v1.1.0
 	github.com/clok/cdocs v1.1.0
 	github.com/clok/kemba v1.1.0
-	github.com/hako/durafmt v0.0.0-20200710122514-c0fb7b4da026
+	github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd
 	github.com/jedib0t/go-pretty/v6 v6.1.0
 	github.com/logrusorgru/aurora/v3 v3.0.0
 	github.com/remeh/sizedwaitgroup v1.0.0
