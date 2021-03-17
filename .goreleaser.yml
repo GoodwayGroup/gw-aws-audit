@@ -37,3 +37,15 @@ changelog:
 
 snapshot:
   name_template: "{{ .Tag }}-next"
+
+brews:
+  - tap:
+      owner: GoodwayGroup
+      name: homebrew-gw-aws-audit
+    homepage: "https://goodwaygroup.github.io/gw-aws-audit/"
+    description: "A set of commands to audit AWS usage to identify cost savings and security issues."
+    license: "MIT"
+    test: |
+      system "#{bin}/gw-aws-audit --help"
+    install: |
+      bin.install "gw-aws-audit"

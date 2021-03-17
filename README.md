@@ -39,8 +39,39 @@ COPYRIGHT:
 
 ## Installation
 
+### [`asdf` plugin](https://github.com/GoodwayGroup/asdf-gw-aws-audit)
+
+Add plugin:
+
+```
+$ asdf plugin-add gw-aws-audit https://github.com/GoodwayGroup/asdf-gw-aws-audit.git
+```
+
+Install the latest version:
+
+```
+$ asdf install gw-aws-audit latest
+```
+
+### [Homebrew](https://brew.sh) (for macOS users)
+
+```
+brew tap GoodwayGroup/gw-aws-audit
+brew install gw-aws-audit
+```
+
+### curl binary
+
 ```
 $ curl https://i.jpillora.com/GoodwayGroup/gw-aws-audit! | bash
+```
+
+### man page
+
+To install `man` page:
+
+```
+$ gw-aws-audit install-manpage
 ```
 
 ## Audit helper script
