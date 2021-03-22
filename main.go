@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/GoodwayGroup/gw-aws-audit/ec2"
 	"github.com/GoodwayGroup/gw-aws-audit/iam"
 	"github.com/GoodwayGroup/gw-aws-audit/info"
@@ -354,8 +355,8 @@ with your VPC.
 								Value: false,
 							},
 						},
-						Action: func(context *cli.Context) error {
-							err := sg.GeneratePortReport(context)
+						Action: func(c *cli.Context) error {
+							err := sg.GeneratePortReport(c)
 							if err != nil {
 								return cli.Exit(err, 2)
 							}
@@ -408,19 +409,8 @@ This will note Internal and External IP usage as well.
 This action will generate a report for all Users within an AWS account with the details
 specific user authentication methods.
 
-┌──────────────┬────────┬───────────┬─────────┬────────────┬─────────────────────────────────────────────────────────────────────────┐
-│              │        │           │         │            │                           ACCESS KEY DETAILS                            │
-│ USER         │ STATUS │       AGE │ CONSOLE │ LAST LOGIN │               KEY ID | STATUS | AGE | LAST USED | SERVICE               │
-├──────────────┼────────┼───────────┼─────────┼────────────┼─────────────────────────────────────────────────────────────────────────┤
-│ user12345    │   PASS │  123 days │      NO │       NONE │                               0 API Keys                                │
-├──────────────┼────────┼───────────┼─────────┼────────────┼─────────────────────────────────────────────────────────────────────────┤
-│ bot-user-123 │   WARN │  236 days │      NO │       NONE │                               2 API Keys                                │
-│              │        │           │         │            │ AKIAIOSFODNN6EXAMPLE │ Active │ 229 days │   229 days 22 hours   │ s3   │
-│              │        │           │         │            │ AKIAIOSFODNN5EXAMPLE │ Active │ 228 days │ 51 minutes 24 seconds │ sts  │
-├──────────────┼────────┼───────────┼─────────┼────────────┼─────────────────────────────────────────────────────────────────────────┤
-│ userAOK123   │   FAIL │   43 days │     YES │     5 days │                               1 API Key                                 │
-│              │        │           │         │            │   AKIAIOSFODNN3EXAMPLE │ Active │ 43 days │ 22 hours 5 minutes │ ec2    │
-└──────────────┴────────┴───────────┴─────────┴────────────┴─────────────────────────────────────────────────────────────────────────┘
+Interactive mode will allow you to search for a User and take actions once a User is
+selected.
 
 USER [string]:
   - The user name
@@ -440,6 +430,10 @@ CONSOLE [bool]:
 LAST LOGIN [duration]:
   - Time since User was created
   - NONE if the User does not have Console Access or if the User has NEVER logged in.
+
+PERMISSIONS [struct]:
+  - G: n -> Groups that the User belongs to
+  - P: n -> Policies that are attached to the User
 
 ACCESS KEY DETAILS [sub table]:
   - Primary header row is the number of Access Keys associated with the User
@@ -461,18 +455,113 @@ ACCESS KEY DETAILS [sub table]:
 								Name:  "show-only",
 								Usage: "filter results to show only pass, warn or fail",
 							},
+							&cli.BoolFlag{
+								Name:    "interactive",
+								Aliases: []string{"i"},
+								Usage:   "after generating the report, prompt for digging into a user",
+							},
 						},
-						Action: func(context *cli.Context) error {
+						Action: func(c *cli.Context) error {
 							showOnly := ""
-							if context.String("show-only") != "" {
-								showOnly = strings.ToLower(context.String("show-only"))
+							if c.String("show-only") != "" {
+								showOnly = strings.ToLower(c.String("show-only"))
 							}
 							allowedFilters := []string{"", "pass", "warn", "fail"}
 							if !funk.ContainsString(allowedFilters, showOnly) {
 								return cli.Exit(fmt.Sprintf("Invalid value for show-only. Must be one of: %v", allowedFilters), 3)
 							}
 
-							err := iam.ListUsers(showOnly)
+							users, err := iam.GetAllUsersWithAccessKeyData(true)
+							if err != nil {
+								return cli.Exit(err, 2)
+							}
+
+							err = iam.ListUsers(users, showOnly)
+							if err != nil {
+								return cli.Exit(err, 2)
+							}
+
+							if c.Bool("interactive") {
+								// pass users into prompt to view users
+								err = iam.ViewUserDetails(users, "")
+								if err != nil {
+									return cli.Exit(err, 2)
+								}
+							}
+							return nil
+						},
+					},
+					{
+						Name:    "permissions",
+						Aliases: []string{"p"},
+						Usage: "view permissions that are associated with a User",
+						UsageText: `
+Produces a table of Groups and Policies that are attached to a User.
+
+Interactive mode allows for you to detach a permission from a User.
+`,
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "user name to look for",
+								Required: true,
+							},
+							&cli.BoolFlag{
+								Name:    "interactive",
+								Aliases: []string{"i"},
+								Usage:   "interactive mode that allows for removal of permissions",
+							},
+						},
+						Action: func(c *cli.Context) error {
+							user := c.String("user")
+							permissions, err := iam.GetUserPermissions(user)
+							if err != nil {
+								return cli.Exit(err, 2)
+							}
+							err = iam.ListPermissions(permissions)
+							if err != nil {
+								return cli.Exit(err, 2)
+							}
+							if c.Bool("interactive") {
+								detach := false
+								prompt := &survey.Confirm{
+									Message: fmt.Sprintf("Detach permissions from %s?", user),
+								}
+								err = survey.AskOne(prompt, &detach)
+								if err != nil {
+									return cli.Exit(err, 2)
+								}
+								if detach {
+									err = iam.DetachPermissions(permissions, user)
+									if err != nil {
+										return cli.Exit(err, 2)
+									}
+								}
+							}
+							return nil
+						},
+					},
+					{
+						Name:    "detach",
+						Aliases: []string{"p"},
+						Usage: "detach an associated Group or Policy from a User",
+						UsageText: "Generates a list of associated permissions for a User and allows you to select them to detach.",
+						Flags: []cli.Flag{
+							&cli.StringFlag{
+								Name:     "user",
+								Aliases:  []string{"u"},
+								Usage:    "user name to look for",
+								Required: true,
+							},
+						},
+						Action: func(c *cli.Context) error {
+							user := c.String("user")
+							permissions, err := iam.GetUserPermissions(user)
+							if err != nil {
+								return cli.Exit(err, 2)
+							}
+							err = iam.DetachPermissions(permissions, user)
 							if err != nil {
 								return cli.Exit(err, 2)
 							}

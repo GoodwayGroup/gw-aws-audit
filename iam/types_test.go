@@ -13,7 +13,7 @@ func TestIamUser_ARN(t *testing.T) {
 
 	t.Run("should return the literal string", func(t *testing.T) {
 		test := "test"
-		u := iamUser{
+		u := User{
 			arn: &test,
 		}
 
@@ -21,7 +21,7 @@ func TestIamUser_ARN(t *testing.T) {
 	})
 
 	t.Run("should return empty string when there is no value", func(t *testing.T) {
-		u := iamUser{}
+		u := User{}
 
 		is.Equal("", u.ARN())
 	})
@@ -32,7 +32,7 @@ func TestIamUser_UserName(t *testing.T) {
 
 	t.Run("should return the literal string", func(t *testing.T) {
 		test := "test"
-		u := iamUser{
+		u := User{
 			userName: &test,
 		}
 
@@ -40,7 +40,7 @@ func TestIamUser_UserName(t *testing.T) {
 	})
 
 	t.Run("should return empty string when there is no value", func(t *testing.T) {
-		u := iamUser{}
+		u := User{}
 
 		is.Equal("", u.UserName())
 	})
@@ -51,7 +51,7 @@ func TestIamUser_ID(t *testing.T) {
 
 	t.Run("should return the literal string", func(t *testing.T) {
 		test := "test"
-		u := iamUser{
+		u := User{
 			userID: &test,
 		}
 
@@ -59,7 +59,7 @@ func TestIamUser_ID(t *testing.T) {
 	})
 
 	t.Run("should return empty string when there is no value", func(t *testing.T) {
-		u := iamUser{}
+		u := User{}
 
 		is.Equal("", u.ID())
 	})
@@ -69,7 +69,7 @@ func TestIamUser_HasConsoleAccess(t *testing.T) {
 	is := assert.New(t)
 
 	t.Run("should return the value set", func(t *testing.T) {
-		u := iamUser{
+		u := User{
 			hasConsoleAccess: true,
 		}
 
@@ -77,7 +77,7 @@ func TestIamUser_HasConsoleAccess(t *testing.T) {
 	})
 
 	t.Run("should return false by default", func(t *testing.T) {
-		u := iamUser{}
+		u := User{}
 
 		is.False(u.HasConsoleAccess())
 	})
@@ -88,7 +88,7 @@ func TestIamUser_LastLogin(t *testing.T) {
 
 	t.Run("should return the value set", func(t *testing.T) {
 		test := time.Now()
-		u := iamUser{
+		u := User{
 			passwordLastUsed: &test,
 		}
 
@@ -96,7 +96,7 @@ func TestIamUser_LastLogin(t *testing.T) {
 	})
 
 	t.Run("should return zeroed time.Time", func(t *testing.T) {
-		u := iamUser{}
+		u := User{}
 
 		is.Equal(time.Time{}, u.LastLogin())
 	})
@@ -107,7 +107,7 @@ func TestIamUser_LastLoginDuration(t *testing.T) {
 
 	t.Run("should return the value set", func(t *testing.T) {
 		test := time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC)
-		u := iamUser{
+		u := User{
 			passwordLastUsed: &test,
 		}
 
@@ -115,7 +115,7 @@ func TestIamUser_LastLoginDuration(t *testing.T) {
 	})
 
 	t.Run("should return zeroed time.Time", func(t *testing.T) {
-		u := iamUser{}
+		u := User{}
 
 		is.Equal("", u.LastLoginDuration())
 	})
@@ -126,7 +126,7 @@ func TestIamUser_CreatedDate(t *testing.T) {
 
 	t.Run("should return the value set", func(t *testing.T) {
 		test := time.Now()
-		u := iamUser{
+		u := User{
 			createDate: &test,
 		}
 
@@ -134,7 +134,7 @@ func TestIamUser_CreatedDate(t *testing.T) {
 	})
 
 	t.Run("should return zeroed time.Time", func(t *testing.T) {
-		u := iamUser{}
+		u := User{}
 
 		is.Equal(time.Time{}, u.CreatedDate())
 	})
@@ -145,7 +145,7 @@ func TestIamUser_CreatedDateDuration(t *testing.T) {
 
 	t.Run("should return the value set", func(t *testing.T) {
 		test := time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC)
-		u := iamUser{
+		u := User{
 			createDate: &test,
 		}
 
@@ -153,7 +153,7 @@ func TestIamUser_CreatedDateDuration(t *testing.T) {
 	})
 
 	t.Run("should return zeroed time.Time", func(t *testing.T) {
-		u := iamUser{}
+		u := User{}
 
 		is.Equal("", u.CreatedDateDuration())
 	})
@@ -163,7 +163,7 @@ func TestIamUser_HasAccessKeys(t *testing.T) {
 	is := assert.New(t)
 
 	t.Run("should return the value set", func(t *testing.T) {
-		u := iamUser{
+		u := User{
 			accessKeys: []*accessKey{{}},
 		}
 
@@ -171,7 +171,7 @@ func TestIamUser_HasAccessKeys(t *testing.T) {
 	})
 
 	t.Run("should return false by default", func(t *testing.T) {
-		u := iamUser{}
+		u := User{}
 
 		is.False(u.HasAccessKeys())
 	})
@@ -181,7 +181,7 @@ func TestIamUser_AccessKeysCount(t *testing.T) {
 	is := assert.New(t)
 
 	t.Run("should return the value set", func(t *testing.T) {
-		u := iamUser{
+		u := User{
 			accessKeys: []*accessKey{{}, {}},
 		}
 
@@ -189,7 +189,7 @@ func TestIamUser_AccessKeysCount(t *testing.T) {
 	})
 
 	t.Run("should return false by default", func(t *testing.T) {
-		u := iamUser{}
+		u := User{}
 
 		is.Equal(0, u.AccessKeysCount())
 	})
@@ -199,21 +199,21 @@ func TestIamUser_CheckStatus(t *testing.T) {
 	is := assert.New(t)
 
 	var tests = []struct {
-		input iamUser
+		input User
 		want  string
 	}{
 		{
-			input: iamUser{},
+			input: User{},
 			want:  "pass",
 		},
 		{
-			input: iamUser{
+			input: User{
 				hasConsoleAccess: true,
 			},
 			want: "fail",
 		},
 		{
-			input: iamUser{
+			input: User{
 				hasConsoleAccess: false,
 				accessKeys:       []*accessKey{{}},
 			},
@@ -233,21 +233,21 @@ func TestIamUser_FormattedCheckStatus(t *testing.T) {
 	is := assert.New(t)
 
 	var tests = []struct {
-		input iamUser
+		input User
 		want  string
 	}{
 		{
-			input: iamUser{},
+			input: User{},
 			want:  aurora.Green("PASS").String(),
 		},
 		{
-			input: iamUser{
+			input: User{
 				hasConsoleAccess: true,
 			},
 			want: aurora.Red("FAIL").String(),
 		},
 		{
-			input: iamUser{
+			input: User{
 				hasConsoleAccess: false,
 				accessKeys:       []*accessKey{{}},
 			},
@@ -268,7 +268,7 @@ func TestIamUser_FormattedLastLoginDateDuration(t *testing.T) {
 
 	t.Run("should return the value set", func(t *testing.T) {
 		test := time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC)
-		u := iamUser{
+		u := User{
 			hasConsoleAccess: true,
 			passwordLastUsed: &test,
 		}
@@ -277,7 +277,7 @@ func TestIamUser_FormattedLastLoginDateDuration(t *testing.T) {
 	})
 
 	t.Run("should return zeroed time.Time", func(t *testing.T) {
-		u := iamUser{}
+		u := User{}
 
 		is.Equal(aurora.Gray(8, "NONE").String(), u.FormattedLastLoginDateDuration())
 	})

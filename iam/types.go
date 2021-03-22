@@ -2,13 +2,13 @@ package iam
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/iam"
+	awsIAM "github.com/aws/aws-sdk-go/service/iam"
 	"github.com/hako/durafmt"
 	"github.com/logrusorgru/aurora/v3"
 	"time"
 )
 
-type iamUser struct {
+type User struct {
 	arn      *string
 	userName *string
 	userID   *string
@@ -18,60 +18,81 @@ type iamUser struct {
 	passwordLastUsed *time.Time
 	createDate       *time.Time
 	accessKeys       []*accessKey
+	permissions      []*permission
 }
 
 var (
 	nilTime = time.Time{}
 )
 
-func (u iamUser) ARN() string {
+func (u User) ARN() string {
 	return aws.StringValue(u.arn)
 }
 
-func (u iamUser) UserName() string {
+func (u User) UserName() string {
 	return aws.StringValue(u.userName)
 }
 
-func (u iamUser) ID() string {
+func (u User) ID() string {
 	return aws.StringValue(u.userID)
 }
 
-func (u iamUser) HasConsoleAccess() bool {
+func (u User) HasConsoleAccess() bool {
 	return u.hasConsoleAccess
 }
 
-func (u iamUser) LastLogin() time.Time {
+func (u User) LastLogin() time.Time {
 	return aws.TimeValue(u.passwordLastUsed)
 }
 
-func (u iamUser) LastLoginDuration() string {
+func (u User) LastLoginDuration() string {
 	if u.LastLogin() == nilTime {
 		return ""
 	}
 	return durafmt.Parse(time.Since(u.LastLogin())).LimitToUnit("days").LimitFirstN(1).String()
 }
 
-func (u iamUser) CreatedDate() time.Time {
+func (u User) CreatedDate() time.Time {
 	return aws.TimeValue(u.createDate)
 }
 
-func (u iamUser) CreatedDateDuration() string {
+func (u User) CreatedDateDuration() string {
 	if u.CreatedDate() == nilTime {
 		return ""
 	}
 	return durafmt.Parse(time.Since(u.CreatedDate())).LimitToUnit("days").LimitFirstN(1).String()
 }
 
-func (u iamUser) HasAccessKeys() bool {
+func (u User) HasAccessKeys() bool {
 	return u.accessKeys != nil
 }
 
-func (u iamUser) AccessKeysCount() int {
+func (u User) AccessKeysCount() int {
 	return len(u.accessKeys)
 }
 
+func (u User) HasPermissions() bool {
+	return u.permissions != nil
+}
+
+func (u User) Permissions() []*permission {
+	return u.permissions
+}
+
+func (u User) PermissionsCount() int {
+	return len(u.permissions)
+}
+
+func (u User) Groups() []*permission {
+	return permissionsByType(u.permissions, "GROUP")
+}
+
+func (u User) Policies() []*permission {
+	return permissionsByType(u.permissions, "GROUP")
+}
+
 // TODO: Make the Status more robust
-func (u iamUser) CheckStatus() string {
+func (u User) CheckStatus() string {
 	switch {
 	case !u.HasConsoleAccess() && !u.HasAccessKeys():
 		return "pass"
@@ -90,7 +111,7 @@ func (u iamUser) CheckStatus() string {
 	}
 }
 
-func (u iamUser) FormattedCheckStatus() string {
+func (u User) FormattedCheckStatus() string {
 	switch u.CheckStatus() {
 	case "pass":
 		return aurora.Green("PASS").String()
@@ -103,7 +124,7 @@ func (u iamUser) FormattedCheckStatus() string {
 	}
 }
 
-func (u iamUser) FormattedLastLoginDateDuration() string {
+func (u User) FormattedLastLoginDateDuration() string {
 	if u.HasConsoleAccess() {
 		return u.LastLoginDuration()
 	}
@@ -114,5 +135,11 @@ type accessKey struct {
 	id          *string
 	createdDate *time.Time
 	status      *string
-	lastUsed    *iam.AccessKeyLastUsed
+	lastUsed    *awsIAM.AccessKeyLastUsed
+}
+
+type permission struct {
+	ARN  string
+	Name string
+	Type string
 }

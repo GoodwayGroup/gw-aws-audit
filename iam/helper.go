@@ -49,3 +49,22 @@ func formattedDateDuration(v string) string {
 	}
 	return v
 }
+
+func findPermission(a []*permission, arn string) *permission {
+	for _, n := range a {
+		if arn == n.ARN {
+			return n
+		}
+	}
+	return nil
+}
+
+func permissionsByType(a []*permission, t string) []*permission {
+	var permissions []*permission
+	for _, n := range a {
+		if t == n.Type {
+			permissions = append(permissions, n)
+		}
+	}
+	return permissions
+}
