@@ -28,6 +28,8 @@ gw-aws-audit
     - [direct-ip-mapping, dim](#direct-ip-mapping-dim)
 - [iam](#iam)
     - [user-report, ur](#user-report-ur)
+    - [permissions, p](#permissions-p)
+    - [detach, p](#detach-p)
 - [cw](#cw)
     - [enhanced-monitoring](#enhanced-monitoring)
 - [install-manpage](#install-manpage)
@@ -242,19 +244,8 @@ generates report of IAM Users and Access Key Usage
 This action will generate a report for all Users within an AWS account with the details
 specific user authentication methods.
 
-┌──────────────┬────────┬───────────┬─────────┬────────────┬─────────────────────────────────────────────────────────────────────────┐
-│              │        │           │         │            │                           ACCESS KEY DETAILS                            │
-│ USER         │ STATUS │       AGE │ CONSOLE │ LAST LOGIN │               KEY ID | STATUS | AGE | LAST USED | SERVICE               │
-├──────────────┼────────┼───────────┼─────────┼────────────┼─────────────────────────────────────────────────────────────────────────┤
-│ user12345    │   PASS │  123 days │      NO │       NONE │                               0 API Keys                                │
-├──────────────┼────────┼───────────┼─────────┼────────────┼─────────────────────────────────────────────────────────────────────────┤
-│ bot-user-123 │   WARN │  236 days │      NO │       NONE │                               2 API Keys                                │
-│              │        │           │         │            │ AKIAIOSFODNN6EXAMPLE │ Active │ 229 days │   229 days 22 hours   │ s3   │
-│              │        │           │         │            │ AKIAIOSFODNN5EXAMPLE │ Active │ 228 days │ 51 minutes 24 seconds │ sts  │
-├──────────────┼────────┼───────────┼─────────┼────────────┼─────────────────────────────────────────────────────────────────────────┤
-│ userAOK123   │   FAIL │   43 days │     YES │     5 days │                               1 API Key                                 │
-│              │        │           │         │            │   AKIAIOSFODNN3EXAMPLE │ Active │ 43 days │ 22 hours 5 minutes │ ec2    │
-└──────────────┴────────┴───────────┴─────────┴────────────┴─────────────────────────────────────────────────────────────────────────┘
+Interactive mode will allow you to search for a User and take actions once a User is
+selected.
 
 USER [string]:
   - The user name
@@ -275,6 +266,10 @@ LAST LOGIN [duration]:
   - Time since User was created
   - NONE if the User does not have Console Access or if the User has NEVER logged in.
 
+PERMISSIONS [struct]:
+  - G: n -> Groups that the User belongs to
+  - P: n -> Policies that are attached to the User
+
 ACCESS KEY DETAILS [sub table]:
   - Primary header row is the number of Access Keys associated with the User
 
@@ -291,7 +286,31 @@ ACCESS KEY DETAILS [sub table]:
     - The last AWS Service that the Access Key was used to access at the "LAST USED" time.
 ```
 
+**--interactive, -i**: after generating the report, prompt for digging into a user
+
 **--show-only**="": filter results to show only pass, warn or fail
+
+### permissions, p
+
+view permissions that are associated with a User
+
+```
+Produces a table of Groups and Policies that are attached to a User.
+
+Interactive mode allows for you to detach a permission from a User.
+```
+
+**--interactive, -i**: interactive mode that allows for removal of permissions
+
+**--user, -u**="": user name to look for
+
+### detach, p
+
+detach an associated Group or Policy from a User
+
+>Generates a list of associated permissions for a User and allows you to select them to detach.
+
+**--user, -u**="": user name to look for
 
 ## cw
 
