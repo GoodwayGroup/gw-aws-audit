@@ -2,10 +2,22 @@
 ## [Unreleased]
 
 
+<a name="v1.16.0"></a>
+## [v1.16.0] - 2021-03-22
+### Chore
+- **docs:** updating docs for version v1.16.0
+
+### Features
+- **iam:** user group and policy management
+
+
 <a name="v1.15.2"></a>
 ## [v1.15.2] - 2021-03-17
 ### Bug Fixes
 - **goreleaser:** addressed type in binary naming
+
+### Features
+- **release:** v1.15.2
 
 ### Pull Requests
 - fix(deps): update github.com/hako/durafmt commit hash to 3a2c319 ([#45](https://github.com/GoodwayGroup/gw-aws-audit/issues/45))
@@ -555,7 +567,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.15.2...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.16.0...HEAD
+[v1.16.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.15.2...v1.16.0
 [v1.15.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.15.1...v1.15.2
 [v1.15.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.15.0...v1.15.1
 [v1.15.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.14.3...v1.15.0
