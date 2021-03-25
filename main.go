@@ -2,7 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/AlecAivazis/survey/v2"
+	"log"
+	"os"
+	"runtime"
+	"time"
+
 	"github.com/GoodwayGroup/gw-aws-audit/ec2"
 	"github.com/GoodwayGroup/gw-aws-audit/iam"
 	"github.com/GoodwayGroup/gw-aws-audit/info"
@@ -10,13 +14,7 @@ import (
 	"github.com/GoodwayGroup/gw-aws-audit/s3"
 	"github.com/GoodwayGroup/gw-aws-audit/sg"
 	"github.com/clok/cdocs"
-	"github.com/thoas/go-funk"
 	"github.com/urfave/cli/v2"
-	"log"
-	"os"
-	"runtime"
-	"strings"
-	"time"
 )
 
 var version string
@@ -229,7 +227,6 @@ SECURITY GROUPS:
 						UsageText: `
 This command will scan the EC2 NetworkInterfaces to determine what
 Security Groups are NOT attached/assigned in AWS.
-
 `,
 						Action: func(c *cli.Context) error {
 							err := sg.ListDetachedSecurityGroups()
@@ -399,175 +396,14 @@ This will note Internal and External IP usage as well.
 				},
 			},
 			{
-				Name: "iam",
+				Name:  "iam",
+				Usage: "IAM related commands",
 				Subcommands: []*cli.Command{
-					{
-						Name:    "user-report",
-						Aliases: []string{"ur"},
-						Usage:   "generates report of IAM Users and Access Key Usage",
-						UsageText: `
-This action will generate a report for all Users within an AWS account with the details
-specific user authentication methods.
-
-Interactive mode will allow you to search for a User and take actions once a User is
-selected.
-
-USER [string]:
-  - The user name
-
-STATUS [enum]:
-  - PASS: When a does NOT have Console Access and has NO Access Keys or only INACTIVE Access Keys
-  - FAIL: When a User has Console Access
-  - WARN: When a User does NOT have Console Access, but does have at least 1 ACTIVE Access Key
-  - UNKNOWN: Catch all for cases not handled.
-
-AGE [duration]:
-  - Time since User was created
-
-CONSOLE [bool]:
-  - Does the User have Console Access? YES/NO
-
-LAST LOGIN [duration]:
-  - Time since User was created
-  - NONE if the User does not have Console Access or if the User has NEVER logged in.
-
-PERMISSIONS [struct]:
-  - G: n -> Groups that the User belongs to
-  - P: n -> Policies that are attached to the User
-
-ACCESS KEY DETAILS [sub table]:
-  - Primary header row is the number of Access Keys associated with the User
-
-  KEY ID [string]:
-    - The AWS_ACCESS_KEY_ID
-
-  STATUS [enum]:
-    - Active/Inactive
-
-  LAST USED [duration]:
-    - Time since the Access Key was last used.
-
-  SERVICE [string]:
-    - The last AWS Service that the Access Key was used to access at the "LAST USED" time.
-`,
-						Flags: []cli.Flag{
-							&cli.StringFlag{
-								Name:  "show-only",
-								Usage: "filter results to show only pass, warn or fail",
-							},
-							&cli.BoolFlag{
-								Name:    "interactive",
-								Aliases: []string{"i"},
-								Usage:   "after generating the report, prompt for digging into a user",
-							},
-						},
-						Action: func(c *cli.Context) error {
-							showOnly := ""
-							if c.String("show-only") != "" {
-								showOnly = strings.ToLower(c.String("show-only"))
-							}
-							allowedFilters := []string{"", "pass", "warn", "fail"}
-							if !funk.ContainsString(allowedFilters, showOnly) {
-								return cli.Exit(fmt.Sprintf("Invalid value for show-only. Must be one of: %v", allowedFilters), 3)
-							}
-
-							users, err := iam.GetAllUsersWithAccessKeyData(true)
-							if err != nil {
-								return cli.Exit(err, 2)
-							}
-
-							err = iam.ListUsers(users, showOnly)
-							if err != nil {
-								return cli.Exit(err, 2)
-							}
-
-							if c.Bool("interactive") {
-								// pass users into prompt to view users
-								err = iam.ViewUserDetails(users, "")
-								if err != nil {
-									return cli.Exit(err, 2)
-								}
-							}
-							return nil
-						},
-					},
-					{
-						Name:    "permissions",
-						Aliases: []string{"p"},
-						Usage: "view permissions that are associated with a User",
-						UsageText: `
-Produces a table of Groups and Policies that are attached to a User.
-
-Interactive mode allows for you to detach a permission from a User.
-`,
-						Flags: []cli.Flag{
-							&cli.StringFlag{
-								Name:     "user",
-								Aliases:  []string{"u"},
-								Usage:    "user name to look for",
-								Required: true,
-							},
-							&cli.BoolFlag{
-								Name:    "interactive",
-								Aliases: []string{"i"},
-								Usage:   "interactive mode that allows for removal of permissions",
-							},
-						},
-						Action: func(c *cli.Context) error {
-							user := c.String("user")
-							permissions, err := iam.GetUserPermissions(user)
-							if err != nil {
-								return cli.Exit(err, 2)
-							}
-							err = iam.ListPermissions(permissions)
-							if err != nil {
-								return cli.Exit(err, 2)
-							}
-							if c.Bool("interactive") {
-								detach := false
-								prompt := &survey.Confirm{
-									Message: fmt.Sprintf("Detach permissions from %s?", user),
-								}
-								err = survey.AskOne(prompt, &detach)
-								if err != nil {
-									return cli.Exit(err, 2)
-								}
-								if detach {
-									err = iam.DetachPermissions(permissions, user)
-									if err != nil {
-										return cli.Exit(err, 2)
-									}
-								}
-							}
-							return nil
-						},
-					},
-					{
-						Name:    "detach",
-						Aliases: []string{"p"},
-						Usage: "detach an associated Group or Policy from a User",
-						UsageText: "Generates a list of associated permissions for a User and allows you to select them to detach.",
-						Flags: []cli.Flag{
-							&cli.StringFlag{
-								Name:     "user",
-								Aliases:  []string{"u"},
-								Usage:    "user name to look for",
-								Required: true,
-							},
-						},
-						Action: func(c *cli.Context) error {
-							user := c.String("user")
-							permissions, err := iam.GetUserPermissions(user)
-							if err != nil {
-								return cli.Exit(err, 2)
-							}
-							err = iam.DetachPermissions(permissions, user)
-							if err != nil {
-								return cli.Exit(err, 2)
-							}
-							return nil
-						},
-					},
+					iam.ActionUserReport,
+					iam.ActionReport,
+					iam.ActionModify,
+					iam.ActionPermissions,
+					iam.ActionKeys,
 				},
 			},
 			{

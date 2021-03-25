@@ -2,9 +2,10 @@ package iam
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/hako/durafmt"
 	"github.com/logrusorgru/aurora/v3"
-	"time"
 )
 
 func formattedYesNo(v bool) string {
@@ -50,7 +51,7 @@ func formattedDateDuration(v string) string {
 	return v
 }
 
-func findPermission(a []*permission, arn string) *permission {
+func findPermission(a []*Permission, arn string) *Permission {
 	for _, n := range a {
 		if arn == n.ARN {
 			return n
@@ -59,12 +60,21 @@ func findPermission(a []*permission, arn string) *permission {
 	return nil
 }
 
-func permissionsByType(a []*permission, t string) []*permission {
-	var permissions []*permission
+func permissionsByType(a []*Permission, t string) []*Permission {
+	var permissions []*Permission
 	for _, n := range a {
 		if t == n.Type {
 			permissions = append(permissions, n)
 		}
 	}
 	return permissions
+}
+
+func findAccessKey(a []*AccessKey, id string) *AccessKey {
+	for _, n := range a {
+		if id == *n.id {
+			return n
+		}
+	}
+	return nil
 }

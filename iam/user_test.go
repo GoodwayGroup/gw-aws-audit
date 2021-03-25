@@ -164,7 +164,7 @@ func TestIamUser_HasAccessKeys(t *testing.T) {
 
 	t.Run("should return the value set", func(t *testing.T) {
 		u := User{
-			accessKeys: []*accessKey{{}},
+			accessKeys: []*AccessKey{{}},
 		}
 
 		is.True(u.HasAccessKeys())
@@ -182,7 +182,7 @@ func TestIamUser_AccessKeysCount(t *testing.T) {
 
 	t.Run("should return the value set", func(t *testing.T) {
 		u := User{
-			accessKeys: []*accessKey{{}, {}},
+			accessKeys: []*AccessKey{{}, {}},
 		}
 
 		is.Equal(2, u.AccessKeysCount())
@@ -215,7 +215,7 @@ func TestIamUser_CheckStatus(t *testing.T) {
 		{
 			input: User{
 				hasConsoleAccess: false,
-				accessKeys:       []*accessKey{{}},
+				accessKeys:       []*AccessKey{{}},
 			},
 			want: "warn",
 		},
@@ -249,7 +249,7 @@ func TestIamUser_FormattedCheckStatus(t *testing.T) {
 		{
 			input: User{
 				hasConsoleAccess: false,
-				accessKeys:       []*accessKey{{}},
+				accessKeys:       []*AccessKey{{}},
 			},
 			want: aurora.Yellow("WARN").String(),
 		},
