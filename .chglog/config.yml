@@ -5,12 +5,12 @@ info:
   repository_url: https://github.com/GoodwayGroup/gw-aws-audit
 options:
   commits:
-  # filters:
-  #   Type:
-  #     - feat
-  #     - fix
-  #     - perf
-  #     - refactor
+    # filters:
+    #   Type:
+    #     - feat
+    #     - fix
+    #     - perf
+    #     - refactor
   commit_groups:
     title_maps:
       feat: Features
@@ -28,10 +28,6 @@ options:
       - Type
       - Scope
       - Subject
-  merges:
-    pattern: "^(.*#\\d+.*)$"
-    pattern_maps:
-      - Source
   notes:
     keywords:
       - BREAKING CHANGE

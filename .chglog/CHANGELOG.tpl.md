@@ -33,13 +33,6 @@
 ### Pull Requests
 {{ range .MergeCommits -}}
 - {{ .Header }}
-{{ $length := len .Body }}
-{{ if ne $length 0 }}
-###### Squashed Commits:
-```
-{{ .Body }}
-```
-{{ end }}
 {{ end }}
 {{ end -}}
 
