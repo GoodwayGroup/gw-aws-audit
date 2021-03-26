@@ -1,26 +1,22 @@
 <a name="unreleased"></a>
 ## [Unreleased]
 
+### Chore
+- update changelog config
+
 
 <a name="v1.17.0"></a>
 ## [v1.17.0] - 2021-03-26
+### Bug Fixes
+- **deps:** update module github.com/aws/aws-sdk-go to v1.38.6 ([#47](https://github.com/GoodwayGroup/gw-aws-audit/issues/47))
+
 ### Chore
 - update README
 - **docs:** updating docs for version v1.17.0
 
-### Pull Requests
-- fix(deps): update module github.com/aws/aws-sdk-go to v1.38.6 ([#47](https://github.com/GoodwayGroup/gw-aws-audit/issues/47))
-
-
-- feat(iam): adding interactive management of users to the tool ([#48](https://github.com/GoodwayGroup/gw-aws-audit/issues/48))
-
-
-###### Squashed Commits:
-```
-BREAKING CHANGE:
-The command `gw-aws-audit iam user-report` has been renamed to `gw-aws-audit iam report`
-```
-
+### Features
+- **iam:** adding interactive management of users to the tool ([#48](https://github.com/GoodwayGroup/gw-aws-audit/issues/48))
+- **release:** v1.17.0
 
 ### BREAKING CHANGE
 
@@ -40,28 +36,12 @@ The command `gw-aws-audit iam user-report` has been renamed to `gw-aws-audit iam
 <a name="v1.15.2"></a>
 ## [v1.15.2] - 2021-03-17
 ### Bug Fixes
+- **deps:** update github.com/hako/durafmt commit hash to 3a2c319 ([#45](https://github.com/GoodwayGroup/gw-aws-audit/issues/45))
+- **deps:** update module github.com/aws/aws-sdk-go to v1.37.33 ([#46](https://github.com/GoodwayGroup/gw-aws-audit/issues/46))
 - **goreleaser:** addressed type in binary naming
 
 ### Features
 - **release:** v1.15.2
-
-### Pull Requests
-- fix(deps): update github.com/hako/durafmt commit hash to 3a2c319 ([#45](https://github.com/GoodwayGroup/gw-aws-audit/issues/45))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
-- fix(deps): update module github.com/aws/aws-sdk-go to v1.37.33 ([#46](https://github.com/GoodwayGroup/gw-aws-audit/issues/46))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
 
 
 <a name="v1.15.1"></a>
@@ -87,42 +67,19 @@ Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).
 
 <a name="v1.14.3"></a>
 ## [v1.14.3] - 2021-03-03
+### Bug Fixes
+- **deps:** update all non-major dependencies ([#40](https://github.com/GoodwayGroup/gw-aws-audit/issues/40))
+
 ### Chore
+- **deps:** update module stretchr/testify to v1.7.0 ([#32](https://github.com/GoodwayGroup/gw-aws-audit/issues/32))
+- **deps:** update module aws/aws-sdk-go to v1.36.28 ([#31](https://github.com/GoodwayGroup/gw-aws-audit/issues/31))
+- **deps:** update module aws/aws-sdk-go to v1.36.18 ([#30](https://github.com/GoodwayGroup/gw-aws-audit/issues/30))
 - **github actions:** add go proxy warming
 - **renovate:** add extension for group:allNonMajor
 - **renovate:** add gomodTidy option
 
 ### Features
 - **release:** v1.14.3
-
-### Pull Requests
-- fix(deps): update all non-major dependencies ([#40](https://github.com/GoodwayGroup/gw-aws-audit/issues/40))
-
-
-- chore(deps): update module stretchr/testify to v1.7.0 ([#32](https://github.com/GoodwayGroup/gw-aws-audit/issues/32))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
-- chore(deps): update module aws/aws-sdk-go to v1.36.28 ([#31](https://github.com/GoodwayGroup/gw-aws-audit/issues/31))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
-- chore(deps): update module aws/aws-sdk-go to v1.36.18 ([#30](https://github.com/GoodwayGroup/gw-aws-audit/issues/30))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
 
 
 <a name="v1.14.2"></a>
@@ -131,43 +88,13 @@ Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).
 - **deps:** update module aws/aws-sdk-go to v1.36.17
 - **deps:** update module urfave/cli/v2 to v2.3.0
 - **deps:** update awssession to v0.1.5 and cdocs to v0.2.3
+- **deps:** update module aws/aws-sdk-go to v1.36.13 ([#27](https://github.com/GoodwayGroup/gw-aws-audit/issues/27))
+- **deps:** update actions/setup-go action to v2 ([#26](https://github.com/GoodwayGroup/gw-aws-audit/issues/26))
+- **deps:** update actions/checkout action to v2 ([#25](https://github.com/GoodwayGroup/gw-aws-audit/issues/25))
+- **deps:** update module aws/aws-sdk-go to v1.35.17 ([#24](https://github.com/GoodwayGroup/gw-aws-audit/issues/24))
 
 ### Features
 - **release:** v1.14.2
-
-### Pull Requests
-- chore(deps): update module aws/aws-sdk-go to v1.36.13 ([#27](https://github.com/GoodwayGroup/gw-aws-audit/issues/27))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
-- chore(deps): update actions/setup-go action to v2 ([#26](https://github.com/GoodwayGroup/gw-aws-audit/issues/26))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
-- chore(deps): update actions/checkout action to v2 ([#25](https://github.com/GoodwayGroup/gw-aws-audit/issues/25))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
-- chore(deps): update module aws/aws-sdk-go to v1.35.17 ([#24](https://github.com/GoodwayGroup/gw-aws-audit/issues/24))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
 
 
 <a name="v1.14.1"></a>
@@ -182,32 +109,12 @@ Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).
 <a name="v1.14.0"></a>
 ## [v1.14.0] - 2020-09-30
 ### Chore
+- **deps:** update module aws/aws-sdk-go to v1.35.0 ([#19](https://github.com/GoodwayGroup/gw-aws-audit/issues/19))
 - **docs:** updating docs for version v1.14.0
 
 ### Features
+- **rds:** add public command to generate report of publicly exposed RDS instances ([#20](https://github.com/GoodwayGroup/gw-aws-audit/issues/20))
 - **release:** v1.14.0
-
-### Pull Requests
-- feat(rds): add public command to generate report of publicly exposed RDS instances ([#20](https://github.com/GoodwayGroup/gw-aws-audit/issues/20))
-
-
-###### Squashed Commits:
-```
-* feat(rds): add public command to generate report of publicly exposed RDS instances
-
-* chore(rds): added UsageText to the public command
-
-* chore: fix lint errors
-```
-
-- chore(deps): update module aws/aws-sdk-go to v1.35.0 ([#19](https://github.com/GoodwayGroup/gw-aws-audit/issues/19))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
 
 
 <a name="v1.13.1"></a>
@@ -224,34 +131,12 @@ Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).
 <a name="v1.13.0"></a>
 ## [v1.13.0] - 2020-09-15
 ### Chore
+- **deps:** update module aws/aws-sdk-go to v1.34.24 ([#17](https://github.com/GoodwayGroup/gw-aws-audit/issues/17))
 - **docs:** updating docs for version v1.13.0
 
 ### Features
+- **iam:** added user-report action to report on console access and api keys ([#18](https://github.com/GoodwayGroup/gw-aws-audit/issues/18))
 - **release:** v1.13.0
-
-### Pull Requests
-- chore(deps): update module aws/aws-sdk-go to v1.34.24 ([#17](https://github.com/GoodwayGroup/gw-aws-audit/issues/17))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
-- feat(iam): added user-report action to report on console access and api keys ([#18](https://github.com/GoodwayGroup/gw-aws-audit/issues/18))
-
-
-###### Squashed Commits:
-```
-* feat(iam): adding user and key info
-
-* feat(iam): added base command to cli
-
-* feat(iam): list-users reports on console access, api keys and overall status
-
-* feat(iam): updated user-report useage text
-```
-
 
 
 <a name="v1.12.0"></a>
@@ -376,45 +261,15 @@ Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).
 ### Chore
 - **deps:** udpate clok/kemba, clok/awssession, clok/cdocs, jedib0t/go-pretty/v6 and aws/aws-sdk-go
 - **deps:** add renovate.json
-- **renovate:** clean up dupe config
+- **deps:** update module aws/aws-sdk-go to v1.34.8 ([#6](https://github.com/GoodwayGroup/gw-aws-audit/issues/6))
+- **deps:** update module thoas/go-funk to v0.7.0 ([#8](https://github.com/GoodwayGroup/gw-aws-audit/issues/8))
+- **deps:** update module jedib0t/go-pretty to v6 ([#9](https://github.com/GoodwayGroup/gw-aws-audit/issues/9))
+- **deps:** update module clok/awssession to v0.1.4 ([#7](https://github.com/GoodwayGroup/gw-aws-audit/issues/7))
 - **renovate:** add renovate.json
+- **renovate:** clean up dupe config
 
 ### Features
 - **release:** v1.5.1
-
-### Pull Requests
-- chore(deps): update module aws/aws-sdk-go to v1.34.8 ([#6](https://github.com/GoodwayGroup/gw-aws-audit/issues/6))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
-- chore(deps): update module thoas/go-funk to v0.7.0 ([#8](https://github.com/GoodwayGroup/gw-aws-audit/issues/8))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
-- chore(deps): update module jedib0t/go-pretty to v6 ([#9](https://github.com/GoodwayGroup/gw-aws-audit/issues/9))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
-- chore(deps): update module clok/awssession to v0.1.4 ([#7](https://github.com/GoodwayGroup/gw-aws-audit/issues/7))
-
-
-###### Squashed Commits:
-```
-Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).com>
-```
-
 
 
 <a name="v1.5.0"></a>
@@ -464,13 +319,11 @@ Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).
 
 <a name="v1.3.0"></a>
 ## [v1.3.0] - 2020-07-13
+### Bug Fixes
+- **metrics:** fix bug in order of columns of s3 metrics report and with the count of objects for a bucket ([#3](https://github.com/GoodwayGroup/gw-aws-audit/issues/3))
+
 ### Features
 - **release:** v1.2.0
-
-### Pull Requests
-- fix(metrics): fix bug in order of columns of s3 metrics report and with the count of objects for a bucket ([#3](https://github.com/GoodwayGroup/gw-aws-audit/issues/3))
-
-
 
 
 <a name="v1.2.0"></a>
@@ -498,30 +351,12 @@ Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).
 - Merge pull request [#2](https://github.com/GoodwayGroup/gw-aws-audit/issues/2) from GoodwayGroup/release/v1.0.0
 
 
-###### Squashed Commits:
-```
-v1.0.0
-```
-
-
-
 <a name="v1.0.0"></a>
 ## [v1.0.0] - 2020-05-14
 ### Features
 - add failed tracking
+- **cli:** port from go-commander to urfave/cli/v2 ([#1](https://github.com/GoodwayGroup/gw-aws-audit/issues/1))
 - **s3:** Add support for all regions when adding s3-cost-name
-
-### Pull Requests
-- feat(cli): port from go-commander to urfave/cli/v2 ([#1](https://github.com/GoodwayGroup/gw-aws-audit/issues/1))
-
-
-###### Squashed Commits:
-```
-* feat(cli): port from go-commander to urfave/cli/v2
-
-* chore: updated readme
-```
-
 
 
 <a name="0.5.0"></a>
