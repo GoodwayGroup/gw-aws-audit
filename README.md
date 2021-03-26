@@ -25,6 +25,7 @@ COMMANDS:
    rds              RDS related commands
    ec2              EC2 related commands
    sg               Security Group related commands
+   iam              IAM related commands
    cw               CloudWatch related commands
    install-manpage  Generate and install man page
    version, v       Print version info
