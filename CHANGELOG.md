@@ -2,6 +2,31 @@
 ## [Unreleased]
 
 
+<a name="v1.17.0"></a>
+## [v1.17.0] - 2021-03-26
+### Chore
+- update README
+- **docs:** updating docs for version v1.17.0
+
+### Pull Requests
+- fix(deps): update module github.com/aws/aws-sdk-go to v1.38.6 ([#47](https://github.com/GoodwayGroup/gw-aws-audit/issues/47))
+
+
+- feat(iam): adding interactive management of users to the tool ([#48](https://github.com/GoodwayGroup/gw-aws-audit/issues/48))
+
+
+###### Squashed Commits:
+```
+BREAKING CHANGE:
+The command `gw-aws-audit iam user-report` has been renamed to `gw-aws-audit iam report`
+```
+
+
+### BREAKING CHANGE
+
+The command `gw-aws-audit iam user-report` has been renamed to `gw-aws-audit iam report`
+
+
 <a name="v1.16.0"></a>
 ## [v1.16.0] - 2021-03-22
 ### Chore
@@ -9,6 +34,7 @@
 
 ### Features
 - **iam:** user group and policy management
+- **release:** v1.16.0
 
 
 <a name="v1.15.2"></a>
@@ -425,17 +451,10 @@ Co-authored-by: Renovate Bot <bot[@renovateapp](https://github.com/renovateapp).
 ## [v1.3.2] - 2020-07-24
 ### Chore
 - updated release process to auto push branch and tag
-
-### Features
-- **release:** v1.3.2
-
-
-<a name="v1.3.1"></a>
-## [v1.3.1] - 2020-07-24
-### Chore
 - update release script
 
 ### Features
+- **release:** v1.3.2
 - **release:** v1.3.1
 - **release:** v1.3.0
 
@@ -567,7 +586,8 @@ v1.0.0
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.16.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.17.0...HEAD
+[v1.17.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.16.0...v1.17.0
 [v1.16.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.15.2...v1.16.0
 [v1.15.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.15.1...v1.15.2
 [v1.15.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.15.0...v1.15.1
@@ -593,8 +613,7 @@ v1.0.0
 [v1.5.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.4.0...v1.5.0
 [v1.4.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.3...v1.4.0
 [v1.3.3]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.2...v1.3.3
-[v1.3.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.1...v1.3.2
-[v1.3.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.0...v1.3.1
+[v1.3.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.3.0...v1.3.2
 [v1.3.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.0.0...v1.1.0
