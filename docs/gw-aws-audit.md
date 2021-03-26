@@ -27,9 +27,10 @@ gw-aws-audit
     - [amazon](#amazon)
     - [direct-ip-mapping, dim](#direct-ip-mapping-dim)
 - [iam](#iam)
-    - [user-report, ur](#user-report-ur)
+    - [report](#report)
+    - [modify](#modify)
     - [permissions, p](#permissions-p)
-    - [detach, p](#detach-p)
+    - [keys](#keys)
 - [cw](#cw)
     - [enhanced-monitoring](#enhanced-monitoring)
 - [install-manpage](#install-manpage)
@@ -150,7 +151,6 @@ generate a report of all Security Groups that are NOT attached to an instance
 ```
 This command will scan the EC2 NetworkInterfaces to determine what
 Security Groups are NOT attached/assigned in AWS.
-
 ```
 
 ### attached
@@ -235,8 +235,9 @@ This will note Internal and External IP usage as well.
 
 ## iam
 
+IAM related commands
 
-### user-report, ur
+### report
 
 generates report of IAM Users and Access Key Usage
 
@@ -244,7 +245,7 @@ generates report of IAM Users and Access Key Usage
 This action will generate a report for all Users within an AWS account with the details
 specific user authentication methods.
 
-Interactive mode will allow you to search for a User and take actions once a User is
+Interactive mode will allow you to search for an IAM User and take actions once an IAM User is
 selected.
 
 USER [string]:
@@ -252,8 +253,8 @@ USER [string]:
 
 STATUS [enum]:
   - PASS: When a does NOT have Console Access and has NO Access Keys or only INACTIVE Access Keys
-  - FAIL: When a User has Console Access
-  - WARN: When a User does NOT have Console Access, but does have at least 1 ACTIVE Access Key
+  - FAIL: When an IAM User has Console Access
+  - WARN: When an IAM User does NOT have Console Access, but does have at least 1 ACTIVE Access Key
   - UNKNOWN: Catch all for cases not handled.
 
 AGE [duration]:
@@ -290,25 +291,44 @@ ACCESS KEY DETAILS [sub table]:
 
 **--show-only**="": filter results to show only pass, warn or fail
 
-### permissions, p
+### modify
 
-view permissions that are associated with a User
+modify an IAM User within AWS
 
 ```
-Produces a table of Groups and Policies that are attached to a User.
+This action allows you to take actions to modify a user's Permissions (Groups and Policies)
+and the state of their Access Keys (Active, Inactive, Delete).
+```
 
-Interactive mode allows for you to detach a permission from a User.
+**--show-only**="": filter results to show only pass, warn or fail
+
+**--user, -u**="": user name to look for
+
+### permissions, p
+
+view permissions that are associated with an IAM User
+
+```
+Produces a table of Groups and Policies that are attached to an IAM User.
+
+Interactive mode allows for you to detach a permission from an IAM User.
 ```
 
 **--interactive, -i**: interactive mode that allows for removal of permissions
 
 **--user, -u**="": user name to look for
 
-### detach, p
+### keys
 
-detach an associated Group or Policy from a User
+view Access Keys associated with an IAM User
 
->Generates a list of associated permissions for a User and allows you to select them to detach.
+```
+Produces a table of Access Keys that are associated with an IAM User.
+
+Interactive mode allows for you to Activate, Deactivate and Delete Access Keys.
+```
+
+**--interactive, -i**: interactive mode that allows status changes of keys
 
 **--user, -u**="": user name to look for
 
