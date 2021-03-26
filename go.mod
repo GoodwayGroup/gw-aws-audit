@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.2.9
-	github.com/aws/aws-sdk-go v1.37.33
+	github.com/aws/aws-sdk-go v1.38.6
 	github.com/cenkalti/backoff/v4 v4.1.0
 	github.com/clok/awssession v1.1.0
 	github.com/clok/cdocs v1.1.0
