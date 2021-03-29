@@ -6,7 +6,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	awsIAM "github.com/aws/aws-sdk-go/service/iam"
-	as "github.com/clok/awssession"
 	"github.com/clok/kemba"
 	"github.com/hako/durafmt"
 	"github.com/logrusorgru/aurora/v3"
@@ -50,12 +49,9 @@ func (u User) ID() string {
 
 func (u *User) detectConsoleAccess() error {
 	kl := kiam.Extend("User:detectConsoleAccess")
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	client := awsIAM.New(sess)
+	client := session.GetIAMClient()
 
+	var err error
 	var results *awsIAM.GetLoginProfileOutput
 	results, err = client.GetLoginProfile(&awsIAM.GetLoginProfileInput{
 		UserName: u.userName,
@@ -112,12 +108,9 @@ func (u User) CreatedDateDuration() string {
 
 func (u *User) GetAccessKeys() error {
 	kl := kiam.Extend("User:GetAccessKeys")
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	client := awsIAM.New(sess)
+	client := session.GetIAMClient()
 
+	var err error
 	var results *awsIAM.ListAccessKeysOutput
 	results, err = client.ListAccessKeys(&awsIAM.ListAccessKeysInput{
 		UserName: u.userName,
@@ -204,12 +197,9 @@ func (u *User) GetPermissions() error {
 
 func (u User) getGroups() (*awsIAM.ListGroupsForUserOutput, error) {
 	kl := kiam.Extend("User:getGroups")
-	sess, err := as.New()
-	if err != nil {
-		return nil, err
-	}
-	client := awsIAM.New(sess)
+	client := session.GetIAMClient()
 
+	var err error
 	var results *awsIAM.ListGroupsForUserOutput
 	results, err = client.ListGroupsForUser(&awsIAM.ListGroupsForUserInput{
 		UserName: u.userName,
@@ -224,12 +214,9 @@ func (u User) getGroups() (*awsIAM.ListGroupsForUserOutput, error) {
 
 func (u User) getPolicies() (*awsIAM.ListAttachedUserPoliciesOutput, error) {
 	kl := kiam.Extend("User:getPolicies")
-	sess, err := as.New()
-	if err != nil {
-		return nil, err
-	}
-	client := awsIAM.New(sess)
+	client := session.GetIAMClient()
 
+	var err error
 	var results *awsIAM.ListAttachedUserPoliciesOutput
 	results, err = client.ListAttachedUserPolicies(&awsIAM.ListAttachedUserPoliciesInput{
 		UserName: u.userName,

@@ -11,7 +11,6 @@ import (
 func ListPemKeyUsage() error {
 	kl := k.Extend("ListPemKeyUsage")
 	results, err := getActiveInstances()
-
 	if err != nil {
 		fmt.Println("Failed to list instances")
 		return err

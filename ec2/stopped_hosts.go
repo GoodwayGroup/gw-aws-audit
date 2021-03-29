@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	as "github.com/clok/awssession"
 	"github.com/clok/kemba"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
@@ -17,12 +16,11 @@ var (
 // ListStoppedHosts will list all stopped EC2 hosts and attached EBS Volumes for those hosts for a given region.
 func ListStoppedHosts() error {
 	kl := k.Extend("ListStoppedHosts")
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	client := ec2.New(sess)
-	params := &ec2.DescribeInstancesInput{
+	client := session.GetEC2Client()
+
+	var err error
+	var results *ec2.DescribeInstancesOutput
+	results, err = client.DescribeInstances(&ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
 			{
 				Name: aws.String("instance-state-name"),
@@ -31,10 +29,7 @@ func ListStoppedHosts() error {
 				},
 			},
 		},
-	}
-
-	results, err := client.DescribeInstances(params)
-
+	})
 	if err != nil {
 		fmt.Println("Failed to list instances")
 		return err
@@ -72,13 +67,13 @@ func ListStoppedHosts() error {
 			kl.Printf("%4s found %d volumes", "└>", len(instance.BlockDeviceMappings))
 			for _, b := range instance.BlockDeviceMappings {
 				volCnt++
-				volParams := &ec2.DescribeVolumesInput{
+				var volumes *ec2.DescribeVolumesOutput
+				volumes, err = client.DescribeVolumes(&ec2.DescribeVolumesInput{
 					VolumeIds: []*string{b.Ebs.VolumeId},
-				}
-				volumes, err2 := client.DescribeVolumes(volParams)
-				if err2 != nil {
+				})
+				if err != nil {
 					fmt.Println("Failed to list instances")
-					return err2
+					return err
 				}
 				volumeSize += aws.Int64Value(volumes.Volumes[0].Size)
 
@@ -90,7 +85,8 @@ func ListStoppedHosts() error {
 				}
 				volumeCosts += costs
 
-				snapParams := &ec2.DescribeSnapshotsInput{
+				var snapshots *ec2.DescribeSnapshotsOutput
+				snapshots, err = client.DescribeSnapshots(&ec2.DescribeSnapshotsInput{
 					Filters: []*ec2.Filter{
 						{
 							Name: aws.String("volume-id"),
@@ -99,11 +95,10 @@ func ListStoppedHosts() error {
 							},
 						},
 					},
-				}
-				snapshots, err3 := client.DescribeSnapshots(snapParams)
-				if err3 != nil {
+				})
+				if err != nil {
 					fmt.Println("Failed to list instances")
-					return err3
+					return err
 				}
 				numSnaps := len(snapshots.Snapshots)
 				snapCnt += int64(numSnaps)

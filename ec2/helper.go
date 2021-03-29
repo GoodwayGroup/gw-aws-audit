@@ -4,18 +4,15 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	as "github.com/clok/awssession"
 )
 
 func getActiveInstances() (*ec2.DescribeInstancesOutput, error) {
 	kl := k.Extend("getActiveInstances")
-	sess, err := as.New()
-	if err != nil {
-		return nil, err
-	}
-	client := ec2.New(sess)
+	client := session.GetEC2Client()
 
-	results, err := client.DescribeInstances(&ec2.DescribeInstancesInput{
+	var err error
+	var results *ec2.DescribeInstancesOutput
+	results, err = client.DescribeInstances(&ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
 			{
 				Name: aws.String("instance-state-name"),
@@ -82,14 +79,11 @@ func GetEC2IPs() ([]*Info, error) {
 
 func GetInterfaceIPs() ([]*Info, error) {
 	kl := k.Extend("GetInterfaceIPs")
-	sess, err := as.New()
-	if err != nil {
-		return nil, err
-	}
-	client := ec2.New(sess)
+	client := session.GetEC2Client()
 
-	results, err := client.DescribeNetworkInterfaces(&ec2.DescribeNetworkInterfacesInput{})
-
+	var err error
+	var results *ec2.DescribeNetworkInterfacesOutput
+	results, err = client.DescribeNetworkInterfaces(&ec2.DescribeNetworkInterfacesInput{})
 	if err != nil {
 		fmt.Println("Failed to list interfaces")
 		return nil, err

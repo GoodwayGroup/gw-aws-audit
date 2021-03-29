@@ -5,7 +5,6 @@ import (
 	"github.com/GoodwayGroup/gw-aws-audit/sg"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rds"
-	as "github.com/clok/awssession"
 	"github.com/clok/kemba"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"net"
@@ -15,13 +14,9 @@ import (
 // ListPublicInterfaces will list RDS instances with a public interface attached.
 func ListPublicInterfaces() error {
 	k := kemba.New("gw-aws-audit:rds:ListPublicInterfaces")
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	client := rds.New(sess)
-	cnt := 0
+	client := session.GetRDSClient()
 
+	var err error
 	var result *rds.DescribeDBInstancesOutput
 	result, err = client.DescribeDBInstances(&rds.DescribeDBInstancesInput{})
 
@@ -36,6 +31,7 @@ func ListPublicInterfaces() error {
 	t.AppendHeader(table.Row{"DB Instance", "Engine", "Security Groups"})
 
 	k.Printf("checking %d RDS instances", len(result.DBInstances))
+	cnt := 0
 	for _, db := range result.DBInstances {
 		if aws.BoolValue(db.PubliclyAccessible) {
 			cnt++

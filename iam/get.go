@@ -11,7 +11,6 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/aws/aws-sdk-go/aws"
 	awsIAM "github.com/aws/aws-sdk-go/service/iam"
-	as "github.com/clok/awssession"
 	"github.com/clok/kemba"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
@@ -144,12 +143,9 @@ func renderUsersReport(users []*User, showOnly string) error {
 
 func getUser(user string) (*User, error) {
 	kl := kiam.Extend("getUser")
-	sess, err := as.New()
-	if err != nil {
-		return nil, err
-	}
-	client := awsIAM.New(sess)
+	client := session.GetIAMClient()
 
+	var err error
 	var result *awsIAM.GetUserOutput
 	result, err = client.GetUser(&awsIAM.GetUserInput{
 		UserName: &user,
@@ -171,12 +167,9 @@ func getUser(user string) (*User, error) {
 func getAllUsers(fullDetails bool) ([]*User, error) {
 	kl := kiam.Extend("getAllUsers")
 	kmeta := kl.Extend("meta")
-	sess, err := as.New()
-	if err != nil {
-		return nil, err
-	}
-	client := awsIAM.New(sess)
+	client := session.GetIAMClient()
 
+	var err error
 	var results *awsIAM.ListUsersOutput
 	results, err = client.ListUsers(&awsIAM.ListUsersInput{
 		MaxItems: aws.Int64(1000),
@@ -192,7 +185,6 @@ func getAllUsers(fullDetails bool) ([]*User, error) {
 	total := int64(len(results.Users))
 	users := make([]*User, total)
 	kl.Printf("found %d users", total)
-	// TODO: print out status
 	for i, user := range results.Users {
 		go func(i int, user *awsIAM.User) {
 			defer swg.Done()
@@ -342,12 +334,9 @@ func detachPermissions(permissions []*Permission, user string) error {
 
 func detachPolicyFromUser(user string, arn string) error {
 	kl := kiam.Extend("detachPolicyFromUser")
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	client := awsIAM.New(sess)
+	client := session.GetIAMClient()
 
+	var err error
 	var results *awsIAM.DetachUserPolicyOutput
 	results, err = client.DetachUserPolicy(&awsIAM.DetachUserPolicyInput{
 		UserName:  &user,
@@ -367,12 +356,9 @@ func detachPolicyFromUser(user string, arn string) error {
 
 func removeUserFromGroup(user string, groupName string) error {
 	kl := kiam.Extend("removeUserFromGroup")
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	client := awsIAM.New(sess)
+	client := session.GetIAMClient()
 
+	var err error
 	var results *awsIAM.RemoveUserFromGroupOutput
 	results, err = client.RemoveUserFromGroup(&awsIAM.RemoveUserFromGroupInput{
 		UserName:  &user,

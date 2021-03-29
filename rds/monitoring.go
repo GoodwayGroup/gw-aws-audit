@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rds"
-	as "github.com/clok/awssession"
 	"github.com/clok/kemba"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
@@ -13,13 +12,9 @@ import (
 // List RDS instances with CW Enhanced Monitoring enabled.
 func ListMonitoringEnabled() error {
 	k := kemba.New("gw-aws-audit:rds:ListMonitoringEnabled")
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	client := rds.New(sess)
-	cnt := 0
+	client := session.GetRDSClient()
 
+	var err error
 	var result *rds.DescribeDBInstancesOutput
 	result, err = client.DescribeDBInstances(&rds.DescribeDBInstancesInput{})
 
@@ -34,6 +29,7 @@ func ListMonitoringEnabled() error {
 	t.AppendHeader(table.Row{"DB Instance", "Engine"})
 
 	k.Printf("checking %d RDS instances", len(result.DBInstances))
+	cnt := 0
 	for _, db := range result.DBInstances {
 		if aws.Int64Value(db.MonitoringInterval) != 0 {
 			cnt++

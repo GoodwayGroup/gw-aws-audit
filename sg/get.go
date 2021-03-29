@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	as "github.com/clok/awssession"
 	"github.com/clok/kemba"
 	"strings"
 )
@@ -16,13 +15,10 @@ var (
 // GetSecurityGroups will retrieve a list of Security Group IDs with mapped ports
 func GetSecurityGroups(sgIDs []*string) (map[string]*SecurityGroup, error) {
 	kl := ksg.Extend("get-sg")
-	sess, err := as.New()
-	if err != nil {
-		return nil, err
-	}
-	client := ec2.New(sess)
+	client := session.GetEC2Client()
 
 	kl.Printf("retrieving SG IDs: %# v", sgIDs)
+	var err error
 	var results *ec2.DescribeSecurityGroupsOutput
 	results, err = client.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{
 		GroupIds: sgIDs,
@@ -82,12 +78,9 @@ func processSecurityGroupsResponse(results *ec2.DescribeSecurityGroupsOutput) ma
 
 func getAllSecurityGroups() (map[string]*SecurityGroup, error) {
 	kl := ksg.Extend("get-all-sg")
-	sess, err := as.New()
-	if err != nil {
-		return nil, err
-	}
-	client := ec2.New(sess)
+	client := session.GetEC2Client()
 
+	var err error
 	var results *ec2.DescribeSecurityGroupsOutput
 	results, err = client.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{
 		MaxResults: aws.Int64(1000),
@@ -133,12 +126,9 @@ func buildPortToken(fromPort string, toPort string, proto *string, securityGroup
 
 func detectAttachedSecurityGroups(sgs map[string]*SecurityGroup) error {
 	kl := ksg.Extend("detect-attached")
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	client := ec2.New(sess)
+	client := session.GetEC2Client()
 
+	var err error
 	var results *ec2.DescribeNetworkInterfacesOutput
 	results, err = client.DescribeNetworkInterfaces(&ec2.DescribeNetworkInterfacesInput{
 		MaxResults: aws.Int64(1000),

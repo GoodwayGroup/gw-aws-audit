@@ -5,35 +5,22 @@ import (
 	"github.com/GoodwayGroup/gw-aws-audit/lib"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
+	awsSession "github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	as "github.com/clok/awssession"
 	"github.com/remeh/sizedwaitgroup"
 	"github.com/thoas/go-funk"
 	"sync/atomic"
 )
 
-var (
-	kact  = k.Extend("AddCostTag")
-	ktag  = k.Extend("checkCostTag")
-	kup   = k.Extend("updateTags")
-	khtr  = k.Extend("handleGetTagsResponse")
-	kproc = kact.Extend("processBucket")
-)
-
 // Add the s3-cost-name tag with bucket name as value to ALL S3 Buckets
 func AddCostTag() error {
 	metrics := lib.Metrics{}
+	client := session.GetS3Client()
 
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	s3svc := s3.New(sess)
-
+	var err error
 	var result *s3.ListBucketsOutput
-	result, err = s3svc.ListBuckets(&s3.ListBucketsInput{})
+	result, err = client.ListBuckets(&s3.ListBucketsInput{})
 	if err != nil {
 		fmt.Println("Failed to list buckets")
 		return err
@@ -71,18 +58,17 @@ func AddCostTag() error {
 
 func processBucket(bucketName *string) (details map[string]int) {
 	kproc.Printf("%s | processing", *bucketName)
-	sess, _ := as.New()
-	region, err := s3manager.GetBucketRegion(aws.BackgroundContext(), sess, *bucketName, "us-west-2")
+	region, err := s3manager.GetBucketRegion(aws.BackgroundContext(), session.Session(), *bucketName, "us-west-2")
 	kproc.Printf("%s | region: %s", *bucketName, region)
 	lib.HandleResponse(err)
 
 	// Create session for region
 	// Create region based s3 service
-	s3svc := s3.New(session.Must(session.NewSession(&aws.Config{
+	client := s3.New(awsSession.Must(awsSession.NewSession(&aws.Config{
 		Region: aws.String(region),
 	})))
 
-	if tagSet, hasCostTag := checkCostTag(s3svc, bucketName); !hasCostTag {
+	if tagSet, hasCostTag := checkCostTag(client, bucketName); !hasCostTag {
 		if tagSet != nil {
 			kproc.Printf("%s | hasTags: %# v", *bucketName, tagSet)
 			keys := make([]string, 0, len(tagSet))
@@ -104,7 +90,7 @@ func processBucket(bucketName *string) (details map[string]int) {
 					},
 				}
 
-				if updateTags(s3svc, newTags) {
+				if updateTags(client, newTags) {
 					return map[string]int{"Processed": 1, "Modified": 1}
 				}
 				return map[string]int{"Processed": 1, "Skipped": 1}
@@ -126,7 +112,7 @@ func processBucket(bucketName *string) (details map[string]int) {
 			},
 		}
 
-		if updateTags(s3svc, newTags) {
+		if updateTags(client, newTags) {
 			return map[string]int{"Processed": 1, "Modified": 1}
 		}
 	}
@@ -135,8 +121,8 @@ func processBucket(bucketName *string) (details map[string]int) {
 	return map[string]int{"Processed": 1, "Skipped": 1}
 }
 
-func updateTags(s3svc *s3.S3, newTags *s3.PutBucketTaggingInput) bool {
-	_, err := s3svc.PutBucketTagging(newTags)
+func updateTags(client *s3.S3, newTags *s3.PutBucketTaggingInput) bool {
+	_, err := client.PutBucketTagging(newTags)
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
 			kup.Printf("AWS Error Code: %s", awsErr.Code())
@@ -151,8 +137,8 @@ func updateTags(s3svc *s3.S3, newTags *s3.PutBucketTaggingInput) bool {
 	return true
 }
 
-func checkCostTag(s3svc *s3.S3, bucketName *string) ([]*s3.Tag, bool) {
-	result, err := s3svc.GetBucketTagging(&s3.GetBucketTaggingInput{
+func checkCostTag(client *s3.S3, bucketName *string) ([]*s3.Tag, bool) {
+	result, err := client.GetBucketTagging(&s3.GetBucketTaggingInput{
 		Bucket: bucketName,
 	})
 	hasTags := handleGetTagsResponse(err)

@@ -6,20 +6,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/cenkalti/backoff/v4"
-	as "github.com/clok/awssession"
-	"github.com/clok/kemba"
 	"github.com/remeh/sizedwaitgroup"
 	"github.com/tcnksm/go-input"
 	"github.com/urfave/cli/v2"
 	"os"
 	"sync/atomic"
 	"time"
-)
-
-var (
-	k    = kemba.New("gw-aws-audit:s3")
-	kcbo = k.Extend("ClearBucketObjects")
-	khr  = kcbo.Extend("handleResponse")
 )
 
 // Perform an asynchronous paged bulk delete of ALL objects within a Bucket.
@@ -59,13 +51,8 @@ func ClearBucketObjects(c *cli.Context) error {
 	swg := sizedwaitgroup.New(7)
 	startTime := time.Now()
 
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	s3svc := s3.New(sess)
-
-	err = s3svc.ListObjectsV2Pages(&s3.ListObjectsV2Input{
+	client := session.GetS3Client()
+	err := client.ListObjectsV2Pages(&s3.ListObjectsV2Input{
 		Bucket:  &bucketName,
 		MaxKeys: aws.Int64(1000),
 	},
@@ -88,7 +75,7 @@ func ClearBucketObjects(c *cli.Context) error {
 							},
 						}
 
-						_, err := s3svc.DeleteObjects(&delInput)
+						_, err := client.DeleteObjects(&delInput)
 						hasError := handleResponse(err, &retries)
 						if hasError {
 							dps := float64(deleted) / time.Since(startTime).Seconds()

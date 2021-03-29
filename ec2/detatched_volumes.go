@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	as "github.com/clok/awssession"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 )
@@ -12,14 +11,11 @@ import (
 // ListDetachedVolumes will list all EBS volumes that are in a Detached state, along with predicted associated cost.
 func ListDetachedVolumes() error {
 	kl := k.Extend("ListDetachedVolumes")
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	client := ec2.New(sess)
+	client := session.GetEC2Client()
 
-	results, err := client.DescribeVolumes(&ec2.DescribeVolumesInput{})
-
+	var err error
+	var results *ec2.DescribeVolumesOutput
+	results, err = client.DescribeVolumes(&ec2.DescribeVolumesInput{})
 	if err != nil {
 		fmt.Println("Failed to list instances")
 		return err

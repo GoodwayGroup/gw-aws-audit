@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"github.com/GoodwayGroup/gw-aws-audit/lib"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
+	awsSession "github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatch"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	as "github.com/clok/awssession"
 	"github.com/remeh/sizedwaitgroup"
 	"log"
 	"os"
@@ -16,25 +15,14 @@ import (
 	"time"
 )
 
-var (
-	kmetrics = k.Extend("GetBucketMetrics")
-	kpbm     = kmetrics.Extend("processBucketMetrics")
-)
-
 // Get ALL S3 Bucket metrics for a given region
 func GetBucketMetrics() error {
 	// create logger to STDERR
 	l := log.New(os.Stderr, "", 0)
-
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	s3svc := s3.New(sess)
-
 	l.Println("Starting metrics pull...")
 
-	result, err := s3svc.ListBuckets(&s3.ListBucketsInput{})
+	client := session.GetS3Client()
+	result, err := client.ListBuckets(&s3.ListBucketsInput{})
 	if err != nil {
 		l.Println("Failed to list buckets")
 		return err
@@ -72,19 +60,18 @@ func GetBucketMetrics() error {
 func processBucketMetrics(bucketName *string) (details map[string]int) {
 	kpbm.Printf("%s | processing", *bucketName)
 
-	sess, _ := as.New()
-	region, err := s3manager.GetBucketRegion(aws.BackgroundContext(), sess, *bucketName, "us-west-2")
+	region, err := s3manager.GetBucketRegion(aws.BackgroundContext(), session.Session(), *bucketName, "us-west-2")
 	kpbm.Printf("%s | region: %s", *bucketName, region)
 	lib.HandleResponse(err)
 
 	// Create session for region
-	s3svc := s3.New(session.Must(session.NewSession(&aws.Config{
+	client := s3.New(awsSession.Must(awsSession.NewSession(&aws.Config{
 		Region: aws.String(region),
 	})))
-	cwsvc := cloudwatch.New(sess)
+	cwsvc := session.GetCloudWatchClient()
 
 	// Check for s3-cost-name tag
-	_, hasCostTag := checkCostTag(s3svc, bucketName)
+	_, hasCostTag := checkCostTag(client, bucketName)
 
 	st := time.Now().AddDate(0, 0, -2)
 	et := time.Now().AddDate(0, 0, -1)

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
-	as "github.com/clok/awssession"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"os"
 )
@@ -12,14 +11,12 @@ import (
 // ListMonitoringEnabled will list EC2 instances with CW Enhanced Monitoring enabled.
 func ListMonitoringEnabled() error {
 	kl := k.Extend("ListMonitoringEnabled")
-	sess, err := as.New()
-	if err != nil {
-		return err
-	}
-	client := ec2.New(sess)
-	cnt := 0
+	client := session.GetEC2Client()
 
-	result, err := client.DescribeInstances(&ec2.DescribeInstancesInput{
+	cnt := 0
+	var err error
+	var result *ec2.DescribeInstancesOutput
+	result, err = client.DescribeInstances(&ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
 			{
 				Name: aws.String("monitoring-state"),
