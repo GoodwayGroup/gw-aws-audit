@@ -27,10 +27,13 @@ gw-aws-audit
     - [amazon](#amazon)
     - [direct-ip-mapping, dim](#direct-ip-mapping-dim)
 - [iam](#iam)
-    - [report](#report)
-    - [modify](#modify)
-    - [permissions, p](#permissions-p)
+    - [user](#user)
+        - [report](#report)
+        - [modify](#modify)
+        - [permissions, p](#permissions-p)
+        - [keys](#keys)
     - [keys](#keys)
+        - [deactivate](#deactivate)
 - [cw](#cw)
     - [enhanced-monitoring](#enhanced-monitoring)
 - [install-manpage](#install-manpage)
@@ -237,7 +240,11 @@ This will note Internal and External IP usage as well.
 
 IAM related commands
 
-### report
+### user
+
+Set of commands to take action on AWS Users
+
+#### report
 
 generates report of IAM Users and Access Key Usage
 
@@ -291,7 +298,7 @@ ACCESS KEY DETAILS [sub table]:
 
 **--show-only**="": filter results to show only pass, warn or fail
 
-### modify
+#### modify
 
 modify an IAM User within AWS
 
@@ -304,7 +311,7 @@ and the state of their Access Keys (Active, Inactive, Delete).
 
 **--user, -u**="": user name to look for
 
-### permissions, p
+#### permissions, p
 
 view permissions that are associated with an IAM User
 
@@ -318,7 +325,7 @@ Interactive mode allows for you to detach a permission from an IAM User.
 
 **--user, -u**="": user name to look for
 
-### keys
+#### keys
 
 view Access Keys associated with an IAM User
 
@@ -331,6 +338,26 @@ Interactive mode allows for you to Activate, Deactivate and Delete Access Keys.
 **--interactive, -i**: interactive mode that allows status changes of keys
 
 **--user, -u**="": user name to look for
+
+### keys
+
+Set of commands to take action on AWS Access Keys
+
+#### deactivate
+
+bulk deactivate Access Keys
+
+```
+This action will check ALL Access Keys to determine if they meet the criteria
+to be marked as INACTIVE within IAM.
+
+Current rules are:
+
+- If a keys HAS been used, the last usage was not within the last n(threshold) days
+- If a key has NEVER been used, that the key was created at least n(threshold) days ago
+```
+
+**--threshold**="": number of days to pass as check for qualification (default: 180)
 
 ## cw
 

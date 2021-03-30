@@ -91,6 +91,10 @@ iam
 \[la]#iam\[ra]
 .RS
 .IP \(bu 2
+user
+\[la]#user\[ra]
+.RS
+.IP \(bu 2
 report
 \[la]#report\[ra]
 .IP \(bu 2
@@ -102,6 +106,19 @@ permissions, p
 .IP \(bu 2
 keys
 \[la]#keys\[ra]
+
+.RE
+
+.IP \(bu 2
+keys
+\[la]#keys\[ra]
+.RS
+.IP \(bu 2
+deactivate
+\[la]#deactivate\[ra]
+
+.RE
+
 
 .RE
 
@@ -395,6 +412,10 @@ This will note Internal and External IP usage as well.
 .PP
 IAM related commands
 
+.SS user
+.PP
+Set of commands to take action on AWS Users
+
 .SS report
 .PP
 generates report of IAM Users and Access Key Usage
@@ -517,6 +538,32 @@ Interactive mode allows for you to Activate, Deactivate and Delete Access Keys.
 
 .PP
 \fB\-\-user, \-u\fP="": user name to look for
+
+.SS keys
+.PP
+Set of commands to take action on AWS Access Keys
+
+.SS deactivate
+.PP
+bulk deactivate Access Keys
+
+.PP
+.RS
+
+.nf
+This action will check ALL Access Keys to determine if they meet the criteria
+to be marked as INACTIVE within IAM.
+
+Current rules are:
+
+\- If a keys HAS been used, the last usage was not within the last n(threshold) days
+\- If a key has NEVER been used, that the key was created at least n(threshold) days ago
+
+.fi
+.RE
+
+.PP
+\fB\-\-threshold\fP="": number of days to pass as check for qualification (default: 180)
 
 .SH cw
 .PP
