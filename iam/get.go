@@ -15,7 +15,7 @@ import (
 	"github.com/remeh/sizedwaitgroup"
 )
 
-func getUser(user string) (*User, error) {
+func getUser(user string, opts *buildUserDataOptions) (*User, error) {
 	kl := kiam.Extend("getUser")
 	client := session.GetIAMClient()
 
@@ -30,7 +30,11 @@ func getUser(user string) (*User, error) {
 	kl.Log(result)
 
 	var in *User
-	in, err = buildUserData(result.User, true)
+	in, err = buildUserData(result.User, &buildUserDataOptions{
+		checkConsoleAccess: opts.checkConsoleAccess,
+		getPermissions:     opts.getPermissions,
+		getAccessKeys:      opts.getAccessKeys,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +42,7 @@ func getUser(user string) (*User, error) {
 	return in, nil
 }
 
-func getAllUsers(fullDetails bool) ([]*User, error) {
+func getAllUsers(opts *buildUserDataOptions) ([]*User, error) {
 	kl := kiam.Extend("getAllUsers")
 	kmeta := kl.Extend("meta")
 	client := session.GetIAMClient()
@@ -64,7 +68,11 @@ func getAllUsers(fullDetails bool) ([]*User, error) {
 			defer swg.Done()
 			kmeta.Printf("[%d] Executing goroutine for user %s", i, aws.StringValue(user.UserName))
 			var iu *User
-			iu, err = buildUserData(user, fullDetails)
+			iu, err = buildUserData(user, &buildUserDataOptions{
+				checkConsoleAccess: opts.checkConsoleAccess,
+				getPermissions:     opts.getPermissions,
+				getAccessKeys:      opts.getAccessKeys,
+			})
 			if err != nil {
 				// TODO: Handle panic
 				panic(err)
@@ -87,8 +95,14 @@ func getAllUsers(fullDetails bool) ([]*User, error) {
 	return users, nil
 }
 
-func buildUserData(user *awsIAM.User, fullDetails bool) (*User, error) {
-	kl := kiam.Extend("buildUserData")
+type buildUserDataOptions struct {
+	checkConsoleAccess bool
+	getPermissions     bool
+	getAccessKeys      bool
+}
+
+func buildUserData(user *awsIAM.User, opts *buildUserDataOptions) (*User, error) {
+	kbud.Printf("user '%s' with opts: %# v", *user.Arn, opts)
 	var hasPassword bool
 	if user.PasswordLastUsed != nil {
 		hasPassword = true
@@ -103,24 +117,28 @@ func buildUserData(user *awsIAM.User, fullDetails bool) (*User, error) {
 		hasPassword:      hasPassword,
 	}
 
-	if fullDetails {
+	if opts.checkConsoleAccess {
 		err := iu.detectConsoleAccess()
-		if err != nil {
-			return nil, err
-		}
-
-		err = iu.GetPermissions()
-		if err != nil {
-			return nil, err
-		}
-
-		err = iu.GetAccessKeys()
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	kl.Log(iu)
+	if opts.getPermissions {
+		err := iu.GetPermissions()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if opts.getAccessKeys {
+		err := iu.GetAccessKeys()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	kbuduser.Log(iu)
 
 	return iu, nil
 }
@@ -145,17 +163,17 @@ func promptForPermissionsAction(user *User) error {
 
 func detachPermissions(permissions []*Permission, user string) error {
 	kl := kiam.Extend("detachPermissions")
-	var options []string
+	var opts []string
 	for _, perm := range permissions {
-		options = append(options, perm.ARN)
+		opts = append(opts, perm.ARN)
 	}
 
-	sort.Strings(options)
+	sort.Strings(opts)
 
 	var toDelete []string
 	prompt := &survey.MultiSelect{
 		Message: "Select Permissions to Detach from User:",
-		Options: options,
+		Options: opts,
 	}
 	_ = survey.AskOne(prompt, &toDelete)
 
@@ -286,17 +304,17 @@ func promptForAccessKeyAction(user *User) error {
 func actionOnUserAccessKey(keys []*AccessKey, action string) error {
 	kl := kiam.Extend("actionOnUserAccessKey")
 	kl.Printf("ACTION: %s", action)
-	var options []string
+	var opts []string
 	for _, key := range keys {
-		options = append(options, *key.id)
+		opts = append(opts, *key.id)
 	}
 
-	sort.Strings(options)
+	sort.Strings(opts)
 
 	var toAction []string
 	prompt := &survey.MultiSelect{
-		Message: fmt.Sprintf("Select Access Keys to %s for User:", aurora.Red(action)),
-		Options: options,
+		Message: fmt.Sprintf("Select Access Keys to %s:", aurora.Red(action)),
+		Options: opts,
 	}
 	_ = survey.AskOne(prompt, &toAction)
 

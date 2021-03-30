@@ -2,16 +2,17 @@ package iam
 
 import (
 	"fmt"
-	"github.com/thoas/go-funk"
 	"sort"
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/kyokomi/emoji/v2"
+	"github.com/thoas/go-funk"
 	"github.com/urfave/cli/v2"
 )
 
 var (
-	ActionKeys = &cli.Command{
+	ActionUserKeys = &cli.Command{
 		Name:  "keys",
 		Usage: "view Access Keys associated with an IAM User",
 		UsageText: `
@@ -54,7 +55,7 @@ Interactive mode allows for you to Activate, Deactivate and Delete Access Keys.
 			return nil
 		},
 	}
-	ActionPermissions = &cli.Command{
+	ActionUserPermissions = &cli.Command{
 		Name:    "permissions",
 		Aliases: []string{"p"},
 		Usage:   "view permissions that are associated with an IAM User",
@@ -97,16 +98,16 @@ Interactive mode allows for you to detach a permission from an IAM User.
 			return nil
 		},
 	}
-	ActionUserReport = &cli.Command{
+	ActionDeprecatedUserReport = &cli.Command{
 		Name:      "user-report",
-		Usage:     "DEPRECATED: Please use the `iam report` command",
-		UsageText: "DEPRECATED: Please use the `iam report` command",
+		Usage:     "DEPRECATED: Please use the `iam user report` command",
+		UsageText: "DEPRECATED: Please use the `iam user report` command",
 		Action: func(c *cli.Context) error {
 			return cli.Exit(fmt.Errorf("deprecated: please user the `iam report` command"), 2)
 		},
 		Hidden: true,
 	}
-	ActionReport = &cli.Command{
+	ActionUserReport = &cli.Command{
 		Name:  "report",
 		Usage: "generates report of IAM Users and Access Key Usage",
 		UsageText: `
@@ -166,7 +167,7 @@ ACCESS KEY DETAILS [sub table]:
 			},
 		},
 		Action: func(c *cli.Context) error {
-			kl := kiam.Extend("ActionReport")
+			kl := kiam.Extend("ActionUserReport")
 			showOnly := ""
 			if c.String("show-only") != "" {
 				showOnly = strings.ToLower(c.String("show-only"))
@@ -176,7 +177,11 @@ ACCESS KEY DETAILS [sub table]:
 				return cli.Exit(fmt.Sprintf("Invalid value for show-only. Must be one of: %v", allowedFilters), 3)
 			}
 
-			users, err := getAllUsers(true)
+			users, err := getAllUsers(&buildUserDataOptions{
+				checkConsoleAccess: true,
+				getPermissions:     true,
+				getAccessKeys:      true,
+			})
 			if err != nil {
 				return cli.Exit(err, 2)
 			}
@@ -228,7 +233,7 @@ ACCESS KEY DETAILS [sub table]:
 			return nil
 		},
 	}
-	ActionModify = &cli.Command{
+	ActionUserModify = &cli.Command{
 		Name:  "modify",
 		Usage: "modify an IAM User within AWS",
 		UsageText: `
@@ -247,7 +252,7 @@ and the state of their Access Keys (Active, Inactive, Delete).
 			},
 		},
 		Action: func(c *cli.Context) error {
-			kl := kiam.Extend("ActionModify")
+			kl := kiam.Extend("ActionUserModify")
 			showOnly := ""
 			if c.String("show-only") != "" {
 				showOnly = strings.ToLower(c.String("show-only"))
@@ -261,7 +266,7 @@ and the state of their Access Keys (Active, Inactive, Delete).
 			var user *User
 			passedUser := c.String("user")
 			if passedUser == "" {
-				users, err := getAllUsers(false)
+				users, err := getAllUsers(&buildUserDataOptions{})
 				if err != nil {
 					return cli.Exit(err, 2)
 				}
@@ -285,7 +290,7 @@ and the state of their Access Keys (Active, Inactive, Delete).
 				kl.Log(passedUser)
 			}
 
-			user, err = getUser(passedUser)
+			user, err = getUser(passedUser, &buildUserDataOptions{})
 			if err != nil {
 				return cli.Exit(err, 2)
 			}
@@ -300,6 +305,89 @@ and the state of their Access Keys (Active, Inactive, Delete).
 			err = modifyUser(user)
 			if err != nil {
 				return cli.Exit(err, 2)
+			}
+
+			return nil
+		},
+	}
+	ActionKeysDeactivate = &cli.Command{
+		Name:  "deactivate",
+		Usage: "bulk deactivate Access Keys",
+		UsageText: `
+This action will check ALL Access Keys to determine if they meet the criteria
+to be marked as INACTIVE within IAM.
+
+Current rules are:
+
+- If a keys HAS been used, the last usage was not within the last n(threshold) days
+- If a key has NEVER been used, that the key was created at least n(threshold) days ago
+`,
+		Flags: []cli.Flag{
+			&cli.Int64Flag{
+				Name:  "threshold",
+				Usage: "number of days to pass as check for qualification",
+				Value: 180,
+			},
+		},
+		Action: func(c *cli.Context) error {
+			users, err := getAllUsers(&buildUserDataOptions{
+				checkConsoleAccess: false,
+				getPermissions:     false,
+				getAccessKeys:      true,
+			})
+			if err != nil {
+				return cli.Exit(err, 2)
+			}
+
+			// sort user list
+			sort.Slice(users, func(i, j int) bool {
+				return strings.ToLower(users[i].UserName()) < strings.ToLower(users[j].UserName())
+			})
+
+			var toAction []*AccessKey
+			thresholdCheck := c.Int64("threshold") * 24
+			for _, user := range users {
+				for _, key := range user.accessKeys {
+					if markToDeactivate(key, thresholdCheck) {
+						toAction = append(toAction, key)
+					}
+				}
+			}
+
+			if len(toAction) == 0 {
+				fmt.Println(emoji.Sprint(":check_mark_button: No Access Keys qualify."))
+				return nil
+			}
+
+			fmt.Println(emoji.Sprintf(":warning: Found %d Access Keys that qualify for deactivation :warning:", len(toAction)))
+
+			takeAction := false
+			prompt := &survey.Confirm{
+				Message: "View keys that qualify?",
+			}
+			err = survey.AskOne(prompt, &takeAction)
+			if err != nil {
+				return err
+			}
+
+			if takeAction {
+				renderUserAccessKeys(toAction)
+			}
+
+			takeAction = false
+			p := &survey.Confirm{
+				Message: "Deactivate Keys?",
+			}
+			err = survey.AskOne(p, &takeAction)
+			if err != nil {
+				return err
+			}
+
+			if takeAction {
+				err = actionOnUserAccessKey(toAction, "DEACTIVATE")
+				if err != nil {
+					return err
+				}
 			}
 
 			return nil

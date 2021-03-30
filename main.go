@@ -399,11 +399,25 @@ This will note Internal and External IP usage as well.
 				Name:  "iam",
 				Usage: "IAM related commands",
 				Subcommands: []*cli.Command{
-					iam.ActionUserReport,
-					iam.ActionReport,
-					iam.ActionModify,
-					iam.ActionPermissions,
-					iam.ActionKeys,
+					{
+						Name:  "user",
+						Usage: "Set of commands to take action on AWS Users",
+						Subcommands: []*cli.Command{
+							iam.ActionUserReport,
+							iam.ActionUserModify,
+							iam.ActionUserPermissions,
+							iam.ActionUserKeys,
+						},
+					},
+					{
+						Name:      "keys",
+						Usage:     "Set of commands to take action on AWS Access Keys",
+						UsageText: "",
+						Subcommands: []*cli.Command{
+							iam.ActionKeysDeactivate,
+						},
+					},
+					iam.ActionDeprecatedUserReport,
 				},
 			},
 			{

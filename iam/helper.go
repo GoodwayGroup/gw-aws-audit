@@ -2,6 +2,7 @@ package iam
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go/aws"
 	"time"
 
 	"github.com/hako/durafmt"
@@ -77,4 +78,22 @@ func findAccessKey(a []*AccessKey, id string) *AccessKey {
 		}
 	}
 	return nil
+}
+
+func markToDeactivate(key *AccessKey, daysAgo int64) bool {
+	if aws.StringValue(key.status) == "Inactive" {
+		return false
+	}
+
+	// If the key has NEVER been used, check the create date
+	if key.lastUsed.LastUsedDate == nil {
+		created := int64(time.Since(aws.TimeValue(key.createdDate)).Hours())
+		if created < daysAgo {
+			return false
+		}
+	}
+
+	// If key has not been used in the past N days
+	delta := int64(time.Since(aws.TimeValue(key.lastUsed.LastUsedDate)).Hours())
+	return delta >= daysAgo
 }
