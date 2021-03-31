@@ -116,6 +116,12 @@ keys
 .IP \(bu 2
 deactivate
 \[la]#deactivate\[ra]
+.IP \(bu 2
+recent
+\[la]#recent\[ra]
+.IP \(bu 2
+unused
+\[la]#unused\[ra]
 
 .RE
 
@@ -564,6 +570,28 @@ Current rules are:
 
 .PP
 \fB\-\-threshold\fP="": number of days to pass as check for qualification (default: 180)
+
+.SS recent
+.PP
+list Access Keys that have been recently used
+
+.PP
+.RS
+
+.PP
+This action will check ALL Access Keys to determine if they have been used within the threshold time.
+
+.RE
+
+.PP
+\fB\-\-threshold, \-t\fP="": number of Units to check for qualification (default: 7)
+
+.PP
+\fB\-\-units, \-u\fP="": hours, days, weeks, months (default: days)
+
+.SS unused
+.PP
+list Access Keys that have NEVER been used
 
 .SH cw
 .PP

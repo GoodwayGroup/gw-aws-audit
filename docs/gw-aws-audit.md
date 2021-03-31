@@ -34,6 +34,8 @@ gw-aws-audit
         - [keys](#keys)
     - [keys](#keys)
         - [deactivate](#deactivate)
+        - [recent](#recent)
+        - [unused](#unused)
 - [cw](#cw)
     - [enhanced-monitoring](#enhanced-monitoring)
 - [install-manpage](#install-manpage)
@@ -358,6 +360,20 @@ Current rules are:
 ```
 
 **--threshold**="": number of days to pass as check for qualification (default: 180)
+
+#### recent
+
+list Access Keys that have been recently used
+
+>This action will check ALL Access Keys to determine if they have been used within the threshold time.
+
+**--threshold, -t**="": number of Units to check for qualification (default: 7)
+
+**--units, -u**="": hours, days, weeks, months (default: days)
+
+#### unused
+
+list Access Keys that have NEVER been used
 
 ## cw
 
