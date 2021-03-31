@@ -429,7 +429,7 @@ Current rules are:
 			case "weeks":
 				check = threshold * 7 * 24
 			case "months":
-				check = threshold * 30 * 7 * 24
+				check = threshold * 30 * 24
 			}
 
 			users, err := getAllUsers(&buildUserDataOptions{
