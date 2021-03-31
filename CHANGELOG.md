@@ -2,10 +2,19 @@
 ## [Unreleased]
 
 
+<a name="v1.19.2"></a>
+## [v1.19.2] - 2021-03-31
+### Bug Fixes
+- **iam:** user modify failed to pull all data
+
+
 <a name="v1.19.1"></a>
 ## [v1.19.1] - 2021-03-31
 ### Bug Fixes
 - **iam:** correct month calculation for treshold checks
+
+### Features
+- **release:** v1.19.1
 
 
 <a name="v1.19.0"></a>
@@ -457,7 +466,8 @@ The command `gw-aws-audit iam user-report` has been renamed to `gw-aws-audit iam
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.1...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.2...HEAD
+[v1.19.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.1...v1.19.2
 [v1.19.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.0...v1.19.1
 [v1.19.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.18.0...v1.19.0
 [v1.18.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.17.0...v1.18.0
