@@ -90,18 +90,18 @@ func renderUsersReport(users []*User, showOnly string) error {
 			})
 			summaryStats["totalKeys"] += len(user.accessKeys)
 			for _, key := range user.accessKeys {
-				switch aws.StringValue(key.status) {
+				switch key.Status() {
 				case "Active":
 					summaryStats["activeKeys"]++
 				case "Inactive":
 					summaryStats["inactiveKeys"]++
 				}
 				st.AppendRow([]interface{}{
-					aws.StringValue(key.id),
-					formattedStatus(aws.StringValue(key.status)),
-					dateDuration(aws.TimeValue(key.createdDate), 1),
+					key.ID(),
+					formattedStatus(key.Status()),
+					dateDuration(key.CreatedDate(), 1),
 					formattedDateDuration(dateDuration(aws.TimeValue(key.lastUsed.LastUsedDate), 2)),
-					aws.StringValue(key.lastUsed.ServiceName),
+					key.LastUsedService(),
 				})
 			}
 			if showOnly == "" || showOnly == user.CheckStatus() {
@@ -184,25 +184,28 @@ func renderUserAccessKeys(keys []*AccessKey) {
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleLight)
 	t.AppendHeader(table.Row{
+		"User",
 		"Key ID",
 		"Status",
 		"Age",
 		"Last Used",
 		"Service",
 	})
-	t.SetColumnConfigs([]table.ColumnConfig{
+	configs := []table.ColumnConfig{
 		{Number: 2, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
 		{Number: 3, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
 		{Number: 4, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
 		{Number: 6, Align: text.AlignCenter, AlignHeader: text.AlignCenter},
-	})
+	}
+	t.SetColumnConfigs(configs)
 	for _, key := range keys {
 		t.AppendRow([]interface{}{
-			aws.StringValue(key.id),
-			formattedStatus(aws.StringValue(key.status)),
-			dateDuration(aws.TimeValue(key.createdDate), 1),
-			formattedDateDuration(dateDuration(aws.TimeValue(key.lastUsed.LastUsedDate), 2)),
-			aws.StringValue(key.lastUsed.ServiceName),
+			key.UserName(),
+			key.ID(),
+			formattedStatus(key.Status()),
+			dateDuration(key.CreatedDate(), 1),
+			formattedDateDuration(dateDuration(key.LastUsedDate(), 2)),
+			key.LastUsedService(),
 		})
 	}
 	t.Render()

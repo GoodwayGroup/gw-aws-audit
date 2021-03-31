@@ -415,6 +415,8 @@ This will note Internal and External IP usage as well.
 						UsageText: "",
 						Subcommands: []*cli.Command{
 							iam.ActionKeysDeactivate,
+							iam.ActionKeysRecent,
+							iam.ActionKeysUnused,
 						},
 					},
 					iam.ActionDeprecatedUserReport,

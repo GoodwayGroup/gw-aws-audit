@@ -393,4 +393,115 @@ Current rules are:
 			return nil
 		},
 	}
+	ActionKeysRecent = &cli.Command{
+		Name:      "recent",
+		Usage:     "list Access Keys that have been recently used",
+		UsageText: "This action will check ALL Access Keys to determine if they have been used within the threshold time.",
+		Flags: []cli.Flag{
+			&cli.Int64Flag{
+				Name:    "threshold",
+				Aliases: []string{"t"},
+				Usage:   "number of Units to check for qualification",
+				Value:   7,
+			},
+			&cli.StringFlag{
+				Name:    "units",
+				Aliases: []string{"u"},
+				Usage:   "hours, days, weeks, months",
+				Value:   "days",
+			},
+		},
+		Action: func(c *cli.Context) error {
+			units := strings.ToLower(c.String("units"))
+			allowedFilters := []string{"hours", "days", "weeks", "months"}
+			if !funk.ContainsString(allowedFilters, units) {
+				return cli.Exit(fmt.Sprintf("Invalid value for units. Must be one of: %v", allowedFilters), 3)
+			}
+
+			// convert units to hours
+			threshold := c.Int64("threshold")
+			var check int64
+			switch units {
+			case "hours":
+				check = threshold
+			case "days":
+				check = threshold * 24
+			case "weeks":
+				check = threshold * 7 * 24
+			case "months":
+				check = threshold * 30 * 7 * 24
+			}
+
+			users, err := getAllUsers(&buildUserDataOptions{
+				checkConsoleAccess: false,
+				getPermissions:     false,
+				getAccessKeys:      true,
+			})
+			if err != nil {
+				return cli.Exit(err, 2)
+			}
+
+			var toAction []*AccessKey
+			for _, user := range users {
+				for _, key := range user.accessKeys {
+					if markAsRecentlyUsed(key, check) {
+						toAction = append(toAction, key)
+					}
+				}
+			}
+
+			if len(toAction) == 0 {
+				fmt.Println(emoji.Sprint(":check_mark_button: No Access Keys qualify."))
+				return nil
+			}
+			fmt.Println(emoji.Sprintf(":peacock: Found %d Access Keys used in the last %d %s :whale:", len(toAction), threshold, units))
+
+			// sort Access Keys list from most recent
+			sort.Slice(toAction, func(i, j int) bool {
+				return toAction[i].LastUsedDate().After(toAction[j].LastUsedDate())
+			})
+
+			renderUserAccessKeys(toAction)
+
+			return nil
+		},
+	}
+	ActionKeysUnused = &cli.Command{
+		Name:  "unused",
+		Usage: "list Access Keys that have NEVER been used",
+		Action: func(c *cli.Context) error {
+			users, err := getAllUsers(&buildUserDataOptions{
+				checkConsoleAccess: false,
+				getPermissions:     false,
+				getAccessKeys:      true,
+			})
+			if err != nil {
+				return cli.Exit(err, 2)
+			}
+
+			var toAction []*AccessKey
+			for _, user := range users {
+				for _, key := range user.accessKeys {
+					if markAsNeverUsed(key) {
+						toAction = append(toAction, key)
+					}
+				}
+			}
+
+			if len(toAction) == 0 {
+				fmt.Println(emoji.Sprint(":check_mark_button: No Access Keys qualify."))
+				return nil
+			}
+			fmt.Println(emoji.Sprintf(":doughnut: Found %d Access Keys that have NEVER been used :coffee:", len(toAction)))
+
+			// sort Access Keys list from most recent
+			sort.Slice(toAction, func(i, j int) bool {
+				return toAction[i].CreatedDate().Before(toAction[j].CreatedDate())
+			})
+
+			renderUserAccessKeys(toAction)
+
+			return nil
+		},
+	}
 )
