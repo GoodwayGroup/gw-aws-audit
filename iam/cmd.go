@@ -290,7 +290,11 @@ and the state of their Access Keys (Active, Inactive, Delete).
 				kl.Log(passedUser)
 			}
 
-			user, err = getUser(passedUser, &buildUserDataOptions{})
+			user, err = getUser(passedUser, &buildUserDataOptions{
+				checkConsoleAccess: true,
+				getAccessKeys:      true,
+				getPermissions:     true,
+			})
 			if err != nil {
 				return cli.Exit(err, 2)
 			}
