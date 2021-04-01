@@ -67,6 +67,19 @@ brew install gw-aws-audit
 $ curl https://i.jpillora.com/GoodwayGroup/gw-aws-audit! | bash
 ```
 
+### [docker](https://www.docker.com/)
+The compiled docker images are maintained on [GitHub Container Registry (ghcr.io)](https://github.com/orgs/GoodwayGroup/packages/container/package/gw-aws-audit).
+We maintain the following tags:
+
+- `edge`: Image that is build from the current `HEAD` of the main line branch.
+- `latest`: Image that is built from the [latest released version](https://github.com/GoodwayGroup/gw-aws-audit/releases)
+- `x.y.z` (versions): Images that are build from the tagged versions within Github.
+
+```bash
+docker pull ghcr.io/goodwaygroup/gw-aws-audit
+docker run -v "$PWD":/workdir ghcr.io/goodwaygroup/gw-aws-audit --version
+```
+
 ### man page
 
 To install `man` page:
