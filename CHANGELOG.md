@@ -2,6 +2,16 @@
 ## [Unreleased]
 
 
+<a name="v1.19.4"></a>
+## [v1.19.4] - 2021-04-01
+### Chore
+- udpate readme
+- **make:** update makefile and release process
+
+### Ci
+- **docker:** add docker push to ghcr.io
+
+
 <a name="v1.19.3"></a>
 ## [v1.19.3] - 2021-03-31
 ### Chore
@@ -9,6 +19,7 @@
 
 ### Features
 - **iam:** support viewing inline policies
+- **release:** v1.19.3
 
 
 <a name="v1.19.2"></a>
@@ -478,7 +489,8 @@ The command `gw-aws-audit iam user-report` has been renamed to `gw-aws-audit iam
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.3...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.4...HEAD
+[v1.19.4]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.3...v1.19.4
 [v1.19.3]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.2...v1.19.3
 [v1.19.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.1...v1.19.2
 [v1.19.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.0...v1.19.1
