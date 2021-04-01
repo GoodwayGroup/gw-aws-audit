@@ -176,7 +176,7 @@ func (u *User) GetPermissions() error {
 		})
 	}
 
-	policies, err := u.getPolicies()
+	policies, err := u.getAttachedPolicies()
 	if err != nil {
 		return err
 	}
@@ -186,6 +186,18 @@ func (u *User) GetPermissions() error {
 			Type: "POLICY",
 			ARN:  aws.StringValue(policy.PolicyArn),
 			Name: aws.StringValue(policy.PolicyName),
+		})
+	}
+
+	inline, err := u.getInlinePolicies()
+	if err != nil {
+		return err
+	}
+
+	for _, policy := range inline.PolicyNames {
+		permissions = append(permissions, &Permission{
+			Type: "INLINE",
+			Name: aws.StringValue(policy),
 		})
 	}
 
@@ -212,13 +224,29 @@ func (u User) getGroups() (*awsIAM.ListGroupsForUserOutput, error) {
 	return results, nil
 }
 
-func (u User) getPolicies() (*awsIAM.ListAttachedUserPoliciesOutput, error) {
-	kl := kiam.Extend("User:getPolicies")
+func (u User) getAttachedPolicies() (*awsIAM.ListAttachedUserPoliciesOutput, error) {
+	kl := kiam.Extend("User:getAttachedPolicies")
 	client := session.GetIAMClient()
 
 	var err error
 	var results *awsIAM.ListAttachedUserPoliciesOutput
 	results, err = client.ListAttachedUserPolicies(&awsIAM.ListAttachedUserPoliciesInput{
+		UserName: u.userName,
+	})
+	if err != nil {
+		return nil, err
+	}
+	kl.Log(results)
+	return results, nil
+}
+
+func (u User) getInlinePolicies() (*awsIAM.ListUserPoliciesOutput, error) {
+	kl := kiam.Extend("User:getInlinePolicies")
+	client := session.GetIAMClient()
+
+	var err error
+	var results *awsIAM.ListUserPoliciesOutput
+	results, err = client.ListUserPolicies(&awsIAM.ListUserPoliciesInput{
 		UserName: u.userName,
 	})
 	if err != nil {
@@ -245,7 +273,11 @@ func (u User) Groups() []*Permission {
 }
 
 func (u User) Policies() []*Permission {
-	return permissionsByType(u.permissions, "GROUP")
+	return permissionsByType(u.permissions, "POLICY")
+}
+
+func (u User) InlinePolicies() []*Permission {
+	return permissionsByType(u.permissions, "INLINE")
 }
 
 // TODO: Make the Status more robust

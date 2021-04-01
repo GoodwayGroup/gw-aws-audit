@@ -165,7 +165,9 @@ func detachPermissions(permissions []*Permission, user string) error {
 	kl := kiam.Extend("detachPermissions")
 	var opts []string
 	for _, perm := range permissions {
-		opts = append(opts, perm.ARN)
+		if perm.Type != "INLINE" {
+			opts = append(opts, perm.ARN)
+		}
 	}
 
 	sort.Strings(opts)

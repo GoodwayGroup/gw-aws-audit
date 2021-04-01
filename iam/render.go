@@ -74,7 +74,7 @@ func renderUsersReport(users []*User, showOnly string) error {
 				user.CreatedDateDuration(),
 				formattedYesNo(user.HasConsoleAccess()),
 				user.FormattedLastLoginDateDuration(),
-				fmt.Sprintf("G: %d P: %d", len(user.Groups()), len(user.Policies())),
+				fmt.Sprintf("G: %d P: %d I: %d", len(user.Groups()), len(user.Policies()), len(user.InlinePolicies())),
 				formattedKeyCount(user.AccessKeysCount()),
 			})
 		}
