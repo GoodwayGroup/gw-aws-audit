@@ -39,7 +39,9 @@ snapshot:
   name_template: "{{ .Tag }}-next"
 
 dockers:
-  - image_templates:
+  - ids:
+      - gw-aws-audit
+    image_templates:
       - "ghcr.io/goodwaygroup/gw-aws-audit:{{ .RawVersion }}"
       - "ghcr.io/goodwaygroup/gw-aws-audit:latest"
 

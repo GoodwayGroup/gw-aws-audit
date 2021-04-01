@@ -19,7 +19,12 @@ all: help
 .PHONY: clean
 clean: ## Clean workspace
 	@ $(MAKE) --no-print-directory log-$@
-	@rm -rf bin/ && rm -rf build/ && rm -rf dist/ && rm -rf cover.out
+	rm -rf bin/
+	rm -rf build/
+	rm -rf dist/
+	rm -rf cover.out
+	rm -f ./$(NAME)
+	go mod tidy
 
 .PHONY: test
 test: ## Run tests
@@ -42,13 +47,13 @@ build: clean ## Build gw-aws-audit
 
 alpine: clean ## Build binary for alpine docker image
 	@ $(MAKE) --no-print-directory log-$@
-	env GOOS=linux GARCH=amd64 CGO_ENABLED=0 go build -ldflags=$(LDFLAGS) -o bin/gw-aws-audit ./main.go
+	env GOOS=linux GARCH=amd64 CGO_ENABLED=0 go build -ldflags=$(LDFLAGS) -o $(NAME) ./main.go
 
 .PHONY: docker
 docker: DOCKER_TAG ?= dev
 docker: alpine ## Build Docker image
 	@ $(MAKE) --no-print-directory log-$@
-	docker build --pull --tag ghcr.io/goodwaygroup/gw-aws-audit:$(DOCKER_TAG) .
+	docker build --pull --tag ghcr.io/goodwaygroup/$(NAME):$(DOCKER_TAG) .
 	make clean
 
 ###########

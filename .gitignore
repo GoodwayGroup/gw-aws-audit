@@ -19,6 +19,8 @@ gen
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-build
+build/
 .DS_Store
-bin
+bin/
+dist/
+gw-aws-audit
