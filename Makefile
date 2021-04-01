@@ -27,7 +27,7 @@ test: ## Run tests
 	$(GOHOST) test -covermode atomic -coverprofile cover.out -v ./...
 
 .PHONY: lint
-lint:   ## Run linters
+lint: ## Run linters
 	@ $(MAKE) --no-print-directory log-$@
 	golangci-lint run
 
@@ -39,6 +39,17 @@ build: clean ## Build gw-aws-audit
 	@ $(MAKE) --no-print-directory log-$@
 	@mkdir -p bin/
 	CGO_ENABLED=0 $(GOHOST) build -ldflags=$(LDFLAGS) -o bin/$(NAME) ./main.go
+
+alpine: clean ## Build binary for alpine docker image
+	@ $(MAKE) --no-print-directory log-$@
+	env GOOS=linux GARCH=amd64 CGO_ENABLED=0 go build -ldflags=$(LDFLAGS) -o bin/gw-aws-audit ./main.go
+
+.PHONY: docker
+docker: DOCKER_TAG ?= dev
+docker: alpine ## Build Docker image
+	@ $(MAKE) --no-print-directory log-$@
+	docker build --pull --tag ghcr.io/goodwaygroup/gw-aws-audit:$(DOCKER_TAG) .
+	make clean
 
 ###########
 ##@ Release
@@ -63,7 +74,7 @@ docs: ## Generate new docs
 ##@ Help
 
 .PHONY: help
-help:   ## Display this help
+help: ## Display this help
 	@awk \
 		-v "col=\033[36m" -v "nocol=\033[0m" \
 		' \

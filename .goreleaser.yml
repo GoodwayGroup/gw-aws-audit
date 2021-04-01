@@ -38,6 +38,11 @@ changelog:
 snapshot:
   name_template: "{{ .Tag }}-next"
 
+dockers:
+  - image_templates:
+      - "ghcr.io/goodwaygroup/gw-aws-audit:{{ .RawVersion }}"
+      - "ghcr.io/goodwaygroup/gw-aws-audit:latest"
+
 brews:
   - tap:
       owner: GoodwayGroup
