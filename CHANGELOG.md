@@ -2,11 +2,18 @@
 ## [Unreleased]
 
 
+<a name="v1.19.5"></a>
+## [v1.19.5] - 2021-04-01
+### Bug Fixes
+- **ci:** address docker release bug
+
+
 <a name="v1.19.4"></a>
 ## [v1.19.4] - 2021-04-01
 ### Chore
 - udpate readme
 - **make:** update makefile and release process
+- **release:** v1.19.4
 
 ### Ci
 - **docker:** add docker push to ghcr.io
@@ -489,7 +496,8 @@ The command `gw-aws-audit iam user-report` has been renamed to `gw-aws-audit iam
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.4...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.5...HEAD
+[v1.19.5]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.4...v1.19.5
 [v1.19.4]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.3...v1.19.4
 [v1.19.3]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.2...v1.19.3
 [v1.19.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.1...v1.19.2
