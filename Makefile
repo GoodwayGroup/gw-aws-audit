@@ -47,7 +47,7 @@ build: clean ## Build gw-aws-audit
 
 alpine: clean ## Build binary for alpine docker image
 	@ $(MAKE) --no-print-directory log-$@
-	env GOOS=linux GARCH=amd64 CGO_ENABLED=0 go build -ldflags=$(LDFLAGS) -o $(NAME) ./main.go
+	env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags=$(LDFLAGS) -o $(NAME) ./main.go
 
 .PHONY: docker
 docker: DOCKER_TAG ?= dev
