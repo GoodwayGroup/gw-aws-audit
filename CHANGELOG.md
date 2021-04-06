@@ -2,12 +2,21 @@
 ## [Unreleased]
 
 
+<a name="v1.20.0"></a>
+## [v1.20.0] - 2021-04-06
+### Features
+- **iam:** add ability to disable console access
+
+
 <a name="v1.19.6"></a>
 ## [v1.19.6] - 2021-04-05
 ### Bug Fixes
 - **ci:** fix typo in makefile
 - **deps:** update all non-major dependencies ([#50](https://github.com/GoodwayGroup/gw-aws-audit/issues/50))
 - **deps:** update module github.com/aws/aws-sdk-go to v1.38.12 ([#49](https://github.com/GoodwayGroup/gw-aws-audit/issues/49))
+
+### Chore
+- **release:** v1.19.6
 
 
 <a name="v1.19.5"></a>
@@ -507,7 +516,8 @@ The command `gw-aws-audit iam user-report` has been renamed to `gw-aws-audit iam
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.6...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.20.0...HEAD
+[v1.20.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.6...v1.20.0
 [v1.19.6]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.5...v1.19.6
 [v1.19.5]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.4...v1.19.5
 [v1.19.4]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.3...v1.19.4
