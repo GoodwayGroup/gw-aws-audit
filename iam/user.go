@@ -84,6 +84,24 @@ func (u User) HasConsoleAccess() bool {
 	return u.hasConsoleAccess
 }
 
+func (u *User) DisableConsoleAccess() error {
+	kl := kiam.Extend("User:DisableConsoleAccess")
+	client := session.GetIAMClient()
+
+	var err error
+	var results *awsIAM.DeleteLoginProfileOutput
+	results, err = client.DeleteLoginProfile(&awsIAM.DeleteLoginProfileInput{
+		UserName: u.userName,
+	})
+	kl.Log(results)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (u User) LastLogin() time.Time {
 	return aws.TimeValue(u.passwordLastUsed)
 }

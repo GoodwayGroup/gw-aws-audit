@@ -250,10 +250,28 @@ func removeUserFromGroup(user string, groupName string) error {
 }
 
 func modifyUser(user *User) error {
+	var options []string
+	if user.AccessKeysCount() > 0 {
+		options = append(options, "ACCESS KEYS")
+	}
+
+	if user.PermissionsCount() > 0 {
+		options = append(options, "PERMISSIONS")
+	}
+
+	if user.HasConsoleAccess() {
+		options = append(options, "DISABLE CONSOLE ACCESS")
+	}
+
+	if len(options) == 0 {
+		fmt.Println(emoji.Sprintf(":see_no_evil: No permissions, access keys or console access to modify for %s", user.UserName()))
+		return nil
+	}
+
 	action := ""
 	prompt := &survey.Select{
 		Message: "What would you like to modify:",
-		Options: []string{"ACCESS KEYS", "PERMISSIONS"},
+		Options: options,
 	}
 	err := survey.AskOne(prompt, &action)
 	if err != nil {
@@ -265,11 +283,31 @@ func modifyUser(user *User) error {
 		err = promptForAccessKeyAction(user)
 	case "PERMISSIONS":
 		err = promptForPermissionsAction(user)
+	case "DISABLE CONSOLE ACCESS":
+		err = promptForDisableConsoleAction(user)
 	}
 	if err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func promptForDisableConsoleAction(user *User) error {
+	detach := false
+	prompt := &survey.Confirm{
+		Message: fmt.Sprintf("Disable AWS Console access for %s?", user.UserName()),
+	}
+	err := survey.AskOne(prompt, &detach)
+	if err != nil {
+		return err
+	}
+	if detach {
+		err = user.DisableConsoleAccess()
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

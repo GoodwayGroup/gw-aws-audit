@@ -215,9 +215,13 @@ func viewUserDetails(user *User) {
 	fmt.Println("User Details")
 	renderUserDetails(user)
 
-	fmt.Printf("\nPersmissions\n")
-	renderPermissions(user.Permissions())
+	if user.PermissionsCount() > 0 {
+		fmt.Printf("\nPersmissions\n")
+		renderPermissions(user.Permissions())
+	}
 
-	fmt.Printf("\nAccess Keys\n")
-	renderUserAccessKeys(user.AccessKeys())
+	if user.AccessKeysCount() > 0 {
+		fmt.Printf("\nAccess Keys\n")
+		renderUserAccessKeys(user.AccessKeys())
+	}
 }
