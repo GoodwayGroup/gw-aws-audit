@@ -2,8 +2,20 @@
 ## [Unreleased]
 
 
+<a name="v1.21.0"></a>
+## [v1.21.0] - 2021-04-07
+### Chore
+- **docs:** updating docs for version v1.21.0
+
+### Features
+- **iam:** add delete access key action and refactor
+
+
 <a name="v1.20.0"></a>
 ## [v1.20.0] - 2021-04-06
+### Chore
+- **release:** v1.20.0
+
 ### Features
 - **iam:** add ability to disable console access
 
@@ -516,7 +528,8 @@ The command `gw-aws-audit iam user-report` has been renamed to `gw-aws-audit iam
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.20.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.21.0...HEAD
+[v1.21.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.20.0...v1.21.0
 [v1.20.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.6...v1.20.0
 [v1.19.6]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.5...v1.19.6
 [v1.19.5]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.4...v1.19.5
