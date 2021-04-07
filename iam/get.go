@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -346,7 +347,7 @@ func actionOnUserAccessKey(keys []*AccessKey, action string) error {
 	kl.Printf("ACTION: %s", action)
 	var opts []string
 	for _, key := range keys {
-		opts = append(opts, *key.id)
+		opts = append(opts, fmt.Sprintf("%s\t%s", key.ID(), key.UserName()))
 	}
 
 	sort.Strings(opts)
@@ -366,9 +367,12 @@ func actionOnUserAccessKey(keys []*AccessKey, action string) error {
 	}
 
 	fmt.Printf("Access Keys to %s:\n", aurora.Red(action))
-	for _, id := range toAction {
-		fmt.Printf("\t%s\n", id)
+	var subset []*AccessKey
+	for _, temp := range toAction {
+		parts := strings.Split(temp, "\t")
+		subset = append(subset, findAccessKey(keys, parts[0]))
 	}
+	renderUserAccessKeys(subset, "activity")
 
 	doIt := false
 	confirm := &survey.Confirm{
@@ -378,8 +382,7 @@ func actionOnUserAccessKey(keys []*AccessKey, action string) error {
 	_ = survey.AskOne(confirm, &doIt)
 
 	if doIt {
-		for _, id := range toAction {
-			key := findAccessKey(keys, id)
+		for _, key := range subset {
 			var err error
 			switch action {
 			case "DEACTIVATE":

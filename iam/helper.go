@@ -98,6 +98,24 @@ func markToDeactivate(key *AccessKey, daysAgo int64) bool {
 	return delta >= daysAgo
 }
 
+func markToDelete(key *AccessKey, daysAgo int64) bool {
+	if aws.StringValue(key.status) == "Active" {
+		return false
+	}
+
+	// If the key has NEVER been used, check the create date
+	if key.lastUsed.LastUsedDate == nil {
+		created := int64(time.Since(aws.TimeValue(key.createdDate)).Hours())
+		if created < daysAgo {
+			return false
+		}
+	}
+
+	// If key has not been used in the past N days
+	delta := int64(time.Since(aws.TimeValue(key.lastUsed.LastUsedDate)).Hours())
+	return delta >= daysAgo
+}
+
 func markAsRecentlyUsed(key *AccessKey, check int64) bool {
 	// If the key has NEVER been used, check the create date
 	if key.lastUsed.LastUsedDate == nil {

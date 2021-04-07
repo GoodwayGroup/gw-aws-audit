@@ -179,7 +179,26 @@ func renderUserDetails(user *User) {
 	t.Render()
 }
 
-func renderUserAccessKeys(keys []*AccessKey) {
+func renderUserAccessKeys(keys []*AccessKey, sortBy string) {
+	switch sortBy {
+	case "created":
+		sort.Slice(keys, func(i, j int) bool {
+			return keys[i].CreatedDate().Before(keys[j].CreatedDate())
+		})
+	case "activity":
+		sort.Slice(keys, func(i, j int) bool {
+			return keys[i].LastUsedDate().Before(keys[j].LastUsedDate())
+		})
+	case "name":
+		sort.Slice(keys, func(i, j int) bool {
+			return strings.ToLower(keys[i].UserName()) < strings.ToLower(keys[j].UserName())
+		})
+	default:
+		sort.Slice(keys, func(i, j int) bool {
+			return strings.ToLower(keys[i].ID()) < strings.ToLower(keys[j].ID())
+		})
+	}
+
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.SetStyle(table.StyleLight)
@@ -222,6 +241,6 @@ func viewUserDetails(user *User) {
 
 	if user.AccessKeysCount() > 0 {
 		fmt.Printf("\nAccess Keys\n")
-		renderUserAccessKeys(user.AccessKeys())
+		renderUserAccessKeys(user.AccessKeys(), "activity")
 	}
 }

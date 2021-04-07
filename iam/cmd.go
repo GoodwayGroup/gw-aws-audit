@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/kyokomi/emoji/v2"
 	"github.com/thoas/go-funk"
 	"github.com/urfave/cli/v2"
 )
@@ -43,7 +42,7 @@ Interactive mode allows for you to Activate, Deactivate and Delete Access Keys.
 				return cli.Exit(err, 2)
 			}
 
-			renderUserAccessKeys(user.AccessKeys())
+			renderUserAccessKeys(user.AccessKeys(), "activity")
 
 			if c.Bool("interactive") {
 				err = promptForAccessKeyAction(user)
@@ -333,70 +332,42 @@ Current rules are:
 				Usage: "number of days to pass as check for qualification",
 				Value: 180,
 			},
+			&cli.StringFlag{
+				Name:    "units",
+				Aliases: []string{"u"},
+				Usage:   "hours, days, weeks, months",
+				Value:   "days",
+			},
 		},
-		Action: func(c *cli.Context) error {
-			users, err := getAllUsers(&buildUserDataOptions{
-				checkConsoleAccess: false,
-				getPermissions:     false,
-				getAccessKeys:      true,
-			})
-			if err != nil {
-				return cli.Exit(err, 2)
-			}
+		Action: keyActions,
+	}
+	ActionKeysDelete = &cli.Command{
+		Name:  "delete",
+		Usage: "bulk delete Access Keys",
+		UsageText: `
+This action will check ALL Access Keys to determine if they meet the criteria
+to be DELETED within IAM.
 
-			// sort user list
-			sort.Slice(users, func(i, j int) bool {
-				return strings.ToLower(users[i].UserName()) < strings.ToLower(users[j].UserName())
-			})
+Current rules are:
 
-			var toAction []*AccessKey
-			thresholdCheck := c.Int64("threshold") * 24
-			for _, user := range users {
-				for _, key := range user.accessKeys {
-					if markToDeactivate(key, thresholdCheck) {
-						toAction = append(toAction, key)
-					}
-				}
-			}
-
-			if len(toAction) == 0 {
-				fmt.Println(emoji.Sprint(":check_mark_button: No Access Keys qualify."))
-				return nil
-			}
-
-			fmt.Println(emoji.Sprintf(":warning: Found %d Access Keys that qualify for deactivation :warning:", len(toAction)))
-
-			takeAction := false
-			prompt := &survey.Confirm{
-				Message: "View keys that qualify?",
-			}
-			err = survey.AskOne(prompt, &takeAction)
-			if err != nil {
-				return err
-			}
-
-			if takeAction {
-				renderUserAccessKeys(toAction)
-			}
-
-			takeAction = false
-			p := &survey.Confirm{
-				Message: "Deactivate Keys?",
-			}
-			err = survey.AskOne(p, &takeAction)
-			if err != nil {
-				return err
-			}
-
-			if takeAction {
-				err = actionOnUserAccessKey(toAction, "DEACTIVATE")
-				if err != nil {
-					return err
-				}
-			}
-
-			return nil
+- The Access Key must be set to INACTIVE
+- If a keys HAS been used, the last usage was not within the last n(threshold) days
+- If a key has NEVER been used, that the key was created at least n(threshold) days ago
+`,
+		Flags: []cli.Flag{
+			&cli.Int64Flag{
+				Name:  "threshold",
+				Usage: "number of days to pass as check for qualification",
+				Value: 180,
+			},
+			&cli.StringFlag{
+				Name:    "units",
+				Aliases: []string{"u"},
+				Usage:   "hours, days, weeks, months",
+				Value:   "days",
+			},
 		},
+		Action: keyActions,
 	}
 	ActionKeysRecent = &cli.Command{
 		Name:      "recent",
@@ -416,97 +387,11 @@ Current rules are:
 				Value:   "days",
 			},
 		},
-		Action: func(c *cli.Context) error {
-			units := strings.ToLower(c.String("units"))
-			allowedFilters := []string{"hours", "days", "weeks", "months"}
-			if !funk.ContainsString(allowedFilters, units) {
-				return cli.Exit(fmt.Sprintf("Invalid value for units. Must be one of: %v", allowedFilters), 3)
-			}
-
-			// convert units to hours
-			threshold := c.Int64("threshold")
-			var check int64
-			switch units {
-			case "hours":
-				check = threshold
-			case "days":
-				check = threshold * 24
-			case "weeks":
-				check = threshold * 7 * 24
-			case "months":
-				check = threshold * 30 * 24
-			}
-
-			users, err := getAllUsers(&buildUserDataOptions{
-				checkConsoleAccess: false,
-				getPermissions:     false,
-				getAccessKeys:      true,
-			})
-			if err != nil {
-				return cli.Exit(err, 2)
-			}
-
-			var toAction []*AccessKey
-			for _, user := range users {
-				for _, key := range user.accessKeys {
-					if markAsRecentlyUsed(key, check) {
-						toAction = append(toAction, key)
-					}
-				}
-			}
-
-			if len(toAction) == 0 {
-				fmt.Println(emoji.Sprint(":check_mark_button: No Access Keys qualify."))
-				return nil
-			}
-			fmt.Println(emoji.Sprintf(":peacock: Found %d Access Keys used in the last %d %s :whale:", len(toAction), threshold, units))
-
-			// sort Access Keys list from most recent
-			sort.Slice(toAction, func(i, j int) bool {
-				return toAction[i].LastUsedDate().After(toAction[j].LastUsedDate())
-			})
-
-			renderUserAccessKeys(toAction)
-
-			return nil
-		},
+		Action: keyActions,
 	}
 	ActionKeysUnused = &cli.Command{
-		Name:  "unused",
-		Usage: "list Access Keys that have NEVER been used",
-		Action: func(c *cli.Context) error {
-			users, err := getAllUsers(&buildUserDataOptions{
-				checkConsoleAccess: false,
-				getPermissions:     false,
-				getAccessKeys:      true,
-			})
-			if err != nil {
-				return cli.Exit(err, 2)
-			}
-
-			var toAction []*AccessKey
-			for _, user := range users {
-				for _, key := range user.accessKeys {
-					if markAsNeverUsed(key) {
-						toAction = append(toAction, key)
-					}
-				}
-			}
-
-			if len(toAction) == 0 {
-				fmt.Println(emoji.Sprint(":check_mark_button: No Access Keys qualify."))
-				return nil
-			}
-			fmt.Println(emoji.Sprintf(":doughnut: Found %d Access Keys that have NEVER been used :coffee:", len(toAction)))
-
-			// sort Access Keys list from most recent
-			sort.Slice(toAction, func(i, j int) bool {
-				return toAction[i].CreatedDate().Before(toAction[j].CreatedDate())
-			})
-
-			renderUserAccessKeys(toAction)
-
-			return nil
-		},
+		Name:   "unused",
+		Usage:  "list Access Keys that have NEVER been used",
+		Action: keyActions,
 	}
 )
