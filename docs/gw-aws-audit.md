@@ -34,6 +34,7 @@ gw-aws-audit
         - [keys](#keys)
     - [keys](#keys)
         - [deactivate](#deactivate)
+        - [delete](#delete)
         - [recent](#recent)
         - [unused](#unused)
 - [cw](#cw)
@@ -361,6 +362,27 @@ Current rules are:
 ```
 
 **--threshold**="": number of days to pass as check for qualification (default: 180)
+
+**--units, -u**="": hours, days, weeks, months (default: days)
+
+#### delete
+
+bulk delete Access Keys
+
+```
+This action will check ALL Access Keys to determine if they meet the criteria
+to be DELETED within IAM.
+
+Current rules are:
+
+- The Access Key must be set to INACTIVE
+- If a keys HAS been used, the last usage was not within the last n(threshold) days
+- If a key has NEVER been used, that the key was created at least n(threshold) days ago
+```
+
+**--threshold**="": number of days to pass as check for qualification (default: 180)
+
+**--units, -u**="": hours, days, weeks, months (default: days)
 
 #### recent
 

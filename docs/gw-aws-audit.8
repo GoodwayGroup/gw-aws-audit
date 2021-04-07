@@ -117,6 +117,9 @@ keys
 deactivate
 \[la]#deactivate\[ra]
 .IP \(bu 2
+delete
+\[la]#delete\[ra]
+.IP \(bu 2
 recent
 \[la]#recent\[ra]
 .IP \(bu 2
@@ -571,6 +574,35 @@ Current rules are:
 
 .PP
 \fB\-\-threshold\fP="": number of days to pass as check for qualification (default: 180)
+
+.PP
+\fB\-\-units, \-u\fP="": hours, days, weeks, months (default: days)
+
+.SS delete
+.PP
+bulk delete Access Keys
+
+.PP
+.RS
+
+.nf
+This action will check ALL Access Keys to determine if they meet the criteria
+to be DELETED within IAM.
+
+Current rules are:
+
+\- The Access Key must be set to INACTIVE
+\- If a keys HAS been used, the last usage was not within the last n(threshold) days
+\- If a key has NEVER been used, that the key was created at least n(threshold) days ago
+
+.fi
+.RE
+
+.PP
+\fB\-\-threshold\fP="": number of days to pass as check for qualification (default: 180)
+
+.PP
+\fB\-\-units, \-u\fP="": hours, days, weeks, months (default: days)
 
 .SS recent
 .PP
