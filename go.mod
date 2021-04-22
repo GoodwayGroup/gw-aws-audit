@@ -3,14 +3,14 @@ module github.com/GoodwayGroup/gw-aws-audit
 go 1.16
 
 require (
-	github.com/AlecAivazis/survey/v2 v2.2.9
-	github.com/aws/aws-sdk-go v1.38.20
+	github.com/AlecAivazis/survey/v2 v2.2.12
+	github.com/aws/aws-sdk-go v1.38.24
 	github.com/cenkalti/backoff/v4 v4.1.0
 	github.com/clok/awssession v1.1.1
 	github.com/clok/cdocs v1.1.2
 	github.com/clok/kemba v1.1.1
 	github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd
-	github.com/jedib0t/go-pretty/v6 v6.1.1
+	github.com/jedib0t/go-pretty/v6 v6.2.0
 	github.com/kyokomi/emoji/v2 v2.2.8
 	github.com/logrusorgru/aurora/v3 v3.0.0
 	github.com/remeh/sizedwaitgroup v1.0.0
