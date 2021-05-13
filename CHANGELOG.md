@@ -2,10 +2,24 @@
 ## [Unreleased]
 
 
+<a name="v1.21.1"></a>
+## [v1.21.1] - 2021-05-13
+### Bug Fixes
+- **deps:** update all non-major dependencies ([#57](https://github.com/GoodwayGroup/gw-aws-audit/issues/57))
+- **deps:** update all non-major dependencies ([#55](https://github.com/GoodwayGroup/gw-aws-audit/issues/55))
+- **deps:** update module github.com/aws/aws-sdk-go to v1.38.20 ([#54](https://github.com/GoodwayGroup/gw-aws-audit/issues/54))
+- **deps:** update module github.com/aws/aws-sdk-go to v1.38.19 ([#52](https://github.com/GoodwayGroup/gw-aws-audit/issues/52))
+- **deps:** update all non-major dependencies ([#51](https://github.com/GoodwayGroup/gw-aws-audit/issues/51))
+
+### Chore
+- **deps:** update alpine docker tag to v3.13.5 ([#53](https://github.com/GoodwayGroup/gw-aws-audit/issues/53))
+
+
 <a name="v1.21.0"></a>
 ## [v1.21.0] - 2021-04-07
 ### Chore
 - **docs:** updating docs for version v1.21.0
+- **release:** v1.21.0
 
 ### Features
 - **iam:** add delete access key action and refactor
@@ -528,7 +542,8 @@ The command `gw-aws-audit iam user-report` has been renamed to `gw-aws-audit iam
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.21.0...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.21.1...HEAD
+[v1.21.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.21.0...v1.21.1
 [v1.21.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.20.0...v1.21.0
 [v1.20.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.6...v1.20.0
 [v1.19.6]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.5...v1.19.6
