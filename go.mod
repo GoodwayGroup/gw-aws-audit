@@ -4,8 +4,8 @@ go 1.16
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.2.12
-	github.com/aws/aws-sdk-go v1.38.50
-	github.com/cenkalti/backoff/v4 v4.1.0
+	github.com/aws/aws-sdk-go v1.38.55
+	github.com/cenkalti/backoff/v4 v4.1.1
 	github.com/clok/awssession v1.1.1
 	github.com/clok/cdocs v1.2.0
 	github.com/clok/kemba v1.1.1
