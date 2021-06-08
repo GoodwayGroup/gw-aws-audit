@@ -9,7 +9,7 @@ require (
 	github.com/clok/awssession v1.1.1
 	github.com/clok/cdocs v1.2.0
 	github.com/clok/kemba v1.1.1
-	github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd
+	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/jedib0t/go-pretty/v6 v6.2.2
 	github.com/kyokomi/emoji/v2 v2.2.8
 	github.com/logrusorgru/aurora/v3 v3.0.0
