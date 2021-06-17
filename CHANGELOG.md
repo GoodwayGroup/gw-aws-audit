@@ -2,6 +2,17 @@
 ## [Unreleased]
 
 
+<a name="v1.21.2"></a>
+## [v1.21.2] - 2021-06-10
+### Bug Fixes
+- **deps:** update github.com/hako/durafmt commit hash to 5c1018a ([#60](https://github.com/GoodwayGroup/gw-aws-audit/issues/60))
+- **deps:** update all non-major dependencies ([#59](https://github.com/GoodwayGroup/gw-aws-audit/issues/59))
+- **deps:** update all non-major dependencies ([#58](https://github.com/GoodwayGroup/gw-aws-audit/issues/58))
+
+### Ci
+- update goreleaser token ([#62](https://github.com/GoodwayGroup/gw-aws-audit/issues/62))
+
+
 <a name="v1.21.1"></a>
 ## [v1.21.1] - 2021-05-13
 ### Bug Fixes
@@ -13,6 +24,7 @@
 
 ### Chore
 - **deps:** update alpine docker tag to v3.13.5 ([#53](https://github.com/GoodwayGroup/gw-aws-audit/issues/53))
+- **release:** v1.21.1
 
 
 <a name="v1.21.0"></a>
@@ -542,7 +554,8 @@ The command `gw-aws-audit iam user-report` has been renamed to `gw-aws-audit iam
 - **cli:** initial CLI implementation
 
 
-[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.21.1...HEAD
+[Unreleased]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.21.2...HEAD
+[v1.21.2]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.21.1...v1.21.2
 [v1.21.1]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.21.0...v1.21.1
 [v1.21.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.20.0...v1.21.0
 [v1.20.0]: https://github.com/GoodwayGroup/gw-aws-audit/compare/v1.19.6...v1.20.0
