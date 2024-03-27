@@ -1,4 +1,4 @@
-FROM alpine:3.13.5
+FROM alpine:3.19.1
 
 COPY gw-aws-audit /usr/local/bin/gw-aws-audit
 RUN chmod +x /usr/local/bin/gw-aws-audit
